@@ -43,6 +43,7 @@ export default function useVinylDesigner() {
   
   // Vinyl properties
   const [showVinylProperties, setShowVinylProperties] = useState(false);
+  const [showImageUploader, setShowImageUploader] = useState(false);
   const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null);
   const [selectedMaterialId, setSelectedMaterialId] = useState<number | null>(null);
   const [dimensions, setDimensions] = useState<{ width: number, height: number } | null>(null);
@@ -306,14 +307,85 @@ export default function useVinylDesigner() {
     });
   };
   
-  // Function to add images (placeholder for future implementation)
+  // Function to add images to the canvas
   const addImage = () => {
     if (!canvas) return;
     
     setSelectedTool("image");
-    toast({
-      title: "Image Tool",
-      description: "Image import functionality is coming soon!",
+    setShowImageUploader(true);
+  };
+  
+  // Function to handle the selected image from the uploader
+  const handleImageSelected = (imageData: string, options?: { scale?: number, filter?: string }) => {
+    if (!canvas) return;
+    
+    fabric.Image.fromURL(imageData, (img) => {
+      // Create unique ID for the object
+      const id = `image-${Date.now()}`;
+      
+      // Set the image properties
+      img.set({
+        id,
+        name: `Image ${id}`,
+        left: canvas.width / 2,
+        top: canvas.height / 2,
+        originX: 'center',
+        originY: 'center',
+        opacity: 0 // Start with opacity 0 for animation
+      });
+      
+      // Apply scaling if provided (convert from percentage to decimal)
+      if (options?.scale) {
+        img.scale(options.scale);
+      }
+      
+      // Apply filter if provided
+      if (options?.filter) {
+        switch (options.filter) {
+          case 'grayscale':
+            img.filters = [new fabric.Image.filters.Grayscale()];
+            break;
+          case 'sepia':
+            img.filters = [new fabric.Image.filters.Sepia()];
+            break;
+          case 'invert':
+            img.filters = [new fabric.Image.filters.Invert()];
+            break;
+          case 'blur':
+            img.filters = [new fabric.Image.filters.Blur({ blur: 0.2 })];
+            break;
+          case 'brightness':
+            img.filters = [new fabric.Image.filters.Brightness({ brightness: 0.5 })];
+            break;
+          case 'contrast':
+            img.filters = [new fabric.Image.filters.Contrast({ contrast: 0.5 })];
+            break;
+        }
+        img.applyFilters();
+      }
+      
+      // Add the image to the canvas
+      canvas.add(img);
+      canvas.setActiveObject(img);
+      
+      // Animated entrance
+      (function fadeIn() {
+        img.set('opacity', (img.opacity || 0) + 0.1);
+        canvas.renderAll();
+        if ((img.opacity || 0) < opacity / 100) {
+          requestAnimationFrame(fadeIn);
+        } else {
+          img.set('opacity', opacity / 100);
+          canvas.renderAll();
+          saveToHistory();
+        }
+      })();
+      
+      setSelectedObj(img);
+      toast({
+        title: "Image Added",
+        description: "Image has been added to your design",
+      });
     });
   };
   
@@ -749,6 +821,10 @@ export default function useVinylDesigner() {
     setShowTemplates,
     selectedTool,
     setSelectedTool,
+    // Image uploader
+    showImageUploader,
+    setShowImageUploader,
+    handleImageSelected,
     // Vinyl properties
     showVinylProperties,
     setShowVinylProperties,
