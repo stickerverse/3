@@ -130,7 +130,7 @@ export default function FontGallery({
   return (
     <div className="mt-4 border-t border-neutral-200 dark:border-neutral-800 pt-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium">Font Gallery</h3>
+        <h3 className="text-lg font-medium">Browse your fonts</h3>
         
         <div className="flex items-center space-x-2">
           <div className="relative w-64">
@@ -150,6 +150,10 @@ export default function FontGallery({
             className="w-64"
           />
         </div>
+      </div>
+      
+      <div className="mb-6 bg-neutral-50 dark:bg-neutral-900 p-4 rounded-md border">
+        <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-2">Preview fonts with your own text ...</p>
       </div>
       
       <Tabs defaultValue="all" className="w-full mb-4">
@@ -177,7 +181,7 @@ export default function FontGallery({
       
       <div 
         ref={galleryRef}
-        className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 h-60 overflow-y-auto p-2 border rounded-md"
+        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 h-[450px] overflow-y-auto p-4 border rounded-md bg-neutral-50 dark:bg-neutral-900"
       >
         {isLoading && displayFonts.length === 0 ? (
           <div className="col-span-full h-full flex items-center justify-center">
@@ -188,23 +192,24 @@ export default function FontGallery({
             <button
               key={font}
               className={`
-                p-3 border rounded-md cursor-pointer transition-all w-full block text-left
-                ${font === currentFont ? 'border-primary border-2 bg-primary/5 ring-2 ring-primary/20' : 'border-neutral-200 dark:border-neutral-700 hover:border-primary/50'}
-                hover:shadow-md
+                bg-white dark:bg-neutral-800 border shadow-sm cursor-pointer transition-all w-full block overflow-hidden
+                ${font === currentFont ? 'border-primary ring-2 ring-primary/30' : 'border-neutral-200 dark:border-neutral-700 hover:border-primary/50'}
+                hover:shadow-md rounded-lg flex flex-col
               `}
               onClick={() => onFontSelected(font)}
               onMouseEnter={() => setHoveredFont(font)}
               onMouseLeave={() => setHoveredFont(null)}
             >
-              <div className="text-center" style={{ fontFamily: font }}>
-                <div className="text-xs text-muted-foreground mb-1 truncate font-sans">{font}</div>
+              <div className="p-6 flex items-center justify-center h-32 bg-white dark:bg-neutral-800" style={{ fontFamily: font }}>
                 <div className={`
-                  h-20 overflow-hidden flex items-center justify-center text-base leading-tight rounded-md
-                  bg-neutral-50 dark:bg-neutral-800/50 p-2
-                  ${hoveredFont === font ? 'scale-105 text-primary transition-all duration-200' : ''}
+                  text-4xl overflow-hidden text-center
+                  ${hoveredFont === font ? 'text-primary scale-110 transition-all duration-200' : ''}
                 `}>
-                  {customText}
+                  Aa
                 </div>
+              </div>
+              <div className="text-center p-2 border-t border-neutral-100 dark:border-neutral-700 truncate text-xs bg-neutral-50 dark:bg-neutral-900 font-sans">
+                {font}
               </div>
             </button>
           ))
