@@ -211,19 +211,19 @@ export default function DesignWorkspace({
       </div>
 
       <div className="px-4">
+        <div className="mb-4">
+          <GitHubFontPreviewer
+            onFontSelected={handleFontSelection}
+            defaultText={selectedObj && selectedObj.type === 'text' ? (selectedObj as fabric.Text).text : "Sample Text"}
+          />
+        </div>
+        
         <FontGallery
           visible={showFontGallery}
           currentFont={getCurrentFont() || "Arial"}
           onFontSelected={handleFontSelection}
           sampleText={selectedObj && selectedObj.type === 'text' ? (selectedObj as fabric.Text).text : "Sample Text"}
         />
-        
-        <div className="mt-4 mb-4">
-          <GitHubFontPreviewer
-            onFontSelected={handleFontSelection}
-            defaultText={selectedObj && selectedObj.type === 'text' ? (selectedObj as fabric.Text).text : "Sample Text"}
-          />
-        </div>
       </div>
 
       <div className="bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 px-4 py-1 flex justify-between items-center text-xs text-neutral-500 dark:text-neutral-400">

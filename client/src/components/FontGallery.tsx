@@ -443,11 +443,7 @@ export default function FontGallery({
               </div>
             </button>
           ))
-        ) : (
-          <div className="col-span-full h-full flex items-center justify-center text-muted-foreground">
-            No fonts found matching your search.
-          </div>
-        )}
+        ) : null}
       </div>
       
       <div className="text-xs text-muted-foreground mt-2 text-center">
