@@ -345,7 +345,6 @@ export default function FontGallery({
                   ${font === currentFont ? 'bg-primary/5 dark:bg-primary/10' : ''}
                   overflow-hidden
                 `} 
-                style={{ fontFamily: `"${font}", sans-serif` }}
               >
                 <div className={`
                   ${!customText ? 'text-5xl' : 
@@ -358,6 +357,7 @@ export default function FontGallery({
                   flex justify-center items-center h-full
                 `}>
                   <span 
+                    style={{ fontFamily: `"${font}", sans-serif` }}
                     className={`
                       inline-block transition-all duration-300 line-clamp-3 max-w-full
                       ${hoveredFont === font ? animationStyles[font] || 'animate-float' : ''}

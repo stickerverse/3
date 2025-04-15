@@ -120,18 +120,21 @@ class GoogleFontsService {
     return new Promise((resolve, reject) => {
       WebFont.load({
         google: {
-          families: fontsToLoad
+          families: fontsToLoad.map(font => `${font}:400,700,italic`)
         },
+        classes: false,    // Don't append classes
+        events: false,     // Don't trigger events 
         active: () => {
           // Mark these fonts as loaded
           fontsToLoad.forEach(font => this.loadedFonts.add(font));
+          console.log("Fonts loaded:", fontsToLoad.length, "fonts");
           resolve();
         },
         inactive: () => {
           console.error('Failed to load fonts:', fontsToLoad);
           reject(new Error(`Failed to load fonts: ${fontsToLoad.join(', ')}`));
         },
-        timeout: 5000 // 5 second timeout
+        timeout: 7000 // 7 second timeout
       });
     });
   }
