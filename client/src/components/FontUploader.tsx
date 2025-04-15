@@ -40,15 +40,15 @@ export default function FontUploader({
         'application/font-woff',
         'application/font-woff2'
       ];
-      
+
       // Some browsers don't set the correct MIME type, so we also check extension
       const fileExtension = selectedFile.name.split('.').pop()?.toLowerCase();
       const isValidExtension = ['ttf', 'otf', 'woff', 'woff2'].includes(fileExtension || '');
-      
+
       if (validFileTypes.includes(selectedFile.type) || isValidExtension) {
         setFile(selectedFile);
         setError("");
-        
+
         // Auto-generate font name from file name if not set
         if (!fontName) {
           const nameFromFile = selectedFile.name
@@ -56,7 +56,7 @@ export default function FontUploader({
             .split(/[-_]/)
             .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
             .join(' ');
-          
+
           setFontName(nameFromFile);
         }
       } else {
@@ -83,12 +83,12 @@ export default function FontUploader({
 
       // Read file as base64
       const reader = new FileReader();
-      
+
       reader.onload = async (event) => {
         try {
           const base64Data = event.target?.result as string;
           const fileExtension = file.name.split('.').pop()?.toLowerCase();
-          
+
           const response = await apiRequest('POST', '/api/fonts/upload', {
             fontName: fontName.trim(),
             fontFile: base64Data,
@@ -97,22 +97,22 @@ export default function FontUploader({
 
           if (response.ok) {
             const result = await response.json();
-            
+
             // Invalidate font queries to refresh the font list
             queryClient.invalidateQueries({ queryKey: ['/api/fonts/local'] });
-            
+
             toast({
               title: "Font uploaded successfully",
               description: `Font '${fontName}' is now available in the font selector`,
             });
-            
+
             // Reset form
             setFontName("");
             setFile(null);
             if (fileInputRef.current) {
               fileInputRef.current.value = "";
             }
-            
+
             // Notify parent component
             if (onFontUploaded) {
               onFontUploaded({
@@ -121,7 +121,7 @@ export default function FontUploader({
                 url: result.url
               });
             }
-            
+
             // Close the modal
             setShowUploader(false);
           } else {
@@ -135,12 +135,12 @@ export default function FontUploader({
           setIsUploading(false);
         }
       };
-      
+
       reader.onerror = () => {
         setError("Error reading the font file");
         setIsUploading(false);
       };
-      
+
       reader.readAsDataURL(file);
     } catch (error: any) {
       console.error("Error preparing upload:", error);
@@ -157,7 +157,7 @@ export default function FontUploader({
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       if (fileInputRef.current) {
         fileInputRef.current.files = e.dataTransfer.files;
@@ -172,8 +172,11 @@ export default function FontUploader({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-primary">Upload Custom Font</DialogTitle>
+          <DialogDescription>
+            Upload custom font files to use in your designs
+          </DialogDescription>
         </DialogHeader>
-        
+
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="fontName" className="text-left">Font Name</Label>
@@ -184,7 +187,7 @@ export default function FontUploader({
               onChange={(e) => setFontName(e.target.value)}
             />
           </div>
-          
+
           <div 
             className="border-2 border-dashed rounded-md p-8 text-center cursor-pointer hover:bg-muted/50 transition-colors"
             onDragOver={handleDragOver}
@@ -208,7 +211,7 @@ export default function FontUploader({
               </p>
             </div>
           </div>
-          
+
           {error && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
@@ -216,7 +219,7 @@ export default function FontUploader({
             </Alert>
           )}
         </div>
-        
+
         <DialogFooter>
           <Button
             type="button"

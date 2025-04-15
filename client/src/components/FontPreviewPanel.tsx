@@ -247,16 +247,40 @@ export default function FontPreviewPanel({
   const ensureFontLoaded = (fontFamily: string) => {
     return new Promise<void>((resolve, reject) => {
       if (isFontLoaded(fontFamily)) {
+        console.log(`Font already loaded: ${fontFamily}`);
         resolve();
         return;
       }
       
+      // First attempt: WebFont loader
       WebFont.load({
         google: {
           families: [fontFamily]
         },
-        active: () => resolve(),
-        inactive: () => reject(new Error(`Failed to load font: ${fontFamily}`)),
+        active: () => {
+          console.log(`Font loaded via WebFont: ${fontFamily}`);
+          resolve();
+        },
+        inactive: () => {
+          console.warn(`WebFont failed to load: ${fontFamily}, trying CSS link fallback`);
+          
+          // Second attempt: Direct CSS @import
+          const link = document.createElement('link');
+          link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontFamily)}&display=swap`;
+          link.rel = 'stylesheet';
+          document.head.appendChild(link);
+          
+          // Give it some time to load
+          setTimeout(() => {
+            if (isFontLoaded(fontFamily)) {
+              console.log(`Font loaded via CSS link: ${fontFamily}`);
+              resolve();
+            } else {
+              console.error(`All methods failed to load font: ${fontFamily}`);
+              reject(new Error(`Failed to load font: ${fontFamily}`));
+            }
+          }, 1000);
+        },
         timeout: 5000 // 5 second timeout
       });
     });
@@ -265,27 +289,48 @@ export default function FontPreviewPanel({
   // Handle font selection with loading if needed
   const handleSelectFont = async (font: string) => {
     try {
-      // Check if it's a local font
-      const localFont = localFonts.find(f => f.family === font);
-      if (localFont) {
-        // For local fonts, we use the loadLocalFont function
-        await loadLocalFont(font, localFont.url);
-      } else {
-        // For Google fonts, use WebFont
-        await ensureFontLoaded(font);
-      }
-      
-      // Update the current font
+      // Update the UI immediately for better user experience
       setFont(font);
+      
+      // Show loading indicator
+      const loadingIndicator = document.createElement('div');
+      loadingIndicator.style.position = 'fixed';
+      loadingIndicator.style.bottom = '10px';
+      loadingIndicator.style.right = '10px';
+      loadingIndicator.style.padding = '5px 10px';
+      loadingIndicator.style.background = 'rgba(0,0,0,0.7)';
+      loadingIndicator.style.color = 'white';
+      loadingIndicator.style.borderRadius = '4px';
+      loadingIndicator.textContent = `Loading font: ${font}...`;
+      document.body.appendChild(loadingIndicator);
+      
+      // First, check if it's already loaded
+      if (isFontLoaded(font)) {
+        console.log(`Font already loaded: ${font}`);
+      } else {
+        // Check if it's a local font
+        const localFont = localFonts.find(f => f.family === font);
+        if (localFont) {
+          // For local fonts, we use the loadLocalFont function
+          console.log(`Loading local font: ${font}`);
+          await loadLocalFont(font, localFont.url);
+        } else {
+          // For Google fonts, use WebFont
+          console.log(`Loading Google font: ${font}`);
+          await ensureFontLoaded(font);
+        }
+      }
       
       // Close the dialog if in detail view for better UX
       if (viewMode === "detail") {
         setShowFontPreview(false);
       }
+      
+      // Remove loading indicator
+      document.body.removeChild(loadingIndicator);
     } catch (error) {
       console.error("Error loading font:", error);
-      // Load the font anyway as it might still work
-      setFont(font);
+      // Keep the font selection anyway as it might still work
     }
   };
   

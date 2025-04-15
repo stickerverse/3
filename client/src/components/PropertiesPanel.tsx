@@ -168,13 +168,35 @@ export default function PropertiesPanel({
     const hasLocalPrefix = fontName.startsWith('Local:');
     if (hasLocalPrefix) {
       // For local fonts, we would handle separately, but this is a placeholder
-      // In a real implementation, we'd get the local font URL from storage/API
-      console.log('Loading local font:', fontName);
+      try {
+        const localFonts = await fetch('/api/fonts/local');
+        const localFontsList = await localFonts.json();
+        const fontInfo = localFontsList.fonts.find((f: any) => f.family === fontName);
+        
+        if (fontInfo && fontInfo.url) {
+          await loadLocalFont(fontName, fontInfo.url);
+          console.log('Loaded local font:', fontName);
+          canvas?.renderAll();
+          return;
+        }
+      } catch (error) {
+        console.error('Error loading local font:', error);
+      }
+      
+      console.log('Falling back to web fonts for:', fontName);
       return Promise.resolve();
     }
     
     // For Google fonts, use WebFont loader with multiple fallback methods
     return new Promise<void>((resolve, reject) => {
+      // First check if the font is already loaded
+      if (isFontLoaded(fontName)) {
+        console.log(`Font already loaded: ${fontName}`);
+        canvas?.renderAll();
+        resolve();
+        return;
+      }
+      
       // First try: Use WebFont.load
       WebFont.load({
         google: {
@@ -433,13 +455,29 @@ export default function PropertiesPanel({
                                   setFont(fontName);
                                   
                                   try {
+                                    // Show loading indicator
+                                    const loadingIndicator = document.createElement('div');
+                                    loadingIndicator.style.position = 'fixed';
+                                    loadingIndicator.style.bottom = '10px';
+                                    loadingIndicator.style.right = '10px';
+                                    loadingIndicator.style.padding = '5px 10px';
+                                    loadingIndicator.style.background = 'rgba(0,0,0,0.7)';
+                                    loadingIndicator.style.color = 'white';
+                                    loadingIndicator.style.borderRadius = '4px';
+                                    loadingIndicator.textContent = `Loading font: ${fontName}...`;
+                                    document.body.appendChild(loadingIndicator);
+                                    
                                     // Ensure the font is loaded before applying it
                                     await loadFontIfNeeded(fontName);
                                     
+                                    // Apply the font to the selected object
                                     if (selectedObj && selectedObj.type === 'text') {
                                       (selectedObj as fabric.Text).set({ fontFamily: fontName });
                                       canvas?.renderAll();
                                     }
+                                    
+                                    // Remove the loading indicator
+                                    document.body.removeChild(loadingIndicator);
                                   } catch (error) {
                                     console.error('Error loading font:', error);
                                   } finally {
