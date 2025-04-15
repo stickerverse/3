@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Font Previewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .editor-area {
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    
+    #editor-canvas {
+      width: 100%;
+      height: 200px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 15px;
+      font-size: 24px;
+      box-sizing: border-box;
+      resize: none;
+    }
+    
+    .font-gallery {
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 15px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    
+    .font-box {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      height: 100px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .font-box:hover {
+      border-color: #aaa;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .font-box.selected {
+      border-color: #007bff;
+      border-width: 2px;
+      background-color: #f0f7ff;
+    }
+    
+    .font-name {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 5px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: Arial, sans-serif;
+    }
+    
+    .font-preview {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 16px;
+      overflow: hidden;
+    }
+    
+    .controls {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 18px;
+      color: #666;
+    }
+    
+    #font-size-control {
+      margin-left: 20px;
+      display: flex;
+      align-items: center;
+    }
+    
+    #font-size-control label {
+      margin-right: 10px;
+    }
+    
+    #font-size {
+      width: 60px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Font Previewer</h1>
+    
+    <div class="controls">
+      <div id="font-size-control">
+        <label for="font-size">Font Size:</label>
+        <input type="number" id="font-size" min="8" max="72" value="24">
+      </div>
+    </div>
+    
+    <div class="editor-area">
+      <textarea id="editor-canvas" placeholder="Type your text here to preview it in different fonts...">Sample Text</textarea>
+    </div>
+    
+    <h2>Available Fonts</h2>
+    <div id="font-gallery" class="font-gallery">
+      <div class="loading">Loading fonts from GitHub repository...</div>
+    </div>
+  </div>
+
+  <script>
+    // Configuration
+    const GITHUB_REPO = 'stickerverse/Fonts1';
+    const GITHUB_BRANCH = 'main';
+    const FONT_EXTENSIONS = ['.ttf', '.otf', '.woff', '.woff2'];
+    
+    // Variables
+    let loadedFonts = [];
+    let selectedFontIndex = -1;
+    let editorText = 'Sample Text';
+    
+    // DOM Elements
+    const editorCanvas = document.getElementById('editor-canvas');
+    const fontGallery = document.getElementById('font-gallery');
+    const fontSizeInput = document.getElementById('font-size');
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      editorCanvas.addEventListener('input', updatePreviews);
+      fontSizeInput.addEventListener('change', updateFontSize);
+      
+      try {
+        await loadFontsFromGitHub();
+        updatePreviews();
+      } catch (error) {
+        console.error('Error loading fonts:', error);
+        fontGallery.innerHTML = `<div class="loading">Error loading fonts: ${error.message}</div>`;
+      }
+    });
+    
+    // Load fonts from GitHub repository
+    async function loadFontsFromGitHub() {
+      try {
+        // First approach: Try to use GitHub API to list contents
+        const fontFiles = await fetchFontFilesFromGitHub();
+        
+        if (fontFiles.length === 0) {
+          throw new Error('No font files found in the repository');
+        }
+        
+        fontGallery.innerHTML = '';
+        
+        // Process each font file
+        for (let i = 0; i < fontFiles.length; i++) {
+          const fontFile = fontFiles[i];
+          const fontName = getFontNameFromPath(fontFile.path);
+          const fontUrl = `https://cdn.jsdelivr.net/gh/${GITHUB_REPO}@${GITHUB_BRANCH}/${fontFile.path}`;
+          
+          // Create font face
+          const fontFaceRule = `
+            @font-face {
+              font-family: '${fontName}';
+              src: url('${fontUrl}') format('${getFormatFromExtension(getExtension(fontFile.path))}');
+              font-weight: normal;
+              font-style: normal;
+            }
+          `;
+          
+          // Add font face to document
+          const style = document.createElement('style');
+          style.textContent = fontFaceRule;
+          document.head.appendChild(style);
+          
+          // Add font to loaded fonts array
+          loadedFonts.push({
+            name: fontName,
+            family: fontName,
+            url: fontUrl,
+            path: fontFile.path
+          });
+          
+          // Create font preview box
+          createFontBox(fontName, i);
+        }
+        
+        // Set first font as selected
+        if (loadedFonts.length > 0) {
+          selectFont(0);
+        }
+        
+      } catch (error) {
+        console.error('Error fetching font files:', error);
+        // Fallback approach: Use a predefined list or generate from common patterns
+        await loadFallbackFonts();
+      }
+    }
+    
+    // Fetch font files from GitHub repository using GitHub API
+    async function fetchFontFilesFromGitHub() {
+      // This approach requires API calls to GitHub which may be rate-limited
+      // For production use, you might want to implement a server-side solution
+      // or generate a static list of fonts
+
+      // For demo purposes, we'll use a simplified approach to list some font files
+      // In a real implementation, you would recursively traverse directories
+      
+      const apiUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents?ref=${GITHUB_BRANCH}`;
+      const response = await fetch(apiUrl);
+      
+      if (!response.ok) {
+        throw new Error(`GitHub API error: ${response.status}`);
+      }
+      
+      const contents = await response.json();
+      
+      // Filter for font files
+      return contents.filter(item => {
+        return item.type === 'file' && FONT_EXTENSIONS.some(ext => item.path.toLowerCase().endsWith(ext));
+      });
+    }
+    
+    // Fallback method: Load a predefined set of fonts
+    async function loadFallbackFonts() {
+      fontGallery.innerHTML = '<div class="loading">Using fallback font loading method...</div>';
+      
+      // Simulate font discovery with common font patterns
+      const fontPaths = generateFontPaths();
+      
+      fontGallery.innerHTML = '';
+      
+      // Process each font path
+      for (let i = 0; i < fontPaths.length; i++) {
+        const fontPath = fontPaths[i];
+        const fontName = getFontNameFromPath(fontPath);
+        const fontUrl = `https://cdn.jsdelivr.net/gh/${GITHUB_REPO}@${GITHUB_BRANCH}/${fontPath}`;
+        
+        try {
+          // Check if font exists by trying to load it
+          const fontExists = await checkFontExists(fontUrl);
+          
+          if (fontExists) {
+            // Create font face
+            const fontFaceRule = `
+              @font-face {
+                font-family: '${fontName}';
+                src: url('${fontUrl}') format('${getFormatFromExtension(getExtension(fontPath))}');
+                font-weight: normal;
+                font-style: normal;
+              }
+            `;
+            
+            // Add font face to document
+            const style = document.createElement('style');
+            style.textContent = fontFaceRule;
+            document.head.appendChild(style);
+            
+            // Add font to loaded fonts array
+            loadedFonts.push({
+              name: fontName,
+              family: fontName,
+              url: fontUrl,
+              path: fontPath
+            });
+            
+            // Create font preview box
+            createFontBox(fontName, loadedFonts.length - 1);
+          }
+        } catch (error) {
+          console.warn(`Failed to load font ${fontName}:`, error);
+        }
+      }
+      
+      if (loadedFonts.length === 0) {
+        fontGallery.innerHTML = '<div class="loading">No fonts could be loaded. Please check the repository structure.</div>';
+      } else if (loadedFonts.length > 0) {
+        selectFont(0);
+      }
+    }
+    
+    // Generate common font paths to try
+    function generateFontPaths() {
+      const paths = [];
+      
+      // Try some common patterns
+      for (const ext of FONT_EXTENSIONS) {
+        // Try root directory
+        paths.push(`font1${ext}`, `font2${ext}`, `Arial${ext}`, `Helvetica${ext}`, `Times${ext}`);
+        
+        // Try common subdirectories
+        paths.push(`fonts/font1${ext}`, `fonts/font2${ext}`);
+        paths.push(`font/font1${ext}`, `font/font2${ext}`);
+      }
+      
+      return paths;
+    }
+    
+    // Check if a font file exists at the given URL
+    async function checkFontExists(url) {
+      try {
+        const response = await fetch(url, { method: 'HEAD' });
+        return response.ok;
+      } catch (error) {
+        return false;
+      }
+    }
+    
+    // Create a font preview box
+    function createFontBox(fontName, index) {
+      const fontBox = document.createElement('div');
+      fontBox.className = 'font-box';
+      fontBox.dataset.index = index;
+      
+      const nameElement = document.createElement('div');
+      nameElement.className = 'font-name';
+      nameElement.textContent = fontName;
+      
+      const previewElement = document.createElement('div');
+      previewElement.className = 'font-preview';
+      previewElement.style.fontFamily = `'${fontName}', sans-serif`;
+      previewElement.textContent = editorText;
+      
+      fontBox.appendChild(nameElement);
+      fontBox.appendChild(previewElement);
+      
+      fontBox.addEventListener('click', () => {
+        selectFont(index);
+      });
+      
+      fontGallery.appendChild(fontBox);
+    }
+    
+    // Select a font
+    function selectFont(index) {
+      // Remove selection from previous font
+      if (selectedFontIndex !== -1) {
+        const prevBox = document.querySelector(`.font-box[data-index="${selectedFontIndex}"]`);
+        if (prevBox) {
+          prevBox.classList.remove('selected');
+        }
+      }
+      
+      // Set new selection
+      selectedFontIndex = index;
+      const selectedFont = loadedFonts[index];
+      
+      // Update editor font
+      editorCanvas.style.fontFamily = `'${selectedFont.family}', sans-serif`;
+      
+      // Update selection visual
+      const currentBox = document.querySelector(`.font-box[data-index="${index}"]`);
+      if (currentBox) {
+        currentBox.classList.add('selected');
+        
+        // Scroll to make selected font visible if needed
+        currentBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+    
+    // Update font previews when text changes
+    function updatePreviews() {
+      editorText = editorCanvas.value || 'Sample Text';
+      
+      // Update all preview boxes
+      const previewElements = document.querySelectorAll('.font-preview');
+      previewElements.forEach(element => {
+        element.textContent = editorText;
+      });
+    }
+    
+    // Update font size
+    function updateFontSize() {
+      const fontSize = fontSizeInput.value;
+      editorCanvas.style.fontSize = `${fontSize}px`;
+    }
+    
+    // Helper function to get font name from file path
+    function getFontNameFromPath(path) {
+      // Extract filename without extension
+      const fileName = path.split('/').pop().split('.')[0];
+      
+      // Clean up the name
+      return fileName
+        .replace(/[_-]/g, ' ') // Replace underscores and hyphens with spaces
+        .replace(/([A-Z])/g, ' $1') // Add spaces before capital letters
+        .trim();
+    }
+    
+    // Helper function to get file extension
+    function getExtension(path) {
+      return path.split('.').pop().toLowerCase();
+    }
+    
+    // Helper function to get font format based on file extension
+    function getFormatFromExtension(ext) {
+      switch (ext) {
+        case 'ttf': return 'truetype';
+        case 'otf': return 'opentype';
+        case 'woff': return 'woff';
+        case 'woff2': return 'woff2';
+        default: return 'truetype';
+      }
+    }
+  </script>
+</body>
+</html>

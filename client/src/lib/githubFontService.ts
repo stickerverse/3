@@ -9,8 +9,12 @@ interface GitHubFileInfo {
 
 class GitHubFontService {
   private repoUrl: string = 'https://api.github.com/repos/stickerverse/Fonts1/contents';
+  private repoOwner: string = 'stickerverse';
+  private repoName: string = 'Fonts1';
+  private repoBranch: string = 'main';
   private fontsCache: GitHubFileInfo[] = [];
   private loadedRepos: Set<string> = new Set();
+  private FONT_EXTENSIONS = ['.ttf', '.otf', '.woff', '.woff2'];
   
   /**
    * Fetches font files from a GitHub repository
@@ -34,10 +38,7 @@ class GitHubFontService {
         }
         
         const lowerName = file.name.toLowerCase();
-        return lowerName.endsWith('.ttf') || 
-               lowerName.endsWith('.otf') || 
-               lowerName.endsWith('.woff') || 
-               lowerName.endsWith('.woff2');
+        return this.FONT_EXTENSIONS.some(ext => lowerName.endsWith(ext));
       });
       
       // Cache the results
@@ -52,8 +53,99 @@ class GitHubFontService {
       return this.fontsCache;
     } catch (error) {
       console.error('Error fetching fonts from GitHub:', error);
-      return [];
+      // Try fallback method if GitHub API fails
+      return this.useFallbackMethod();
     }
+  }
+  
+  /**
+   * Fallback method to try accessing fonts through jsdelivr CDN
+   * This is useful when GitHub API is rate limited
+   */
+  private async useFallbackMethod(): Promise<GitHubFileInfo[]> {
+    console.log('Using fallback method to load GitHub fonts');
+    const fontPaths = this.generatePotentialFontPaths();
+    const foundFonts: GitHubFileInfo[] = [];
+    
+    for (const fontPath of fontPaths) {
+      // Construct the jsdelivr URL
+      const cdnUrl = `https://cdn.jsdelivr.net/gh/${this.repoOwner}/${this.repoName}@${this.repoBranch}/${fontPath}`;
+      
+      try {
+        // Check if the font exists by doing a HEAD request
+        const exists = await this.checkFontExists(cdnUrl);
+        
+        if (exists) {
+          // Extract font name from path
+          const name = fontPath.split('/').pop() || '';
+          
+          foundFonts.push({
+            name,
+            path: fontPath,
+            download_url: cdnUrl,
+            type: 'file'
+          });
+          
+          console.log(`Found font via fallback method: ${name}`);
+        }
+      } catch (error) {
+        // Skip failed fonts silently
+      }
+    }
+    
+    // Cache the results
+    this.fontsCache = [...this.fontsCache, ...foundFonts];
+    return foundFonts;
+  }
+  
+  /**
+   * Check if a font file exists at the given URL
+   */
+  private async checkFontExists(url: string): Promise<boolean> {
+    try {
+      const response = await fetch(url, { method: 'HEAD' });
+      return response.ok;
+    } catch (error) {
+      return false;
+    }
+  }
+  
+  /**
+   * Generate potential font file paths to try
+   * Uses common patterns and directories that might exist in font repositories
+   */
+  private generatePotentialFontPaths(): string[] {
+    const paths: string[] = [];
+    
+    // Try some common font names with different extensions
+    const fontNames = [
+      'Arial', 'Helvetica', 'Times', 'Georgia', 'Verdana', 'Courier', 
+      'Impact', 'Comic', 'Trebuchet', 'Palatino', 'Garamond', 'Bookman',
+      'Avant', 'Century', 'Futura', 'Geneva', 'Helvetica', 'Monaco',
+      'Font', 'Regular', 'Bold', 'Medium', 'Thin', 'Light', 'Heavy',
+      'Italic', 'Condensed', 'Extended', 'Mono', 'Sans', 'Serif',
+      'Display', 'Title', 'Text', 'Heading', 'Body', 'Base'
+    ];
+    
+    // Try common directories
+    const commonDirs = ['', 'fonts/', 'font/', 'assets/', 'assets/fonts/', 'static/fonts/', 'public/fonts/'];
+    
+    // Generate all combinations
+    for (const dir of commonDirs) {
+      for (const name of fontNames) {
+        for (const ext of this.FONT_EXTENSIONS) {
+          paths.push(`${dir}${name}${ext}`);
+          paths.push(`${dir}${name.toLowerCase()}${ext}`);
+          
+          // Add some variants
+          paths.push(`${dir}${name}-Regular${ext}`);
+          paths.push(`${dir}${name}-Bold${ext}`);
+          paths.push(`${dir}${name}-Italic${ext}`);
+        }
+      }
+    }
+    
+    return paths;
   }
   
   /**
@@ -62,7 +154,13 @@ class GitHubFontService {
    */
   async loadFontsFromGitHub(repoUrl?: string): Promise<string[]> {
     if (repoUrl) {
-      this.repoUrl = `https://api.github.com/repos/${repoUrl}/contents`;
+      // Parse the repository URL to extract owner and name
+      const parts = repoUrl.split('/');
+      if (parts.length >= 2) {
+        this.repoOwner = parts[0];
+        this.repoName = parts[1];
+        this.repoUrl = `https://api.github.com/repos/${repoUrl}/contents`;
+      }
     }
     
     // If we've already loaded this repo, don't reload

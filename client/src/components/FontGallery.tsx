@@ -419,6 +419,7 @@ export default function FontGallery({
                       ${customText ? 'px-1' : ''}
                       ${!hoveredFont && customText ? 'py-2 px-3 bg-white/10 dark:bg-black/10 rounded-md' : ''}
                       ${!googleFontsService.isFontLoaded(font) && !categories['github']?.includes(font) ? 'opacity-70' : ''}
+                      ${categories['github']?.includes(font) ? 'font-bold' : ''}
                     `}
                   >
                     {hoveredFont === font 

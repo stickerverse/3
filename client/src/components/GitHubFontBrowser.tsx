@@ -139,15 +139,17 @@ export default function GitHubFontBrowser({
               {loadedFonts.map((fontName, index) => (
                 <div 
                   key={`github-browser-font-${index}-${fontName}`}
-                  className="border p-4 rounded-md hover:border-primary hover:bg-primary/5 transition-colors"
+                  className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:border-primary/50 hover:scale-105 transition-all duration-200"
                 >
                   <div
-                    className="text-xl mb-2 h-14 flex items-center justify-center overflow-hidden"
+                    className="flex items-center justify-center h-36 p-4 bg-white dark:bg-neutral-800 overflow-hidden"
                     style={{ fontFamily: fontName }}
                   >
-                    {previewText || "Aa Bb Cc"}
+                    <span className="text-5xl">
+                      {previewText || "Aa"}
+                    </span>
                   </div>
-                  <div className="text-sm text-center truncate font-medium">
+                  <div className="text-sm text-center p-2 border-t border-neutral-100 dark:border-neutral-700 truncate font-medium bg-neutral-50 dark:bg-neutral-900">
                     {fontName}
                   </div>
                 </div>
