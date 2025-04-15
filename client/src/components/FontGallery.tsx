@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import googleFontsService from "../lib/googleFontsService";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, HardDrive } from "lucide-react";
+import { Search, HardDrive } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SystemFontBrowser from "./SystemFontBrowser";
+import FontComparison from "./FontComparison";
 
 interface FontGalleryProps {
   currentFont: string;
@@ -321,14 +322,22 @@ export default function FontGallery({
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-medium">Browse your fonts</h3>
 
-        <div className="relative w-64">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search fonts..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-8"
-          />
+        <div className="flex gap-2">
+          <div className="relative w-64">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search fonts..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+          <div className="w-48">
+            <FontComparison 
+              currentFont={currentFont}
+              onFontSelected={onFontSelected}
+            />
+          </div>
         </div>
       </div>
 
