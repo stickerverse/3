@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import googleFontsService from "../lib/googleFontsService";
+import githubFontService from "../lib/githubFontService";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, Github } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface FontGalleryProps {
@@ -117,24 +118,55 @@ export default function FontGallery({
     
     setIsLoading(true);
     
-    let filteredFonts = activeCategory === "all"
-      ? fonts
-      : categories[activeCategory] || [];
+    const loadGithubFonts = async () => {
+      if (activeCategory === "github") {
+        try {
+          // Load fonts from GitHub if they haven't been loaded yet
+          if (!categories['github'] || categories['github'].length === 0) {
+            // Load fonts from GitHub repo
+            const githubFonts = await githubFontService.loadFontsFromGitHub("stickerverse/Fonts1");
+            
+            // Update categories with GitHub fonts
+            const updatedCategories = { ...categories, github: githubFonts };
+            setCategories(updatedCategories);
+            
+            // Display GitHub fonts
+            setDisplayFonts(githubFonts);
+          } else {
+            // Display GitHub fonts from cache
+            setDisplayFonts(categories['github']);
+          }
+        } catch (error) {
+          console.error("Error loading GitHub fonts:", error);
+          setDisplayFonts([]);
+        } finally {
+          setIsLoading(false);
+        }
+        return; // Exit early
+      }
       
-    if (searchQuery) {
-      filteredFonts = filteredFonts.filter(font => 
-        font.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
+      // For non-GitHub categories
+      let filteredFonts = activeCategory === "all"
+        ? fonts
+        : categories[activeCategory] || [];
+        
+      if (searchQuery) {
+        filteredFonts = filteredFonts.filter(font => 
+          font.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+      
+      // Reset to show only first batch of filtered fonts
+      setDisplayFonts(filteredFonts.slice(0, 50));
+      
+      // Preload the visible fonts
+      googleFontsService.loadFonts(filteredFonts.slice(0, 50));
+      
+      setIsLoading(false);
+    };
     
-    // Reset to show only first batch of filtered fonts
-    setDisplayFonts(filteredFonts.slice(0, 50));
-    
-    // Preload the visible fonts
-    googleFontsService.loadFonts(filteredFonts.slice(0, 50));
-    
-    setIsLoading(false);
-  }, [searchQuery, activeCategory, visible]);
+    loadGithubFonts();
+  }, [searchQuery, activeCategory, visible, categories]);
   
   const handleCategoryChange = (category: string) => {
     setActiveCategory(category);
@@ -309,6 +341,10 @@ export default function FontGallery({
           <TabsTrigger value="all" onClick={() => handleCategoryChange("all")}>
             All Fonts
           </TabsTrigger>
+          <TabsTrigger value="github" onClick={() => handleCategoryChange("github")}>
+            <Github className="h-4 w-4 mr-1" />
+            GitHub Fonts
+          </TabsTrigger>
           <TabsTrigger value="sans-serif" onClick={() => handleCategoryChange("sans-serif")}>
             Sans Serif
           </TabsTrigger>
@@ -370,7 +406,7 @@ export default function FontGallery({
                 `}>
                   <span 
                     style={{ 
-                      fontFamily: googleFontsService.isFontLoaded(font) 
+                      fontFamily: (googleFontsService.isFontLoaded(font) || categories['github']?.includes(font))
                         ? `"${font}", sans-serif` 
                         : 'system-ui, sans-serif',
                       fontDisplay: 'swap'
@@ -382,7 +418,7 @@ export default function FontGallery({
                       ${hoveredFont !== font && font === currentFont ? 'bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent ring-2 ring-primary/20 rounded-md px-2 py-1' : ''}
                       ${customText ? 'px-1' : ''}
                       ${!hoveredFont && customText ? 'py-2 px-3 bg-white/10 dark:bg-black/10 rounded-md' : ''}
-                      ${!googleFontsService.isFontLoaded(font) ? 'opacity-70' : ''}
+                      ${!googleFontsService.isFontLoaded(font) && !categories['github']?.includes(font) ? 'opacity-70' : ''}
                     `}
                   >
                     {hoveredFont === font 
