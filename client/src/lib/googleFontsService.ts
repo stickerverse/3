@@ -16,7 +16,8 @@ class GoogleFontsService {
   
   // Font categories for organization
   categories: Record<string, string[]> = {
-    'local': [],     // New category for local fonts
+    'local': [],     // Category for local fonts
+    'github': [],    // Category for GitHub fonts
     'serif': [],
     'sans-serif': [],
     'display': [],
@@ -462,6 +463,67 @@ class GoogleFontsService {
    */
   getLocalFontUrl(fontFamily: string): string | undefined {
     return this.localFontUrls.get(fontFamily);
+  }
+  
+  /**
+   * Get the font format from a filename
+   * @param fileName The name of the font file
+   * @returns The format as a string (woff, woff2, opentype, truetype)
+   */
+  getFontFormat(fileName: string): string {
+    const lowerName = fileName.toLowerCase();
+    if (lowerName.endsWith('.woff2')) return 'woff2';
+    if (lowerName.endsWith('.woff')) return 'woff';
+    if (lowerName.endsWith('.otf')) return 'opentype';
+    if (lowerName.endsWith('.ttf')) return 'truetype';
+    return 'truetype'; // Default to truetype
+  }
+  
+  /**
+   * Register a font from a direct URL (e.g. from GitHub)
+   * @param fontFamily The font family name
+   * @param url The direct URL to the font file
+   * @returns True if registration was successful
+   */
+  registerFontFromUrl(fontFamily: string, url: string): boolean {
+    try {
+      // Get the file name from the URL
+      const fileName = url.split('/').pop() || '';
+      
+      // Create a style element with the font-face declaration
+      const style = document.createElement('style');
+      style.textContent = `
+        @font-face {
+          font-family: '${fontFamily}';
+          src: url('${url}') format('${this.getFontFormat(fileName)}');
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+        }
+      `;
+      document.head.appendChild(style);
+      
+      // Add to github fonts category
+      if (!this.categories['github']) {
+        this.categories['github'] = [];
+      }
+      
+      // Don't add duplicates
+      if (!this.categories['github'].includes(fontFamily)) {
+        this.categories['github'].push(fontFamily);
+      }
+      
+      // Store the URL mapping (we can reuse the same map)
+      this.localFontUrls.set(fontFamily, url);
+      
+      // Mark as loaded
+      this.loadedFonts.add(fontFamily);
+      
+      return true;
+    } catch (error) {
+      console.error("Error registering GitHub font:", error);
+      return false;
+    }
   }
 }
 

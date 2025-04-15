@@ -84,11 +84,12 @@ class GitHubFontService {
         // Generate a font name from the filename
         const fontName = this.getFontNameFromFilename(file.name);
         
-        // Register the font with the Google Fonts service
-        const success = googleFontsService.registerLocalFont(fontName, file.download_url);
+        // Register the font with the Google Fonts service using the GitHub URL
+        const success = googleFontsService.registerFontFromUrl(fontName, file.download_url);
         
         if (success) {
           loadedFonts.push(fontName);
+          console.log(`Successfully loaded GitHub font: ${fontName}`);
         }
       } catch (error) {
         console.error(`Error loading font ${file.name}:`, error);

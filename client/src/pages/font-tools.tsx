@@ -4,12 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Type as FontIcon, Upload, Edit3 } from 'lucide-react';
+import { Type as FontIcon, Upload, Edit3, Github } from 'lucide-react';
 import FontGallery from '../components/FontGallery';
 import FontCarouselPicker from '../components/FontCarouselPicker';
 import FontUploader from '../components/FontUploader';
 import FontPreviewPanel from '../components/FontPreviewPanel';
+import GitHubFontBrowser from '../components/GitHubFontBrowser';
 import googleFontsService from '../lib/googleFontsService';
+import githubFontService from '../lib/githubFontService';
 
 export default function FontToolsPage() {
   const [currentFont, setCurrentFont] = useState("Arial");
@@ -119,7 +121,7 @@ export default function FontToolsPage() {
         </Card>
       </div>
       
-      <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg border">
+      <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg border mb-12">
         <h2 className="text-xl font-bold mb-4">Local Font Management</h2>
         <div className="mb-6">
           <p className="text-muted-foreground mb-4">
@@ -185,6 +187,59 @@ export default function FontToolsPage() {
             </Button>
           </div>
         )}
+      </div>
+      
+      <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg border mb-12">
+        <h2 className="text-xl font-bold mb-4 flex items-center">
+          <Github className="h-5 w-5 mr-2 text-primary" />
+          GitHub Font Repository
+        </h2>
+        <div className="mb-6">
+          <p className="text-muted-foreground mb-4">
+            Load fonts directly from a GitHub repository. The default repository is <code>stickerverse/Fonts1</code>.
+          </p>
+          
+          <GitHubFontBrowser 
+            onFontsLoaded={(fontNames) => {
+              if (fontNames.length > 0) {
+                // Update font categories
+                setFontCategories({...googleFontsService.categories});
+                
+                // Set the current font to the first loaded font
+                setCurrentFont(fontNames[0]);
+              }
+            }}
+          />
+        </div>
+        
+        {fontCategories['github'] && fontCategories['github'].length > 0 ? (
+          <div className="border rounded-md p-4 mt-8">
+            <h3 className="text-lg font-medium mb-4">GitHub Fonts</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {fontCategories['github'].map(font => (
+                <button
+                  key={font}
+                  className={`
+                    p-4 border rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 
+                    ${currentFont === font ? 'border-primary bg-primary/5' : ''}
+                    transition-colors
+                  `}
+                  onClick={() => setCurrentFont(font)}
+                >
+                  <div 
+                    className="text-2xl mb-2 truncate"
+                    style={{ fontFamily: font }}
+                  >
+                    {previewText || "Aa Bb Cc"}
+                  </div>
+                  <div className="text-sm text-muted-foreground truncate">
+                    {font}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
       
       {/* Font Preview Panel */}
