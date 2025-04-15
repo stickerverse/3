@@ -57,10 +57,15 @@ const scanFonts = () => {
         }
         
         // Copy the fonts-metadata.json to public folder
-        if (fs.existsSync(path.join(process.cwd(), 'fonts-metadata.json'))) {
-          const metadataJson = fs.readFileSync(path.join(process.cwd(), 'fonts-metadata.json'));
+        const metadataJsonPath = path.join(process.cwd(), 'fonts-metadata.json');
+        const publicMetadataPath = path.join(process.cwd(), 'public', 'fonts-metadata.json');
+        
+        if (fs.existsSync(metadataJsonPath)) {
+          const metadataJson = fs.readFileSync(metadataJsonPath);
           fs.writeFileSync(fontsMetadataPath, metadataJson);
           console.log('Copied fonts-metadata.json to public folder');
+        } else if (fs.existsSync(publicMetadataPath)) {
+          console.log('fonts-metadata.json already exists in public folder');
         } else {
           console.error('fonts-metadata.json not found after scan');
         }
