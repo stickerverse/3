@@ -372,9 +372,9 @@ export default function FontGallery({
             <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div>
           </div>
         ) : displayFonts.length > 0 ? (
-          displayFonts.map((font) => (
+          displayFonts.map((font, index) => (
             <button
-              key={font}
+              key={`font-${activeCategory}-${font}-${index}`}
               className={`
                 bg-white dark:bg-neutral-800 cursor-pointer transition-all w-full block overflow-hidden
                 ${font === currentFont ? 

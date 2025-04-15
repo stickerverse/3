@@ -101,6 +101,12 @@ export default function GitHubFontBrowser({
             <p className="text-xs text-muted-foreground">
               Enter a GitHub repository in the format "username/repository"
             </p>
+            {isLoading && (
+              <div className="mt-4 flex items-center gap-2 text-amber-600 dark:text-amber-400 animate-pulse">
+                <RefreshCw className="h-4 w-4 animate-spin" />
+                <span>Loading fonts from GitHub repository...</span>
+              </div>
+            )}
           </div>
         </form>
         
@@ -130,9 +136,9 @@ export default function GitHubFontBrowser({
             </div>
             
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto p-2">
-              {loadedFonts.map((fontName) => (
+              {loadedFonts.map((fontName, index) => (
                 <div 
-                  key={fontName}
+                  key={`github-browser-font-${index}-${fontName}`}
                   className="border p-4 rounded-md hover:border-primary hover:bg-primary/5 transition-colors"
                 >
                   <div

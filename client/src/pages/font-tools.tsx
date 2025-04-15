@@ -225,9 +225,9 @@ export default function FontToolsPage() {
           <div className="border rounded-md p-4 mt-8">
             <h3 className="text-lg font-medium mb-4">GitHub Fonts</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {fontCategories['github'].map(font => (
+              {fontCategories['github'].map((font, index) => (
                 <button
-                  key={font}
+                  key={`github-font-${index}-${font}`}
                   className={`
                     p-4 border rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 
                     ${currentFont === font ? 'border-primary bg-primary/5' : ''}
