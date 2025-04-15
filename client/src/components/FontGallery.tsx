@@ -345,34 +345,33 @@ export default function FontGallery({
                   ${font === currentFont ? 'bg-primary/5 dark:bg-primary/10' : ''}
                   overflow-hidden
                 `} 
-                style={{ fontFamily: font }}
+                style={{ fontFamily: `"${font}", sans-serif` }}
               >
                 <div className={`
                   ${!customText ? 'text-5xl' : 
                     customText.length < 5 ? 'text-5xl' : 
                     customText.length < 10 ? 'text-4xl' : 
-                    customText.length < 20 ? 'text-3xl' : 'text-2xl'} 
-                  overflow-hidden text-center relative w-full px-2
+                    customText.length < 20 ? 'text-3xl' : 'text-xl'} 
+                  text-center relative w-full py-2
                   ${hoveredFont === font ? 'text-primary scale-110 transition-all duration-200' : ''}
                   ${font === currentFont ? 'text-primary font-bold' : ''}
+                  flex justify-center items-center h-full
                 `}>
                   <span 
                     className={`
-                      inline-block transition-all duration-300 w-full block
+                      inline-block transition-all duration-300 line-clamp-3 max-w-full
                       ${hoveredFont === font ? animationStyles[font] || 'animate-float' : ''}
-                      ${hoveredFont === font && font.length > 15 ? 'text-4xl' : ''}
                       ${hoveredFont === font ? getPreviewStyle(font) : ''}
                       ${hoveredFont !== font && font === currentFont ? 'bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent ring-2 ring-primary/20 rounded-md px-2 py-1' : ''}
-                      ${customText ? 'max-w-full break-words px-1' : ''}
+                      ${customText ? 'px-1' : ''}
                       ${!hoveredFont && customText ? 'py-2 px-3 bg-white/10 dark:bg-black/10 rounded-md' : ''}
-                      ${!hoveredFont && customText ? 'leading-tight tracking-tight' : ''}
-                      ${customText && customText.length > 30 ? 'text-ellipsis break-all' : 'truncate'}
+                      break-words
                     `}
                   >
                     {hoveredFont === font 
                       ? animationText 
                       : customText 
-                        ? (customText.length > 60 ? customText.substring(0, 60) + "..." : customText) 
+                        ? (customText.length > 30 ? customText.substring(0, 30) + "..." : customText) 
                         : "Aa"}
                   </span>
                   {hoveredFont === font && (
