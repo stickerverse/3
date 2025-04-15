@@ -707,6 +707,28 @@ class GoogleFontsService {
       console.warn('Error checking for fonts.json:', error);
     }
   }
+
+  /**
+   * Ensures system fonts are loaded from the fonts.json file
+   * Used by font comparison tool
+   */
+  async ensureSystemFontsLoaded(): Promise<void> {
+    // First check if we already have system fonts loaded
+    if (this.categories['system'] && this.categories['system'].length > 0) {
+      console.log(`Found ${this.categories['system'].length} fonts in the system category`);
+      return;
+    }
+    
+    // If not, load them from the JSON file
+    await this.loadSystemFontsFromJson();
+  }
+  
+  /**
+   * Returns the list of system fonts
+   */
+  getSystemFonts(): string[] {
+    return this.categories['system'] || [];
+  }
 }
 
 export default new GoogleFontsService();
