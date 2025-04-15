@@ -26,7 +26,11 @@ export default function FontGallery({
   const [activeCategory, setActiveCategory] = useState("all");
   const [customText, setCustomText] = useState(sampleText);
   const [hoveredFont, setHoveredFont] = useState<string | null>(null);
+  const [animatedFonts, setAnimatedFonts] = useState<Record<string, boolean>>({});
+  const [animationText, setAnimationText] = useState<string>("Aa");
+  const [animationStyles, setAnimationStyles] = useState<Record<string, string>>({});
   const galleryRef = useRef<HTMLDivElement>(null);
+  const animationInterval = useRef<NodeJS.Timeout | null>(null);
   
   // Load all fonts when component mounts
   useEffect(() => {
@@ -124,6 +128,123 @@ export default function FontGallery({
     setActiveCategory(category);
   };
   
+  // Determine the animation style for each font category
+  useEffect(() => {
+    if (!visible) return;
+    
+    const fontAnimationStyles: Record<string, string> = {};
+    
+    // Assign an animation style to each font based on its category
+    Object.entries(categories).forEach(([category, fontList]) => {
+      const animation = getAnimationForCategory(category);
+      fontList.forEach(font => {
+        fontAnimationStyles[font] = animation;
+      });
+    });
+    
+    setAnimationStyles(fontAnimationStyles);
+  }, [categories, visible]);
+  
+  // Get animation style based on font category
+  const getAnimationForCategory = (category: string): string => {
+    switch(category) {
+      case 'sans-serif': return 'animate-float';
+      case 'serif': return 'animate-bounce';
+      case 'display': return 'animate-bounce';
+      case 'handwriting': return 'animate-float';
+      case 'monospace': return 'animate-float';
+      default: return 'animate-float';
+    }
+  };
+  
+  // Get different styles for different font categories
+  const getPreviewStyle = (font: string): string => {
+    if (!font || !categories) return '';
+    
+    let category = "sans-serif"; // default
+    for (const [cat, fonts] of Object.entries(categories)) {
+      if (fonts.includes(font)) {
+        category = cat;
+        break;
+      }
+    }
+    
+    switch(category) {
+      case 'serif': 
+        return 'bg-gradient-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent';
+      case 'display': 
+        return 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent';
+      case 'handwriting': 
+        return 'bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent';
+      case 'monospace': 
+        return 'bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent';
+      default: 
+        return '';
+    }
+  };
+  
+  // Animation effect for the hovered font
+  useEffect(() => {
+    if (hoveredFont) {
+      // Start animation for this font
+      setAnimatedFonts(prev => ({ ...prev, [hoveredFont]: true }));
+      
+      // Set up interval to cycle through different text displays
+      if (!animationInterval.current) {
+        const sansSerifOptions = ["Aa", "Bb", "Cc", "Dd"];
+        const serifOptions = ["Aa", "Serif", "Type", "Text"];
+        const displayOptions = ["Wow!", "Look!", "Cool!", "Nice!"];
+        const handwritingOptions = ["Hello", "Write", "Script", "Note"];
+        const monospaceOptions = ["Code", "0101", "Hack", "</>"];
+        
+        // Determine which category the hovered font belongs to
+        let category = "sans-serif"; // default
+        for (const [cat, fonts] of Object.entries(categories)) {
+          if (fonts.includes(hoveredFont)) {
+            category = cat;
+            break;
+          }
+        }
+        
+        // Choose appropriate text options based on category
+        let textOptions: string[];
+        switch(category) {
+          case 'sans-serif': textOptions = sansSerifOptions; break;
+          case 'serif': textOptions = serifOptions; break;
+          case 'display': textOptions = displayOptions; break;
+          case 'handwriting': textOptions = handwritingOptions; break;
+          case 'monospace': textOptions = monospaceOptions; break;
+          default: textOptions = sansSerifOptions;
+        }
+        
+        let index = 0;
+        animationInterval.current = setInterval(() => {
+          index = (index + 1) % textOptions.length;
+          setAnimationText(textOptions[index]);
+        }, 1200);
+      }
+    } else {
+      // Stop animation when no font is hovered
+      if (animationInterval.current) {
+        clearInterval(animationInterval.current);
+        animationInterval.current = null;
+        setAnimationText("Aa");
+      }
+      
+      // Reset all animations after a delay
+      setTimeout(() => {
+        setAnimatedFonts({});
+      }, 300);
+    }
+    
+    return () => {
+      if (animationInterval.current) {
+        clearInterval(animationInterval.current);
+        animationInterval.current = null;
+      }
+    };
+  }, [hoveredFont, categories]);
+  
   // If component is not visible, don't render anything
   if (!visible) return null;
   
@@ -210,11 +331,24 @@ export default function FontGallery({
                 style={{ fontFamily: font }}
               >
                 <div className={`
-                  text-5xl overflow-hidden text-center
+                  text-5xl overflow-hidden text-center relative
                   ${hoveredFont === font ? 'text-primary scale-110 transition-all duration-200' : ''}
                   ${font === currentFont ? 'text-primary font-bold' : ''}
                 `}>
-                  Aa
+                  <span className={`
+                    inline-block transition-all duration-300 
+                    ${hoveredFont === font ? animationStyles[font] || 'animate-float' : ''}
+                    ${hoveredFont === font && font.length > 15 ? 'text-4xl' : ''}
+                    ${hoveredFont === font ? getPreviewStyle(font) : ''}
+                    ${hoveredFont !== font && font === currentFont ? 'bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent' : ''}
+                  `}>
+                    {hoveredFont === font ? animationText : "Aa"}
+                  </span>
+                  {hoveredFont === font && (
+                    <span className="absolute top-full left-1/2 transform -translate-x-1/2 text-xs text-primary mt-1 whitespace-nowrap animate-pulse">
+                      Click to select
+                    </span>
+                  )}
                 </div>
               </div>
               <div className={`
