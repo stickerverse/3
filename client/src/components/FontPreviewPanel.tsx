@@ -5,14 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Search } from "lucide-react";
+import { Search, Upload, PlusCircle } from "lucide-react";
 import { 
   fontCategories as defaultFontCategories, 
   loadFontsByCategory,
   fetchGoogleFonts,
+  fetchLocalFonts,
+  loadLocalFont,
   isFontLoaded 
 } from "@/lib/fontLoader";
 import WebFont from "webfontloader";
+import FontUploader from "./FontUploader";
 
 interface FontPreviewPanelProps {
   showFontPreview: boolean;
@@ -41,13 +44,21 @@ export default function FontPreviewPanel({
   const [loadedCategories, setLoadedCategories] = useState<Set<string>>(new Set());
   const [apiCategories, setApiCategories] = useState<Record<string, string[]> | null>(null);
   const [popularFonts, setPopularFonts] = useState<Array<{family: string, category: string}>>([]);
+  const [localFonts, setLocalFonts] = useState<Array<{
+    family: string, 
+    fileName: string, 
+    url: string, 
+    category: string, 
+    isLocal: boolean
+  }>>([]);
+  const [showUploader, setShowUploader] = useState(false);
 
   // Use Google Fonts categories from API if available, otherwise use default categories
   const allCategories = apiCategories || defaultFontCategories;
   
-  // Initial load of categories from Google Fonts API
+  // Initial load of categories from Google Fonts API and local fonts
   useEffect(() => {
-    const loadGoogleFonts = async () => {
+    const loadFonts = async () => {
       if (!showFontPreview) return;
       
       setIsLoadingCategories(true);
@@ -71,14 +82,37 @@ export default function FontPreviewPanel({
           }
         });
         
+        // Fetch and load local fonts
+        const localFontsList = await fetchLocalFonts();
+        setLocalFonts(localFontsList);
+        
+        // Add local category if there are local fonts
+        if (localFontsList.length > 0) {
+          // Create a deep copy of the categories
+          const categoriesWithLocal = { 
+            ...data.categories,
+            'local': localFontsList.map(font => font.family)
+          };
+          setApiCategories(categoriesWithLocal);
+          
+          // Load all local fonts
+          for (const localFont of localFontsList) {
+            try {
+              await loadLocalFont(localFont.family, localFont.url);
+            } catch (err) {
+              console.error(`Failed to load local font ${localFont.family}:`, err);
+            }
+          }
+        }
+        
       } catch (error) {
-        console.error('Failed to load Google Fonts:', error);
+        console.error('Failed to load fonts:', error);
       } finally {
         setIsLoadingCategories(false);
       }
     };
     
-    loadGoogleFonts();
+    loadFonts();
   }, [showFontPreview]);
   
   // Get all fonts from all categories
@@ -157,12 +191,49 @@ export default function FontPreviewPanel({
   // Handle font selection with loading if needed
   const handleSelectFont = async (font: string) => {
     try {
-      await ensureFontLoaded(font);
+      // Check if it's a local font
+      const localFont = localFonts.find(f => f.family === font);
+      if (localFont) {
+        // For local fonts, we use the loadLocalFont function
+        await loadLocalFont(font, localFont.url);
+      } else {
+        // For Google fonts, use WebFont
+        await ensureFontLoaded(font);
+      }
       setFont(font);
     } catch (error) {
       console.error("Error loading font:", error);
       // Load the font anyway as it might still work
       setFont(font);
+    }
+  };
+  
+  // Handle successful font upload
+  const handleFontUploaded = async (font: { family: string, fileName: string, url: string }) => {
+    try {
+      // Load the newly uploaded font
+      await loadLocalFont(font.family, font.url);
+      
+      // Refresh local fonts list
+      const localFontsList = await fetchLocalFonts();
+      setLocalFonts(localFontsList);
+      
+      // Add or update local category
+      if (apiCategories) {
+        const updatedCategories = { 
+          ...apiCategories,
+          'local': localFontsList.map(f => f.family)
+        };
+        setApiCategories(updatedCategories);
+      }
+      
+      // Select the newly uploaded font
+      setFont(font.family);
+      
+      // Switch to local category tab
+      setSelectedCategory('local');
+    } catch (error) {
+      console.error("Error handling uploaded font:", error);
     }
   };
 

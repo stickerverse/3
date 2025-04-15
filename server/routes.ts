@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
 import fetch from "node-fetch";
+import * as fs from "fs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Define routes for designs
@@ -113,6 +114,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).end();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete design" });
+    }
+  });
+  
+  // Upload local font file
+  app.post("/api/fonts/upload", async (req, res) => {
+    try {
+      // Font file comes as base64 encoded data
+      const { fontName, fontFile, fontType } = req.body;
+      
+      if (!fontName || !fontFile) {
+        return res.status(400).json({ message: "Font name and font file are required" });
+      }
+      
+      // Decode base64 string to get font file data
+      const base64Data = fontFile.replace(/^data:.*?;base64,/, "");
+      const fontBuffer = Buffer.from(base64Data, 'base64');
+      
+      // Save font file to public folder for serving
+      const fontFileName = `${fontName.replace(/\s+/g, '-').toLowerCase()}.${fontType || 'ttf'}`;
+      const fontDirectory = './public/fonts';
+      
+      // Create directory if it doesn't exist
+      if (!fs.existsSync(fontDirectory)) {
+        fs.mkdirSync(fontDirectory, { recursive: true });
+      }
+      
+      const fontPath = `${fontDirectory}/${fontFileName}`;
+      fs.writeFileSync(fontPath, fontBuffer);
+      
+      res.status(200).json({ 
+        success: true, 
+        fontName,
+        fileName: fontFileName,
+        url: `/fonts/${fontFileName}` 
+      });
+    } catch (error) {
+      console.error('Error uploading font:', error);
+      res.status(500).json({ message: "Failed to upload font file" });
+    }
+  });
+  
+  // Get list of local fonts
+  app.get("/api/fonts/local", (req, res) => {
+    try {
+      const fontDirectory = './public/fonts';
+      
+      // Create directory if it doesn't exist
+      if (!fs.existsSync(fontDirectory)) {
+        fs.mkdirSync(fontDirectory, { recursive: true });
+        return res.json({ fonts: [] });
+      }
+      
+      // Get all font files
+      const fontFiles = fs.readdirSync(fontDirectory)
+        .filter(file => /\.(ttf|otf|woff|woff2)$/i.test(file));
+      
+      // Format the response
+      const localFonts = fontFiles.map(file => {
+        const fontName = file.replace(/\.(ttf|otf|woff|woff2)$/i, '')
+          .split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+        
+        return {
+          family: fontName,
+          fileName: file,
+          url: `/fonts/${file}`,
+          category: 'local',
+          isLocal: true
+        };
+      });
+      
+      res.json({ fonts: localFonts });
+    } catch (error) {
+      console.error('Error getting local fonts:', error);
+      res.status(500).json({ message: "Failed to get local fonts", fonts: [] });
     }
   });
   

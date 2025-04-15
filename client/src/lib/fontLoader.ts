@@ -31,8 +31,63 @@ let googleFontsCache: {
   categories: Record<string, string[]>
 } | null = null;
 
+// Cache for local fonts
+let localFontsCache: Array<{
+  family: string, 
+  fileName: string, 
+  url: string, 
+  category: string, 
+  isLocal: boolean
+}> | null = null;
+
 // All fonts in a single array
 export const allFonts = Object.values(fontCategories).flat();
+
+// Fetch local fonts from our API
+export async function fetchLocalFonts(): Promise<Array<{
+  family: string, 
+  fileName: string, 
+  url: string, 
+  category: string, 
+  isLocal: boolean
+}>> {
+  // Return from cache if available
+  if (localFontsCache) {
+    return localFontsCache;
+  }
+  
+  try {
+    const response = await apiRequest('GET', '/api/fonts/local');
+    
+    if (response.ok) {
+      const data = await response.json();
+      localFontsCache = data.fonts;
+      return data.fonts;
+    } else {
+      throw new Error('Failed to fetch local fonts');
+    }
+  } catch (error) {
+    console.error('Error fetching local fonts:', error);
+    return [];
+  }
+}
+
+// Load a local font given its URL
+export function loadLocalFont(fontFamily: string, url: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const fontFace = new FontFace(fontFamily, `url(${url})`);
+    
+    fontFace.load()
+      .then(loadedFace => {
+        document.fonts.add(loadedFace);
+        resolve();
+      })
+      .catch(err => {
+        console.error(`Error loading local font ${fontFamily}:`, err);
+        reject(err);
+      });
+  });
+}
 
 // Fetch font data from our API
 export async function fetchGoogleFonts(sort = 'popularity'): Promise<{
