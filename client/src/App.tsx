@@ -13,11 +13,13 @@ function Router() {
         <div className="container mx-auto flex items-center space-x-4">
           <Link href="/" className="font-medium hover:underline">Home</Link>
           <Link href="/font-tools" className="font-medium hover:underline">Font Tools</Link>
+          <Link href="/github-fonts" className="font-medium hover:underline">GitHub Fonts</Link>
         </div>
       </nav>
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/font-tools" component={FontTools} />
+        <Route path="/github-fonts" component={() => import("./pages/github-fonts").then(mod => mod.default)} />
         <Route component={NotFound} />
       </Switch>
     </>

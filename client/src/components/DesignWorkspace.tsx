@@ -11,6 +11,7 @@ import Toolbar from "@/components/Toolbar";
 import FontShowcase from "@/components/FontShowcase"; 
 import FontCarouselPicker from "@/components/FontCarouselPicker";
 import FontGallery from "@/components/FontGallery";
+import GitHubFontPreviewer from "@/components/GitHubFontPreviewer";
 import googleFontsService from "@/lib/googleFontsService";
 import { loadFontBatch, isFontLoaded } from "@/lib/fontLoader"; 
 
@@ -216,6 +217,13 @@ export default function DesignWorkspace({
           onFontSelected={handleFontSelection}
           sampleText={selectedObj && selectedObj.type === 'text' ? (selectedObj as fabric.Text).text : "Sample Text"}
         />
+        
+        <div className="mt-4 mb-4">
+          <GitHubFontPreviewer
+            onFontSelected={handleFontSelection}
+            defaultText={selectedObj && selectedObj.type === 'text' ? (selectedObj as fabric.Text).text : "Sample Text"}
+          />
+        </div>
       </div>
 
       <div className="bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 px-4 py-1 flex justify-between items-center text-xs text-neutral-500 dark:text-neutral-400">
@@ -227,12 +235,14 @@ export default function DesignWorkspace({
           >
             Need help? View Tutorial
           </button>
-          <button 
-            className={`hover:text-primary transition-colors ${showFontGallery ? 'text-primary' : ''}`}
-            onClick={() => setShowFontGallery(!showFontGallery)}
-          >
-            {showFontGallery ? 'Hide Font Gallery' : 'Show Font Gallery'}
-          </button>
+          <div className="flex space-x-4">
+            <button 
+              className={`hover:text-primary transition-colors ${showFontGallery ? 'text-primary' : ''}`}
+              onClick={() => setShowFontGallery(!showFontGallery)}
+            >
+              {showFontGallery ? 'Hide Font Gallery' : 'Show Font Gallery'}
+            </button>
+          </div>
         </div>
         <div>
           {selectedObj ? (
