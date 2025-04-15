@@ -302,45 +302,73 @@ export default function FontPreviewPanel({
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filteredFonts.map(font => (
-                    <div 
-                      key={font}
-                      className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                        currentFont === font ? 'border-primary border-2 bg-primary/5' : 'border-neutral-200 dark:border-neutral-700'
-                      }`}
-                      onClick={() => handleSelectFont(font)}
-                    >
-                      <div className="flex justify-between items-center mb-2">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-medium truncate">
-                            {font}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {getFontCategory(font)}
-                          </span>
-                        </div>
-                        {currentFont === font && (
-                          <Badge variant="default" className="ml-2">Selected</Badge>
-                        )}
-                      </div>
-                      <div 
-                        className="h-14 flex items-center justify-center overflow-hidden"
-                        style={{ fontFamily: `'${font}', sans-serif` }}
+                <>
+                  <div className="mb-4 flex justify-between items-center">
+                    <span className="text-sm font-medium">
+                      {filteredFonts.length} fonts found
+                    </span>
+                    
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setShowUploader(true)}
+                        className="flex items-center gap-1"
                       >
-                        <span className="text-2xl truncate">
-                          {previewText || "Your Text Here"}
-                        </span>
-                      </div>
+                        <Upload className="h-4 w-4" />
+                        <span>Upload Font</span>
+                      </Button>
                     </div>
-                  ))}
+                  </div>
                   
-                  {filteredFonts.length === 0 && (
-                    <div className="col-span-full text-center p-8 text-neutral-500">
+                  {filteredFonts.length === 0 ? (
+                    <div className="text-center p-8 text-neutral-500">
                       No fonts match your search criteria
                     </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {filteredFonts.map(font => (
+                        <div 
+                          key={`font-${font}`}
+                          className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                            currentFont === font ? 'border-primary border-2 bg-primary/5' : 'border-neutral-200 dark:border-neutral-700'
+                          }`}
+                          onClick={() => handleSelectFont(font)}
+                        >
+                          <div className="flex justify-between items-center mb-2">
+                            <div className="flex flex-col">
+                              <span className="text-sm font-medium truncate">
+                                {font}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {getFontCategory(font)}
+                              </span>
+                            </div>
+                            {currentFont === font && (
+                              <Badge variant="default" className="ml-2">Selected</Badge>
+                            )}
+                          </div>
+                          <div 
+                            className="h-20 flex items-center justify-center overflow-hidden relative"
+                          >
+                            <span 
+                              className="text-2xl"
+                              style={{ fontFamily: `'${font}', sans-serif` }}
+                            >
+                              {previewText || "Your Text Here"}
+                            </span>
+                            
+                            {!isFontLoaded(font) && (
+                              <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
+                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   )}
-                </div>
+                </>
               )}
             </ScrollArea>
           </Tabs>
@@ -355,6 +383,13 @@ export default function FontPreviewPanel({
           </Button>
         </DialogFooter>
       </DialogContent>
+      
+      {/* Font Uploader */}
+      <FontUploader 
+        showUploader={showUploader}
+        setShowUploader={setShowUploader}
+        onFontUploaded={handleFontUploaded}
+      />
     </Dialog>
   );
 }

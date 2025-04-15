@@ -123,16 +123,32 @@ export default function PropertiesPanel({
     }
   };
 
-  const handleFontChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  const handleFontChange = async (e: ChangeEvent<HTMLSelectElement>) => {
     const selectedFont = e.target.value;
     
-    // Ensure the font is loaded before applying it
-    loadFontIfNeeded(selectedFont);
+    // Show loading indicator for the selected font
+    const tempElement = document.createElement('div');
+    tempElement.style.fontFamily = selectedFont;
+    tempElement.style.visibility = 'hidden';
+    tempElement.textContent = text || 'Sample Text';
+    document.body.appendChild(tempElement);
     
+    // Set the font immediately so the UI updates
     setFont(selectedFont);
-    if (selectedObj && selectedObj.type === 'text') {
-      (selectedObj as fabric.Text).set({ fontFamily: selectedFont });
-      canvas?.renderAll();
+    
+    try {
+      // Ensure the font is loaded before applying it
+      await loadFontIfNeeded(selectedFont);
+      
+      if (selectedObj && selectedObj.type === 'text') {
+        (selectedObj as fabric.Text).set({ fontFamily: selectedFont });
+        canvas?.renderAll();
+      }
+    } catch (error) {
+      console.error('Error loading font:', error);
+    } finally {
+      // Remove the temporary element
+      document.body.removeChild(tempElement);
     }
   };
   
@@ -142,19 +158,38 @@ export default function PropertiesPanel({
     const isFontAvailable = document.fonts && document.fonts.check(`12px "${fontName}"`);
     
     if (!isFontAvailable) {
-      WebFont.load({
-        google: {
-          families: [fontName]
-        },
-        active: () => {
-          console.log(`Font loaded: ${fontName}`);
-          canvas?.renderAll();
-        },
-        inactive: () => {
-          console.warn(`Failed to load font: ${fontName}`);
-        }
+      return new Promise<void>((resolve, reject) => {
+        WebFont.load({
+          google: {
+            families: [fontName]
+          },
+          active: () => {
+            console.log(`Font loaded: ${fontName}`);
+            canvas?.renderAll();
+            resolve();
+          },
+          inactive: () => {
+            console.warn(`Failed to load font: ${fontName}`);
+            // Try alternate loading method as fallback
+            const link = document.createElement('link');
+            link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}&display=swap`;
+            link.rel = 'stylesheet';
+            link.onload = () => {
+              console.log(`Font loaded via fallback: ${fontName}`);
+              canvas?.renderAll();
+              resolve();
+            };
+            link.onerror = () => {
+              console.error(`Failed to load font even with fallback: ${fontName}`);
+              reject();
+            };
+            document.head.appendChild(link);
+          },
+          timeout: 3000 // 3 second timeout
+        });
       });
     }
+    return Promise.resolve();
   };
 
   const handleFontSizeChange = (value: number[]) => {
@@ -335,12 +370,30 @@ export default function PropertiesPanel({
                                 key={fontName}
                                 className={`text-sm text-left p-1 rounded ${font === fontName ? 'bg-primary/10 text-primary' : 'hover:bg-neutral-100 dark:hover:bg-neutral-700'}`}
                                 style={{ fontFamily: fontName }}
-                                onClick={() => {
-                                  loadFontIfNeeded(fontName);
+                                onClick={async () => {
+                                  // Show loading indicator for the selected font
+                                  const tempElement = document.createElement('div');
+                                  tempElement.style.fontFamily = fontName;
+                                  tempElement.style.visibility = 'hidden';
+                                  tempElement.textContent = text || 'Sample Text';
+                                  document.body.appendChild(tempElement);
+                                  
+                                  // Set the font immediately so the UI updates
                                   setFont(fontName);
-                                  if (selectedObj && selectedObj.type === 'text') {
-                                    (selectedObj as fabric.Text).set({ fontFamily: fontName });
-                                    canvas?.renderAll();
+                                  
+                                  try {
+                                    // Ensure the font is loaded before applying it
+                                    await loadFontIfNeeded(fontName);
+                                    
+                                    if (selectedObj && selectedObj.type === 'text') {
+                                      (selectedObj as fabric.Text).set({ fontFamily: fontName });
+                                      canvas?.renderAll();
+                                    }
+                                  } catch (error) {
+                                    console.error('Error loading font:', error);
+                                  } finally {
+                                    // Remove the temporary element
+                                    document.body.removeChild(tempElement);
                                   }
                                 }}
                               >
