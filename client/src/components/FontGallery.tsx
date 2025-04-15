@@ -3,8 +3,9 @@ import googleFontsService from "../lib/googleFontsService";
 import githubFontService from "../lib/githubFontService";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, Github } from "lucide-react";
+import { Search, Filter, Github, HardDrive } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import SystemFontBrowser from "./SystemFontBrowser";
 
 interface FontGalleryProps {
   currentFont: string;
@@ -118,7 +119,8 @@ export default function FontGallery({
     
     setIsLoading(true);
     
-    const loadGithubFonts = async () => {
+    const loadCategoryFonts = async () => {
+      // Handle special categories first
       if (activeCategory === "github") {
         try {
           // Load fonts from GitHub if they haven't been loaded yet
@@ -145,7 +147,30 @@ export default function FontGallery({
         return; // Exit early
       }
       
-      // For non-GitHub categories
+      // Handle system fonts category
+      if (activeCategory === "system") {
+        try {
+          // Load system fonts if needed
+          const systemFonts = await googleFontsService.getFontsByCategory('system');
+          
+          if (!systemFonts || systemFonts.length === 0) {
+            // Try to load system fonts from json file
+            await googleFontsService.loadSystemFontsFromJson();
+            const refreshedFonts = await googleFontsService.getFontsByCategory('system');
+            setDisplayFonts(refreshedFonts || []);
+          } else {
+            setDisplayFonts(systemFonts);
+          }
+        } catch (error) {
+          console.error("Error loading system fonts:", error);
+          setDisplayFonts([]);
+        } finally {
+          setIsLoading(false);
+        }
+        return; // Exit early
+      }
+      
+      // For standard categories (all, sans-serif, serif, etc.)
       let filteredFonts = activeCategory === "all"
         ? fonts
         : categories[activeCategory] || [];
@@ -165,7 +190,7 @@ export default function FontGallery({
       setIsLoading(false);
     };
     
-    loadGithubFonts();
+    loadCategoryFonts();
   }, [searchQuery, activeCategory, visible, categories]);
   
   const handleCategoryChange = (category: string) => {
@@ -366,16 +391,21 @@ export default function FontGallery({
         </TabsList>
       </Tabs>
       
-      <div 
-        ref={galleryRef}
-        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 h-[480px] overflow-y-auto p-5 border rounded-lg bg-neutral-50 dark:bg-neutral-900"
-      >
-        {isLoading && displayFonts.length === 0 ? (
-          <div className="col-span-full h-full flex items-center justify-center">
-            <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div>
-          </div>
-        ) : displayFonts.length > 0 ? (
-          displayFonts.map((font, index) => (
+      {activeCategory === "system" ? (
+        <div className="h-[480px] overflow-y-auto border rounded-lg bg-neutral-50 dark:bg-neutral-900">
+          <SystemFontBrowser onFontSelected={onFontSelected} />
+        </div>
+      ) : (
+        <div 
+          ref={galleryRef}
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 h-[480px] overflow-y-auto p-5 border rounded-lg bg-neutral-50 dark:bg-neutral-900"
+        >
+          {isLoading && displayFonts.length === 0 ? (
+            <div className="col-span-full h-full flex items-center justify-center">
+              <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div>
+            </div>
+          ) : displayFonts.length > 0 ? (
+            displayFonts.map((font, index) => (
             <button
               key={`font-${activeCategory}-${font}-${index}`}
               className={`
@@ -449,12 +479,17 @@ export default function FontGallery({
           ))
         ) : null}
       </div>
+      )}
       
       <div className="text-xs text-muted-foreground mt-2 text-center">
-        {displayFonts.length} of {activeCategory === "all" 
-          ? fonts.length 
-          : categories[activeCategory]?.length || 0} fonts • 
-        Scroll to load more
+        {activeCategory !== "system" && (
+          <>
+            {displayFonts.length} of {activeCategory === "all" 
+              ? fonts.length 
+              : categories[activeCategory]?.length || 0} fonts • 
+            Scroll to load more
+          </>
+        )}
       </div>
     </div>
   );

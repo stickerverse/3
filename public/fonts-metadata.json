@@ -1,0 +1,27 @@
+[
+  {
+    "path": "system/OpenSans-Regular.ttf",
+    "name": "Open Sans Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "system/OpenSans-Bold.ttf",
+    "name": "Open Sans Bold",
+    "format": "truetype"
+  },
+  {
+    "path": "system/OpenSans-Italic.ttf",
+    "name": "Open Sans Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "custom/CustomFont1.ttf",
+    "name": "Custom Font 1",
+    "format": "truetype"
+  },
+  {
+    "path": "custom/CustomFont2.ttf",
+    "name": "Custom Font 2",
+    "format": "truetype"
+  }
+]
