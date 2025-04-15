@@ -7,6 +7,7 @@ import PropertiesPanel from "@/components/PropertiesPanel";
 import LayersPanel from "@/components/LayersPanel";
 import TemplateSelector from "@/components/TemplateSelector";
 import TutorialOverlay from "@/components/TutorialOverlay";
+import VinylPropertiesDialog from "@/components/VinylPropertiesDialog";
 
 export default function Home() {
   const vinylDesigner = useVinylDesigner();
@@ -69,6 +70,10 @@ export default function Home() {
           selectedObj={vinylDesigner.selectedObj}
           canvas={vinylDesigner.canvas}
           toggleTutorial={vinylDesigner.toggleTutorial}
+          toggleVinylProperties={vinylDesigner.toggleVinylProperties}
+          dimensions={vinylDesigner.dimensions}
+          selectedSizeId={vinylDesigner.selectedSizeId}
+          selectedMaterialId={vinylDesigner.selectedMaterialId}
         />
 
         <PropertiesPanel 
@@ -118,6 +123,15 @@ export default function Home() {
       <TutorialOverlay 
         showTutorial={vinylDesigner.showTutorial}
         setShowTutorial={vinylDesigner.setShowTutorial}
+      />
+
+      <VinylPropertiesDialog
+        isOpen={vinylDesigner.showVinylProperties}
+        onClose={() => vinylDesigner.setShowVinylProperties(false)}
+        initialSizeId={vinylDesigner.selectedSizeId}
+        initialMaterialId={vinylDesigner.selectedMaterialId}
+        initialDimensions={vinylDesigner.dimensions}
+        onSave={vinylDesigner.saveVinylProperties}
       />
     </div>
   );

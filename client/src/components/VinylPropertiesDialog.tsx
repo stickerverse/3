@@ -1,10 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import VinylSizeSelector from "./VinylSizeSelector";
+import VinylMaterialSelector from "./VinylMaterialSelector";
+import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import VinylSizeSelector from './VinylSizeSelector';
-import VinylMaterialSelector from './VinylMaterialSelector';
 
 interface VinylPropertiesDialogProps {
   isOpen: boolean;
@@ -27,55 +37,63 @@ export default function VinylPropertiesDialog({
   initialDimensions = null,
   onSave
 }: VinylPropertiesDialogProps) {
-  const [activeTab, setActiveTab] = useState('size');
+  const [activeTab, setActiveTab] = useState("size");
   const [selectedSizeId, setSelectedSizeId] = useState<number | null>(initialSizeId);
   const [selectedMaterialId, setSelectedMaterialId] = useState<number | null>(initialMaterialId);
-  const [dimensions, setDimensions] = useState<{ width: number, height: number } | null>(initialDimensions);
+  const [customDimensions, setCustomDimensions] = useState<{ width: number, height: number } | null>(
+    initialDimensions || { width: 100, height: 100 }
+  );
+  const [useCustomDimensions, setUseCustomDimensions] = useState<boolean>(!!initialDimensions && !initialSizeId);
+  
   const { toast } = useToast();
 
-  // Update local state when props change
+  // Reset form when dialog opens with new initialValues
   useEffect(() => {
     if (isOpen) {
       setSelectedSizeId(initialSizeId);
       setSelectedMaterialId(initialMaterialId);
-      setDimensions(initialDimensions);
+      setCustomDimensions(initialDimensions || { width: 100, height: 100 });
+      setUseCustomDimensions(!!initialDimensions && !initialSizeId);
     }
   }, [isOpen, initialSizeId, initialMaterialId, initialDimensions]);
 
-  const handleSizeSelected = (sizeId: number, dims: { width: number, height: number }) => {
+  const handleSizeSelected = (sizeId: number, dimensions: { width: number, height: number }) => {
     setSelectedSizeId(sizeId);
-    setDimensions(dims);
+    setCustomDimensions(dimensions);
+    setUseCustomDimensions(false);
   };
 
   const handleMaterialSelected = (materialId: number) => {
     setSelectedMaterialId(materialId);
   };
 
-  const handleSave = () => {
-    if (!selectedMaterialId) {
-      toast({
-        title: "Missing material",
-        description: "Please select a material for your vinyl design",
-        variant: "destructive"
-      });
-      setActiveTab('material');
-      return;
-    }
+  const handleCustomWidthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const width = parseInt(e.target.value) || 0;
+    setCustomDimensions(prev => ({ ...(prev || { width: 0, height: 0 }), width }));
+  };
 
-    if (!dimensions) {
-      toast({
-        title: "Missing size",
-        description: "Please select a size for your vinyl design",
-        variant: "destructive"
-      });
-      setActiveTab('size');
-      return;
+  const handleCustomHeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const height = parseInt(e.target.value) || 0;
+    setCustomDimensions(prev => ({ ...(prev || { width: 0, height: 0 }), height }));
+  };
+
+  const handleSave = () => {
+    // Validate dimensions
+    if (useCustomDimensions && customDimensions) {
+      if (customDimensions.width <= 0 || customDimensions.height <= 0) {
+        toast({
+          title: "Invalid dimensions",
+          description: "Width and height must be greater than 0",
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     onSave({
-      sizeId: selectedSizeId,
+      sizeId: useCustomDimensions ? null : selectedSizeId,
       materialId: selectedMaterialId,
-      dimensions
+      dimensions: useCustomDimensions ? customDimensions : null
     });
     
     onClose();
@@ -83,59 +101,79 @@ export default function VinylPropertiesDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-3xl max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-primary">Vinyl Properties</DialogTitle>
+          <DialogTitle>Vinyl Properties</DialogTitle>
           <DialogDescription>
-            Choose the size and material for your vinyl design
+            Configure the size and material for your vinyl design
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="size" value={activeTab} onValueChange={setActiveTab} className="mt-4 flex-1 overflow-hidden flex flex-col">
-          <TabsList className="mb-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-2">
             <TabsTrigger value="size">Size</TabsTrigger>
             <TabsTrigger value="material">Material</TabsTrigger>
           </TabsList>
-
-          <div className="flex-1 overflow-hidden">
-            <TabsContent value="size" className="h-full overflow-y-auto">
-              <VinylSizeSelector
-                selectedSizeId={selectedSizeId}
+          
+          <TabsContent value="size" className="mt-4">
+            <div className="mb-6">
+              <VinylSizeSelector 
+                selectedSizeId={useCustomDimensions ? null : selectedSizeId}
                 onSizeSelected={handleSizeSelected}
+                showCustom={true}
               />
-            </TabsContent>
+            </div>
 
-            <TabsContent value="material" className="h-full overflow-y-auto">
-              <VinylMaterialSelector
-                selectedMaterialId={selectedMaterialId}
-                onMaterialSelected={handleMaterialSelected}
-              />
-            </TabsContent>
-          </div>
+            <div className="space-y-4">
+              <div className="flex items-center">
+                <input 
+                  type="checkbox" 
+                  id="useCustomDimensions" 
+                  checked={useCustomDimensions} 
+                  onChange={(e) => setUseCustomDimensions(e.target.checked)}
+                  className="mr-2 h-4 w-4 rounded border-gray-300"
+                />
+                <Label htmlFor="useCustomDimensions">Use custom dimensions</Label>
+              </div>
+
+              {useCustomDimensions && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="customWidth">Width (mm)</Label>
+                    <Input
+                      id="customWidth"
+                      type="number"
+                      min="10"
+                      value={customDimensions?.width || 100}
+                      onChange={handleCustomWidthChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="customHeight">Height (mm)</Label>
+                    <Input
+                      id="customHeight"
+                      type="number"
+                      min="10"
+                      value={customDimensions?.height || 100}
+                      onChange={handleCustomHeightChange}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="material" className="mt-4">
+            <VinylMaterialSelector 
+              selectedMaterialId={selectedMaterialId}
+              onMaterialSelected={handleMaterialSelected}
+            />
+          </TabsContent>
         </Tabs>
 
-        <DialogFooter className="mt-6 flex justify-between items-center">
-          <div className="flex space-x-4">
-            {activeTab === 'size' ? (
-              <Button 
-                variant="outline" 
-                onClick={() => setActiveTab('material')}
-              >
-                Next: Material
-              </Button>
-            ) : (
-              <Button 
-                variant="outline" 
-                onClick={() => setActiveTab('size')}
-              >
-                Back to Size
-              </Button>
-            )}
-          </div>
-          <div className="flex space-x-2">
-            <Button variant="outline" onClick={onClose}>Cancel</Button>
-            <Button onClick={handleSave}>Apply Changes</Button>
-          </div>
+        <DialogFooter className="mt-6">
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button onClick={handleSave}>Apply</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
