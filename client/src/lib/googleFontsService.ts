@@ -101,7 +101,7 @@ class GoogleFontsService {
    * @param {string|Array<string>} fontFamilies - Font(s) to load
    * @returns {Promise} - Resolves when fonts are loaded
    */
-  loadFonts(fontFamilies: string | string[]): Promise<void> {
+  async loadFonts(fontFamilies: string | string[]): Promise<void> {
     if (!fontFamilies || 
         (Array.isArray(fontFamilies) && fontFamilies.length === 0)) {
       return Promise.resolve();
@@ -117,24 +117,63 @@ class GoogleFontsService {
       return Promise.resolve();
     }
     
+    // Load fonts in smaller batches to improve reliability
+    const batchSize = 5;
+    const batches = [];
+    
+    for (let i = 0; i < fontsToLoad.length; i += batchSize) {
+      const batch = fontsToLoad.slice(i, i + batchSize);
+      batches.push(batch);
+    }
+    
+    // Process each batch sequentially
+    for (const batch of batches) {
+      await this.loadFontBatch(batch);
+    }
+    
+    return Promise.resolve();
+  }
+  
+  /**
+   * Helper method to load a batch of fonts
+   * @param fontBatch Array of font names to load in one batch
+   */
+  private loadFontBatch(fontBatch: string[]): Promise<void> {
     return new Promise((resolve, reject) => {
+      // Create link elements manually for each font
+      const links: HTMLLinkElement[] = [];
+      
+      // First, create link elements to preload fonts
+      fontBatch.forEach(fontFamily => {
+        // Sanitize the font name for the URL
+        const encodedFont = fontFamily.replace(/ /g, '+');
+        const link = document.createElement('link');
+        link.href = `https://fonts.googleapis.com/css2?family=${encodedFont}:wght@400;700&display=swap`;
+        link.rel = 'stylesheet';
+        document.head.appendChild(link);
+        links.push(link);
+      });
+      
+      // Then use WebFont loader as a backup
       WebFont.load({
         google: {
-          families: fontsToLoad.map(font => `${font}:400,700,italic`)
+          families: fontBatch.map(font => `${font}:400,700,italic`)
         },
         classes: false,    // Don't append classes
         events: false,     // Don't trigger events 
         active: () => {
           // Mark these fonts as loaded
-          fontsToLoad.forEach(font => this.loadedFonts.add(font));
-          console.log("Fonts loaded:", fontsToLoad.length, "fonts");
+          fontBatch.forEach(font => this.loadedFonts.add(font));
+          console.log("Fonts loaded:", fontBatch.length, "fonts");
           resolve();
         },
         inactive: () => {
-          console.error('Failed to load fonts:', fontsToLoad);
-          reject(new Error(`Failed to load fonts: ${fontsToLoad.join(', ')}`));
+          // Still mark as loaded to avoid blocking UI even if WebFont considers it inactive
+          fontBatch.forEach(font => this.loadedFonts.add(font));
+          console.warn('WebFont loader inactive for:', fontBatch);
+          resolve(); // Resolve instead of reject to avoid blocking UI
         },
-        timeout: 7000 // 7 second timeout
+        timeout: 3000 // 3 second timeout is enough since we already added stylesheets
       });
     });
   }

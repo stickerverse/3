@@ -39,15 +39,27 @@ export default function FontGallery({
       
       setIsLoading(true);
       try {
+        // First preload a small set of popular fonts for immediate display
+        const popularFonts = googleFontsService.popularFonts;
+        await googleFontsService.loadFonts(popularFonts);
+        
+        // Then fetch all fonts from API
         const data = await googleFontsService.fetchGoogleFonts("all");
         const fontList = data.fonts.map((font: any) => font.family);
         
         setFonts(fontList);
-        setDisplayFonts(fontList.slice(0, 50)); // Initially show only first 50 fonts
+        setDisplayFonts(fontList.slice(0, 20)); // Initially show fewer fonts for faster loading
         setCategories(data.categories);
         
-        // Preload the visible fonts
-        await googleFontsService.loadFonts(fontList.slice(0, 50));
+        // Preload the initial set of visible fonts more thoroughly
+        const initialFonts = fontList.slice(0, 20);
+        await googleFontsService.loadFonts(initialFonts);
+        
+        // After a delay, load the next batch in the background
+        setTimeout(() => {
+          googleFontsService.loadFonts(fontList.slice(20, 50));
+        }, 1000);
+        
       } catch (error) {
         console.error("Error loading fonts:", error);
       } finally {
@@ -357,15 +369,20 @@ export default function FontGallery({
                   flex justify-center items-center h-full
                 `}>
                   <span 
-                    style={{ fontFamily: `"${font}", sans-serif` }}
+                    style={{ 
+                      fontFamily: googleFontsService.isFontLoaded(font) 
+                        ? `"${font}", sans-serif` 
+                        : 'system-ui, sans-serif',
+                      fontDisplay: 'swap'
+                    }}
                     className={`
-                      inline-block transition-all duration-300 line-clamp-3 max-w-full
+                      inline-block transition-all duration-300
                       ${hoveredFont === font ? animationStyles[font] || 'animate-float' : ''}
                       ${hoveredFont === font ? getPreviewStyle(font) : ''}
                       ${hoveredFont !== font && font === currentFont ? 'bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent ring-2 ring-primary/20 rounded-md px-2 py-1' : ''}
                       ${customText ? 'px-1' : ''}
                       ${!hoveredFont && customText ? 'py-2 px-3 bg-white/10 dark:bg-black/10 rounded-md' : ''}
-                      break-words
+                      ${!googleFontsService.isFontLoaded(font) ? 'opacity-70' : ''}
                     `}
                   >
                     {hoveredFont === font 
