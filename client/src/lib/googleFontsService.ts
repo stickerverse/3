@@ -17,7 +17,6 @@ class GoogleFontsService {
   // Font categories for organization
   categories: Record<string, string[]> = {
     'local': [],     // Category for local fonts
-    'github': [],    // Category for GitHub fonts
     'system': [],    // Category for system fonts
     'serif': [],
     'sans-serif': [],
@@ -103,7 +102,6 @@ class GoogleFontsService {
       this.loadedFonts.clear();
       this.categories = {
         'local': [],
-        'github': [],
         'system': [],
         'serif': [],
         'sans-serif': [],
@@ -491,7 +489,7 @@ class GoogleFontsService {
   }
   
   /**
-   * Register a font from a direct URL (e.g. from GitHub)
+   * Register a font from a direct URL
    * @param fontFamily The font family name
    * @param url The direct URL to the font file
    * @returns True if registration was successful
@@ -514,16 +512,6 @@ class GoogleFontsService {
       `;
       document.head.appendChild(style);
       
-      // Add to github fonts category
-      if (!this.categories['github']) {
-        this.categories['github'] = [];
-      }
-      
-      // Don't add duplicates
-      if (!this.categories['github'].includes(fontFamily)) {
-        this.categories['github'].push(fontFamily);
-      }
-      
       // Store the URL mapping (we can reuse the same map)
       this.localFontUrls.set(fontFamily, url);
       
@@ -532,7 +520,7 @@ class GoogleFontsService {
       
       return true;
     } catch (error) {
-      console.error("Error registering GitHub font:", error);
+      console.error("Error registering font from URL:", error);
       return false;
     }
   }
