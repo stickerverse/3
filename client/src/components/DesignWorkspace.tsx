@@ -13,7 +13,8 @@ import FontCarouselPicker from "@/components/FontCarouselPicker";
 import FontGallery from "@/components/FontGallery";
 import SystemFontBrowser from "@/components/SystemFontBrowser";
 
-import StandaloneFontPreviewer from './StandaloneFontPreviewer'; // Added import for StandaloneFontPreviewer
+import StandaloneFontPreviewer from '@/components/StandaloneFontPreviewer'; 
+import LocalFontPreviewer from '@/components/LocalFontPreviewer'; // Add import for our new component
 import googleFontsService from "@/lib/googleFontsService";
 import { loadFontBatch, isFontLoaded } from "@/lib/fontLoader"; 
 
@@ -252,19 +253,21 @@ export default function DesignWorkspace({
           </div>
         </div>
         
-        {/* Standalone Font Previewer */}
+        {/* Local Font Previewer */}
         <div className="mb-4">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg font-medium">Font Preview Gallery</h3>
+            <h3 className="text-lg font-medium">Local Font Previewer</h3>
             <div className="flex items-center">
               <span className="text-xs text-muted-foreground">
-                Click on a font to apply it to selected text
+                Browse and select fonts from your local collection
               </span>
             </div>
           </div>
           <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-3">
-            <StandaloneFontPreviewer 
-              onFontSelected={handleFontSelection} 
+            <LocalFontPreviewer 
+              onFontSelected={handleFontSelection}
+              currentFont={getCurrentFont() || ""}
+              previewText={selectedObj && selectedObj.type === 'text' ? (selectedObj as fabric.Text).text.substring(0, 10) : "Aa Bb Cc"}
             />
           </div>
         </div>
