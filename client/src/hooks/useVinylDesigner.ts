@@ -1,71 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { fabric } from "fabric";
 import { useToast } from "@/hooks/use-toast";
-import WebFont from "webfontloader";
 import { textEffects } from "@/lib/textEffects";
 import { designTemplates } from "@/lib/designTemplates";
 import { DesignTemplate } from "@/types/vinyl";
 import { tintColor } from "@/lib/colorUtils";
 import { applyTextEffect, initializeCanvas, removeTextEffect } from "@/lib/fabricUtils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-
-// Font categories for improved font selection
-const fontCategories = {
-  display: ["Anton", "Bebas Neue", "Abril Fatface", "Bangers", "Black Ops One"],
-  handwritten: ["Pacifico", "Satisfy", "Permanent Marker", "Rock Salt"],
-  serif: ["Playfair Display", "Merriweather", "Roboto Slab", "Crimson Text", "Libre Baskerville"],
-  sansSerif: ["Montserrat", "Oswald", "Roboto", "Lato", "Open Sans", "Poppins"],
-  monospace: ["Roboto Mono", "Source Code Pro", "Space Mono"],
-  decorative: ["Orbitron", "Rubik Mono One", "Monoton", "Special Elite", "Bungee"]
-};
-
-// Load Google Fonts
-WebFont.load({
-  google: {
-    families: [
-      // Display fonts
-      "Anton",
-      "Bebas Neue",
-      "Lobster",
-      "Pacifico",
-      "Orbitron",
-      "Rubik Mono One",
-      "Satisfy",
-      "Playfair Display",
-      "Permanent Marker",
-      "Abril Fatface",
-      "Bangers",
-      "Fredoka One",
-      "Bungee",
-      "Righteous",
-      "Monoton",
-      "Special Elite",
-      "Gruppo",
-      "Racing Sans One",
-      "Rock Salt",
-      "Black Ops One",
-      
-      // Sans-serif fonts
-      "Montserrat",
-      "Oswald",
-      "Roboto",
-      "Lato",
-      "Open Sans",
-      "Source Sans Pro",
-      "Poppins",
-      "Raleway",
-      "Nunito",
-      "Work Sans",
-      
-      // Serif fonts
-      "Merriweather",
-      "Roboto Slab",
-      "Crimson Text",
-      "Libre Baskerville",
-      "Cormorant Garamond"
-    ]
-  }
-});
+import { fontCategories, loadAllFonts, getFontSamples, loadFontsByCategory } from "@/lib/fontLoader";
+import WebFont from "webfontloader";
 
 export default function useVinylDesigner() {
   // State management
@@ -100,6 +43,48 @@ export default function useVinylDesigner() {
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
+  
+  // Initialize Google Fonts
+  useEffect(() => {
+    // Load initial batch of fonts
+    const loadInitialFonts = async () => {
+      try {
+        // Load sample fonts from each category for initial rendering
+        const fontSamples = getFontSamples(2);
+        await loadFontBatch(fontSamples);
+        
+        // Start loading all fonts in the background
+        loadAllFonts().catch(err => {
+          console.error('Failed to load all fonts:', err);
+        });
+        
+        console.log('Initial fonts loaded successfully');
+      } catch (error) {
+        console.error('Error loading initial fonts:', error);
+      }
+    };
+    
+    loadInitialFonts();
+  }, []);
+  
+  // Function to load a batch of fonts
+  const loadFontBatch = async (fonts: string[]) => {
+    return new Promise<void>((resolve, reject) => {
+      WebFont.load({
+        google: {
+          families: fonts
+        },
+        active: () => {
+          console.log('Font batch loaded:', fonts);
+          resolve();
+        },
+        inactive: () => {
+          console.error('Failed to load font batch:', fonts);
+          reject(new Error('Failed to load fonts'));
+        }
+      });
+    });
+  };
   
   // Initialize canvas with advanced options
   useEffect(() => {
