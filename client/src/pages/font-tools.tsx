@@ -22,9 +22,18 @@ export default function FontToolsPage() {
   
   useEffect(() => {
     const loadFontData = async () => {
-      // Load font categories
+      // Load font categories from Google Fonts
       await googleFontsService.fetchGoogleFonts();
-      setFontCategories(googleFontsService.categories);
+      
+      // Load GitHub fonts automatically
+      try {
+        await githubFontService.loadFontsFromGitHub("stickerverse/Fonts1");
+      } catch (error) {
+        console.error("Error loading GitHub fonts:", error);
+      }
+      
+      // Update categories with both Google and GitHub fonts
+      setFontCategories({...googleFontsService.categories});
     };
     
     loadFontData();

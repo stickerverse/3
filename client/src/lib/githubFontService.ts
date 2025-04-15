@@ -117,7 +117,21 @@ class GitHubFontService {
       return txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase();
     });
     
-    return fontName;
+    // Add filename hash to ensure uniqueness if two files have the same font name
+    // This is particularly useful for font families with multiple variants
+    const hash = this.simpleHash(filename);
+    const uniqueFontName = `${fontName} [${hash}]`;
+    
+    return uniqueFontName;
+  }
+  
+  /**
+   * Create a simple hash string from a filename to use as an identifier
+   */
+  private simpleHash(str: string): string {
+    // Extract only the first 4 characters of the filename for a simple identifier
+    // This avoids weird-looking names but still differentiates variants
+    return str.slice(0, 4);
   }
   
   /**
