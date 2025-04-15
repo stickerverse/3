@@ -1,4 +1,4 @@
-import { ChangeEvent, useState, useEffect } from "react";
+import { ChangeEvent, useState, useEffect, useCallback } from "react";
 import { fabric } from "fabric";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { textEffects } from "@/lib/textEffects";
@@ -12,7 +12,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import FontPreviewPanel from "@/components/FontPreviewPanel";
-import { fetchGoogleFonts, loadFontBatch } from "@/lib/fontLoader";
+import { 
+  fetchGoogleFonts, 
+  loadFontBatch, 
+  isFontLoaded,
+  loadLocalFont 
+} from "@/lib/fontLoader";
 import WebFont from "webfontloader";
 
 interface PropertiesPanelProps {
@@ -153,44 +158,90 @@ export default function PropertiesPanel({
   };
   
   // Function to load a font if it's not already loaded
-  const loadFontIfNeeded = (fontName: string) => {
-    // Check if the font is already loaded in the document
-    const isFontAvailable = document.fonts && document.fonts.check(`12px "${fontName}"`);
+  const loadFontIfNeeded = useCallback((fontName: string) => {
+    // First check if the font is already loaded using our utility function
+    if (isFontLoaded(fontName)) {
+      return Promise.resolve();
+    }
     
-    if (!isFontAvailable) {
-      return new Promise<void>((resolve, reject) => {
-        WebFont.load({
-          google: {
-            families: [fontName]
-          },
-          active: () => {
-            console.log(`Font loaded: ${fontName}`);
+    // Check if it's a local font (user uploaded)
+    const hasLocalPrefix = fontName.startsWith('Local:');
+    if (hasLocalPrefix) {
+      // For local fonts, we would handle separately, but this is a placeholder
+      // In a real implementation, we'd get the local font URL from storage/API
+      console.log('Loading local font:', fontName);
+      return Promise.resolve();
+    }
+    
+    // For Google fonts, use WebFont loader with multiple fallback methods
+    return new Promise<void>((resolve, reject) => {
+      // First try: Use WebFont.load
+      WebFont.load({
+        google: {
+          families: [fontName]
+        },
+        active: () => {
+          console.log(`Font loaded: ${fontName}`);
+          canvas?.renderAll();
+          resolve();
+        },
+        inactive: () => {
+          console.warn(`Failed to load font: ${fontName}`);
+          // Second try: Use direct CSS link as fallback
+          const link = document.createElement('link');
+          link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}&display=swap`;
+          link.rel = 'stylesheet';
+          link.onload = () => {
+            console.log(`Font loaded via fallback: ${fontName}`);
             canvas?.renderAll();
             resolve();
-          },
-          inactive: () => {
-            console.warn(`Failed to load font: ${fontName}`);
-            // Try alternate loading method as fallback
-            const link = document.createElement('link');
-            link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}&display=swap`;
-            link.rel = 'stylesheet';
-            link.onload = () => {
-              console.log(`Font loaded via fallback: ${fontName}`);
-              canvas?.renderAll();
+          };
+          link.onerror = () => {
+            console.error(`Failed to load font with direct link: ${fontName}`);
+            // Third try: Use FontFace API as a final resort
+            try {
+              const fontUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}&display=swap`;
+              fetch(fontUrl)
+                .then(response => response.text())
+                .then(cssText => {
+                  // Try to extract the actual font URL from the CSS
+                  const fontUrlMatch = cssText.match(/url\(([^)]+)\)/);
+                  if (fontUrlMatch && fontUrlMatch[1]) {
+                    const actualFontUrl = fontUrlMatch[1].replace(/"/g, '');
+                    const fontFace = new FontFace(fontName, `url(${actualFontUrl})`);
+                    fontFace.load()
+                      .then(loadedFace => {
+                        document.fonts.add(loadedFace);
+                        console.log(`Font loaded via FontFace API: ${fontName}`);
+                        canvas?.renderAll();
+                        resolve();
+                      })
+                      .catch(err => {
+                        console.error(`Failed to load font via FontFace API: ${fontName}`, err);
+                        // At this point, we've tried everything we can
+                        // Just resolve anyway to prevent blocking the UI
+                        resolve();
+                      });
+                  } else {
+                    console.error(`Could not extract font URL from CSS: ${fontName}`);
+                    resolve();
+                  }
+                })
+                .catch(err => {
+                  console.error(`Failed to fetch font CSS: ${fontName}`, err);
+                  resolve();
+                });
+            } catch (err) {
+              console.error(`FontFace API attempt failed: ${fontName}`, err);
               resolve();
-            };
-            link.onerror = () => {
-              console.error(`Failed to load font even with fallback: ${fontName}`);
-              reject();
-            };
-            document.head.appendChild(link);
-          },
-          timeout: 3000 // 3 second timeout
-        });
+            }
+          };
+          document.head.appendChild(link);
+        },
+        timeout: 5000 // 5 second timeout
       });
-    }
-    return Promise.resolve();
-  };
+    });
+  }, [canvas]);
 
   const handleFontSizeChange = (value: number[]) => {
     setFontSize(value[0]);
