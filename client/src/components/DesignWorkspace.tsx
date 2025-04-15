@@ -10,6 +10,7 @@ import {
 import Toolbar from "@/components/Toolbar"; 
 import FontShowcase from "@/components/FontShowcase"; 
 import FontCarouselPicker from "@/components/FontCarouselPicker";
+import FontGallery from "@/components/FontGallery";
 import googleFontsService from "@/lib/googleFontsService";
 import { loadFontBatch, isFontLoaded } from "@/lib/fontLoader"; 
 
@@ -53,7 +54,8 @@ export default function DesignWorkspace({
 }: DesignWorkspaceProps) {
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 600, height: 400 });
-  const [showFontShowcase, setShowFontShowcase] = useState(false); 
+  const [showFontShowcase, setShowFontShowcase] = useState(false);
+  const [showFontGallery, setShowFontGallery] = useState(true); 
 
   const zoomIn = () => {
     if (zoom < 200) {
@@ -207,14 +209,29 @@ export default function DesignWorkspace({
         </div>
       </div>
 
+      <div className="px-4">
+        <FontGallery
+          visible={showFontGallery}
+          currentFont={getCurrentFont() || "Arial"}
+          onFontSelected={handleFontSelection}
+          sampleText={selectedObj && selectedObj.type === 'text' ? (selectedObj as fabric.Text).text : "Sample Text"}
+        />
+      </div>
+
       <div className="bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 px-4 py-1 flex justify-between items-center text-xs text-neutral-500 dark:text-neutral-400">
         <div>Size: {canvasSize.width}px × {canvasSize.height}px</div>
-        <div>
+        <div className="flex items-center space-x-4">
           <button 
             className="hover:text-primary transition-colors" 
             onClick={toggleTutorial}
           >
             Need help? View Tutorial
+          </button>
+          <button 
+            className={`hover:text-primary transition-colors ${showFontGallery ? 'text-primary' : ''}`}
+            onClick={() => setShowFontGallery(!showFontGallery)}
+          >
+            {showFontGallery ? 'Hide Font Gallery' : 'Show Font Gallery'}
           </button>
         </div>
         <div>
