@@ -32,6 +32,7 @@ export default function FontCarouselPicker({
   const [visibleFonts, setVisibleFonts] = useState<string[]>([]);
   const [customText, setCustomText] = useState(sampleText);
   const [currentFontSet, setCurrentFontSet] = useState("all");
+  const [hoverFont, setHoverFont] = useState<string | null>(null);
   
   const carouselRef = useRef<HTMLDivElement>(null);
   const itemsToShow = 3;
@@ -195,7 +196,7 @@ export default function FontCarouselPicker({
           <Type className="h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[320px] p-0" align="start">
+      <PopoverContent className="w-[360px] p-0 max-h-[70vh] overflow-y-auto" align="start">
         <div className="space-y-4 p-3">
           <div className="flex items-center justify-between">
             <h4 className="font-medium text-sm">Font Selection</h4>
@@ -264,15 +265,21 @@ export default function FontCarouselPicker({
                       className={`
                         flex-1 p-3 border rounded-md cursor-pointer transition-all
                         ${font === currentFont ? 'border-primary bg-primary/5' : 'border-neutral-200 hover:border-primary/50'}
+                        hover:scale-105 hover:shadow-md transform ease-in-out duration-200
                       `}
                       onClick={() => handleFontSelect(font)}
+                      onMouseEnter={() => setHoverFont(font)}
+                      onMouseLeave={() => setHoverFont(null)}
                     >
                       <div 
                         className="text-center"
                         style={{ fontFamily: font }}
                       >
-                        <div className="text-xs text-muted-foreground mb-1 truncate">{font}</div>
-                        <div className="h-16 overflow-hidden flex items-center justify-center">
+                        <div className="text-xs text-muted-foreground mb-1 truncate font-sans">{font}</div>
+                        <div className={`
+                          h-16 overflow-hidden flex items-center justify-center text-sm md:text-base leading-tight
+                          ${hoverFont === font ? 'scale-110 text-primary transition-all duration-200' : ''}
+                        `}>
                           {customText}
                         </div>
                       </div>

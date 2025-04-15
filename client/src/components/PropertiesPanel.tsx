@@ -372,6 +372,15 @@ export default function PropertiesPanel({
                   </div>
                 ) : (
                   <div className="w-full">
+                    <div className="mb-2 p-2 rounded-md bg-neutral-50 dark:bg-neutral-800 flex flex-col items-center">
+                      <div 
+                        className="mb-1 text-center text-base" 
+                        style={{ fontFamily: font }}
+                      >
+                        {text || "Preview Text"}
+                      </div>
+                      <div className="text-xs text-muted-foreground">{font}</div>
+                    </div>
                     <FontCarouselPicker
                       currentFont={font}
                       onFontSelected={async (fontName) => {
