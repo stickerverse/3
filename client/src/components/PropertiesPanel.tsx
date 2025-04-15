@@ -158,7 +158,7 @@ export default function PropertiesPanel({
   };
   
   // Function to load a font if it's not already loaded
-  const loadFontIfNeeded = useCallback((fontName: string) => {
+  const loadFontIfNeeded = useCallback(async (fontName: string) => {
     // First check if the font is already loaded using our utility function
     if (isFontLoaded(fontName)) {
       return Promise.resolve();
