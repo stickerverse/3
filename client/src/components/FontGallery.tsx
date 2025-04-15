@@ -33,55 +33,55 @@ export default function FontGallery({
   const [animationStyles, setAnimationStyles] = useState<Record<string, string>>({});
   const galleryRef = useRef<HTMLDivElement>(null);
   const animationInterval = useRef<NodeJS.Timeout | null>(null);
-  
+
   // Load all fonts when component mounts
   useEffect(() => {
     const loadFonts = async () => {
       if (!visible) return;
-      
+
       setIsLoading(true);
       try {
         // First preload a small set of popular fonts for immediate display
         const popularFonts = googleFontsService.popularFonts;
         await googleFontsService.loadFonts(popularFonts);
-        
+
         // Then fetch all fonts from API
         const data = await googleFontsService.fetchGoogleFonts("all");
         const fontList = data.fonts.map((font: any) => font.family);
-        
+
         setFonts(fontList);
         setDisplayFonts(fontList.slice(0, 20)); // Initially show fewer fonts for faster loading
         setCategories(data.categories);
-        
+
         // Preload the initial set of visible fonts more thoroughly
         const initialFonts = fontList.slice(0, 20);
         await googleFontsService.loadFonts(initialFonts);
-        
+
         // After a delay, load the next batch in the background
         setTimeout(() => {
           googleFontsService.loadFonts(fontList.slice(20, 50));
         }, 1000);
-        
+
       } catch (error) {
         console.error("Error loading fonts:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    
+
     loadFonts();
   }, [visible]);
-  
+
   // Handle scroll to load more fonts
   useEffect(() => {
     if (!galleryRef.current || !visible) return;
-    
+
     const handleScroll = () => {
       const container = galleryRef.current;
       if (!container) return;
-      
+
       const { scrollTop, scrollHeight, clientHeight } = container;
-      
+
       // If scrolled to bottom - 200px, load more fonts
       if (scrollHeight - scrollTop <= clientHeight + 200) {
         // Load next batch of fonts
@@ -90,11 +90,11 @@ export default function FontGallery({
           const filteredFonts = activeCategory === "all"
             ? fonts
             : categories[activeCategory] || [];
-            
+
           const searchFiltered = searchQuery
             ? filteredFonts.filter(font => font.toLowerCase().includes(searchQuery.toLowerCase()))
             : filteredFonts;
-          
+
           const nextBatch = searchFiltered.slice(currentLength, currentLength + 20);
           if (nextBatch.length > 0) {
             setDisplayFonts(prev => [...prev, ...nextBatch]);
@@ -104,21 +104,21 @@ export default function FontGallery({
         }
       }
     };
-    
+
     const containerRef = galleryRef.current;
     containerRef.addEventListener("scroll", handleScroll);
-    
+
     return () => {
       containerRef.removeEventListener("scroll", handleScroll);
     };
   }, [displayFonts, fonts, categories, activeCategory, searchQuery, visible]);
-  
+
   // Handle search and category filter
   useEffect(() => {
     if (!visible) return;
-    
+
     setIsLoading(true);
-    
+
     const loadCategoryFonts = async () => {
       // Handle special categories first
       if (activeCategory === "github") {
@@ -127,11 +127,11 @@ export default function FontGallery({
           if (!categories['github'] || categories['github'].length === 0) {
             // Load fonts from GitHub repo
             const githubFonts = await githubFontService.loadFontsFromGitHub("stickerverse/Fonts1");
-            
+
             // Update categories with GitHub fonts
             const updatedCategories = { ...categories, github: githubFonts };
             setCategories(updatedCategories);
-            
+
             // Display GitHub fonts
             setDisplayFonts(githubFonts);
           } else {
@@ -146,13 +146,13 @@ export default function FontGallery({
         }
         return; // Exit early
       }
-      
+
       // Handle system fonts category
       if (activeCategory === "system") {
         try {
           // Load system fonts if needed
           const systemFonts = await googleFontsService.getFontsByCategory('system');
-          
+
           if (!systemFonts || systemFonts.length === 0) {
             // Try to load system fonts from json file
             await googleFontsService.loadSystemFontsFromJson();
@@ -169,40 +169,40 @@ export default function FontGallery({
         }
         return; // Exit early
       }
-      
+
       // For standard categories (all, sans-serif, serif, etc.)
       let filteredFonts = activeCategory === "all"
         ? fonts
         : categories[activeCategory] || [];
-        
+
       if (searchQuery) {
         filteredFonts = filteredFonts.filter(font => 
           font.toLowerCase().includes(searchQuery.toLowerCase())
         );
       }
-      
+
       // Reset to show only first batch of filtered fonts
       setDisplayFonts(filteredFonts.slice(0, 50));
-      
+
       // Preload the visible fonts
       googleFontsService.loadFonts(filteredFonts.slice(0, 50));
-      
+
       setIsLoading(false);
     };
-    
+
     loadCategoryFonts();
   }, [searchQuery, activeCategory, visible, categories]);
-  
+
   const handleCategoryChange = (category: string) => {
     setActiveCategory(category);
   };
-  
+
   // Determine the animation style for each font category
   useEffect(() => {
     if (!visible) return;
-    
+
     const fontAnimationStyles: Record<string, string> = {};
-    
+
     // Assign an animation style to each font based on its category
     Object.entries(categories).forEach(([category, fontList]) => {
       const animation = getAnimationForCategory(category);
@@ -210,10 +210,10 @@ export default function FontGallery({
         fontAnimationStyles[font] = animation;
       });
     });
-    
+
     setAnimationStyles(fontAnimationStyles);
   }, [categories, visible]);
-  
+
   // Get animation style based on font category
   const getAnimationForCategory = (category: string): string => {
     switch(category) {
@@ -225,11 +225,11 @@ export default function FontGallery({
       default: return 'animate-float';
     }
   };
-  
+
   // Get different styles for different font categories
   const getPreviewStyle = (font: string): string => {
     if (!font || !categories) return '';
-    
+
     let category = "sans-serif"; // default
     for (const [cat, fonts] of Object.entries(categories)) {
       if (fonts.includes(font)) {
@@ -237,7 +237,7 @@ export default function FontGallery({
         break;
       }
     }
-    
+
     switch(category) {
       case 'serif': 
         return 'bg-gradient-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent';
@@ -251,13 +251,13 @@ export default function FontGallery({
         return '';
     }
   };
-  
+
   // Animation effect for the hovered font
   useEffect(() => {
     if (hoveredFont) {
       // Start animation for this font
       setAnimatedFonts(prev => ({ ...prev, [hoveredFont]: true }));
-      
+
       // Set up interval to cycle through different text displays
       if (!animationInterval.current) {
         const sansSerifOptions = ["Aa", "Bb", "Cc", "Dd"];
@@ -265,7 +265,7 @@ export default function FontGallery({
         const displayOptions = ["Wow!", "Look!", "Cool!", "Nice!"];
         const handwritingOptions = ["Hello", "Write", "Script", "Note"];
         const monospaceOptions = ["Code", "0101", "Hack", "</>"];
-        
+
         // Determine which category the hovered font belongs to
         let category = "sans-serif"; // default
         for (const [cat, fonts] of Object.entries(categories)) {
@@ -274,7 +274,7 @@ export default function FontGallery({
             break;
           }
         }
-        
+
         // Choose appropriate text options based on category
         let textOptions: string[];
         switch(category) {
@@ -285,7 +285,7 @@ export default function FontGallery({
           case 'monospace': textOptions = monospaceOptions; break;
           default: textOptions = sansSerifOptions;
         }
-        
+
         let index = 0;
         animationInterval.current = setInterval(() => {
           index = (index + 1) % textOptions.length;
@@ -299,13 +299,13 @@ export default function FontGallery({
         animationInterval.current = null;
         setAnimationText("Aa");
       }
-      
+
       // Reset all animations after a delay
       setTimeout(() => {
         setAnimatedFonts({});
       }, 300);
     }
-    
+
     return () => {
       if (animationInterval.current) {
         clearInterval(animationInterval.current);
@@ -313,15 +313,15 @@ export default function FontGallery({
       }
     };
   }, [hoveredFont, categories]);
-  
+
   // If component is not visible, don't render anything
   if (!visible) return null;
-  
+
   return (
     <div className="mt-4 border-t border-neutral-200 dark:border-neutral-800 pt-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-medium">Browse your fonts</h3>
-        
+
         <div className="relative w-64">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -332,7 +332,7 @@ export default function FontGallery({
           />
         </div>
       </div>
-      
+
       <div className="mb-6 bg-neutral-50 dark:bg-neutral-900 p-4 rounded-md border">
         <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-2">
           Enter text below to preview it with all fonts
@@ -360,7 +360,7 @@ export default function FontGallery({
           )}
         </div>
       </div>
-      
+
       <Tabs defaultValue="all" className="w-full mb-4">
         <TabsList className="w-full flex-wrap">
           <TabsTrigger value="all" onClick={() => handleCategoryChange("all")}>
@@ -390,7 +390,7 @@ export default function FontGallery({
           </TabsTrigger>
         </TabsList>
       </Tabs>
-      
+
       {activeCategory === "system" ? (
         <div className="h-[480px] overflow-y-auto border rounded-lg bg-neutral-50 dark:bg-neutral-900">
           <SystemFontBrowser onFontSelected={onFontSelected} />
@@ -478,19 +478,8 @@ export default function FontGallery({
             </button>
           ))
         ) : null}
-      </div>
+        </div>
       )}
-      
-      <div className="text-xs text-muted-foreground mt-2 text-center">
-        {activeCategory !== "system" && (
-          <>
-            {displayFonts.length} of {activeCategory === "all" 
-              ? fonts.length 
-              : categories[activeCategory]?.length || 0} fonts • 
-            Scroll to load more
-          </>
-        )}
-      </div>
     </div>
   );
 }
