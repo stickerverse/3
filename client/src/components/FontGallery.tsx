@@ -360,6 +360,9 @@ export default function FontGallery({
           <TabsTrigger value="monospace" onClick={() => handleCategoryChange("monospace")}>
             Monospace
           </TabsTrigger>
+          <TabsTrigger value="system" onClick={() => handleCategoryChange("system")}>
+            System Fonts
+          </TabsTrigger>
         </TabsList>
       </Tabs>
       

@@ -18,6 +18,7 @@ class GoogleFontsService {
   categories: Record<string, string[]> = {
     'local': [],     // Category for local fonts
     'github': [],    // Category for GitHub fonts
+    'system': [],    // Category for system fonts
     'serif': [],
     'sans-serif': [],
     'display': [],
@@ -101,12 +102,22 @@ class GoogleFontsService {
       this.fontCache = null;
       this.loadedFonts.clear();
       this.categories = {
+        'local': [],
+        'github': [],
+        'system': [],
         'serif': [],
         'sans-serif': [],
         'display': [],
         'handwriting': [],
         'monospace': []
       };
+    }
+    
+    // Try to load fonts from public/fonts.json if it exists
+    try {
+      this.loadSystemFontsFromJson();
+    } catch (error) {
+      console.log("No system fonts found in fonts.json");
     }
     
     // Load popular fonts initially for better UX
@@ -523,6 +534,105 @@ class GoogleFontsService {
     } catch (error) {
       console.error("Error registering GitHub font:", error);
       return false;
+    }
+  }
+  
+  /**
+   * Load fonts from the public/fonts.json file
+   * This method is called during initialization and loads fonts scanned by scan-fonts.js
+   */
+  async loadSystemFontsFromJson(): Promise<void> {
+    try {
+      // First check if fonts.json exists
+      const response = await fetch('/fonts.json');
+      if (!response.ok) {
+        throw new Error('No fonts.json file found');
+      }
+      
+      // Parse the fonts.json file
+      const fontPaths = await response.json();
+      
+      if (!Array.isArray(fontPaths) || fontPaths.length === 0) {
+        console.log('No fonts found in fonts.json');
+        return;
+      }
+      
+      console.log(`Found ${fontPaths.length} system fonts in fonts.json`);
+      
+      // Check if we also have metadata
+      let fontMetadata: any[] = [];
+      try {
+        const metaResponse = await fetch('/fonts-metadata.json');
+        if (metaResponse.ok) {
+          fontMetadata = await metaResponse.json();
+        }
+      } catch (error) {
+        console.log('No fonts-metadata.json found, using simple naming');
+      }
+      
+      // Process each font path
+      for (const fontPath of fontPaths) {
+        try {
+          // Generate full URL to the font
+          const fontUrl = `/fonts/${fontPath}`;
+          
+          // Find metadata if available
+          let fontName = '';
+          const metadata = fontMetadata.find(meta => meta.path === fontPath);
+          
+          if (metadata && metadata.name) {
+            fontName = metadata.name;
+          } else {
+            // Extract name from filename
+            const fileName = fontPath.split('/').pop() || '';
+            fontName = fileName.split('.')[0]
+              .replace(/[_-]/g, ' ') // Replace underscores and hyphens with spaces
+              .replace(/([A-Z])/g, ' $1') // Add spaces before capital letters
+              .trim();
+          }
+          
+          // Add prefix to distinguish system fonts
+          fontName = `System: ${fontName}`;
+          
+          // Register the font
+          const style = document.createElement('style');
+          style.textContent = `
+            @font-face {
+              font-family: '${fontName}';
+              src: url('${fontUrl}') format('${this.getFontFormat(fontPath)}');
+              font-weight: normal;
+              font-style: normal;
+              font-display: swap;
+            }
+          `;
+          document.head.appendChild(style);
+          
+          // Add to system fonts category
+          if (!this.categories['system']) {
+            this.categories['system'] = [];
+          }
+          
+          // Don't add duplicates
+          if (!this.categories['system'].includes(fontName)) {
+            this.categories['system'].push(fontName);
+          }
+          
+          // Store the URL mapping
+          this.localFontUrls.set(fontName, fontUrl);
+          
+          // Mark as loaded
+          this.loadedFonts.add(fontName);
+          
+          console.log(`Loaded system font: ${fontName}`);
+        } catch (error) {
+          console.error(`Error loading system font ${fontPath}:`, error);
+        }
+      }
+      
+      console.log(`Successfully loaded ${this.categories['system']?.length || 0} system fonts`);
+      
+    } catch (error) {
+      console.warn('Error loading system fonts:', error);
     }
   }
 }
