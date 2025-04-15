@@ -11,6 +11,7 @@ import Toolbar from "@/components/Toolbar";
 import FontShowcase from "@/components/FontShowcase"; 
 import FontCarouselPicker from "@/components/FontCarouselPicker";
 import FontGallery from "@/components/FontGallery";
+import SystemFontBrowser from "@/components/SystemFontBrowser";
 
 import StandaloneFontPreviewer from './StandaloneFontPreviewer'; // Added import for StandaloneFontPreviewer
 import googleFontsService from "@/lib/googleFontsService";
@@ -212,6 +213,22 @@ export default function DesignWorkspace({
       </div>
 
       <div className="px-4">
+        {/* Local Fonts Section */}
+        <div className="mb-4">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-medium">Local Font Library</h3>
+            <div className="flex items-center">
+              <span className="text-xs text-muted-foreground">
+                Fonts from your <code className="bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 rounded">/fonts</code> directory
+              </span>
+            </div>
+          </div>
+          <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-3">
+            <SystemFontBrowser onFontSelected={handleFontSelection} />
+          </div>
+        </div>
+        
+        {/* Google Fonts Gallery */}
         <FontGallery
           visible={showFontGallery}
           currentFont={getCurrentFont() || "Arial"}
