@@ -1,0 +1,301 @@
+import { useState, useEffect } from "react";
+import FontSelector from "./font-selector";
+import googleFontsService from "@/lib/googleFontsService";
+import { Button } from "@/components/ui/button";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
+  Bold, 
+  Italic, 
+  Underline,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify
+} from "lucide-react";
+
+interface FontToolbarProps {
+  currentFont?: string;
+  onFontChange?: (font: string) => void;
+  initialFontSize?: number;
+  onFontSizeChange?: (size: number) => void;
+  onBoldChange?: (isBold: boolean) => void;
+  onItalicChange?: (isItalic: boolean) => void;
+  onUnderlineChange?: (isUnderline: boolean) => void;
+  onAlignmentChange?: (alignment: string) => void;
+  showAdvancedOptions?: boolean;
+}
+
+const FontToolbar = ({ 
+  currentFont = "Arial",
+  onFontChange,
+  initialFontSize = 16,
+  onFontSizeChange,
+  onBoldChange,
+  onItalicChange,
+  onUnderlineChange,
+  onAlignmentChange,
+  showAdvancedOptions = true
+}: FontToolbarProps) => {
+  const [selectedFont, setSelectedFont] = useState(currentFont);
+  const [fontSize, setFontSize] = useState(initialFontSize);
+  const [isBold, setIsBold] = useState(false);
+  const [isItalic, setIsItalic] = useState(false);
+  const [isUnderline, setIsUnderline] = useState(false);
+  const [textAlignment, setTextAlignment] = useState("left");
+  const [isLoading, setIsLoading] = useState(true);
+  const [popularFonts, setPopularFonts] = useState<string[]>([]);
+
+  // Font sizes for the dropdown
+  const fontSizes = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 48, 64, 72];
+
+  // Initialize - load popular fonts
+  useEffect(() => {
+    const initializeFonts = async () => {
+      try {
+        setIsLoading(true);
+        await googleFontsService.init();
+        const samples = await googleFontsService.getFontSamples(5);
+        setPopularFonts(samples);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error initializing fonts:", error);
+        setIsLoading(false);
+      }
+    };
+
+    initializeFonts();
+  }, []);
+
+  // Handle font change
+  const handleFontChange = (font: string) => {
+    setSelectedFont(font);
+    if (onFontChange) {
+      onFontChange(font);
+    }
+  };
+
+  // Handle font size change
+  const handleFontSizeChange = (value: string) => {
+    const size = parseInt(value, 10);
+    setFontSize(size);
+    if (onFontSizeChange) {
+      onFontSizeChange(size);
+    }
+  };
+
+  // Toggle bold
+  const toggleBold = () => {
+    const newValue = !isBold;
+    setIsBold(newValue);
+    if (onBoldChange) {
+      onBoldChange(newValue);
+    }
+  };
+
+  // Toggle italic
+  const toggleItalic = () => {
+    const newValue = !isItalic;
+    setIsItalic(newValue);
+    if (onItalicChange) {
+      onItalicChange(newValue);
+    }
+  };
+
+  // Toggle underline
+  const toggleUnderline = () => {
+    const newValue = !isUnderline;
+    setIsUnderline(newValue);
+    if (onUnderlineChange) {
+      onUnderlineChange(newValue);
+    }
+  };
+
+  // Change text alignment
+  const changeAlignment = (alignment: string) => {
+    setTextAlignment(alignment);
+    if (onAlignmentChange) {
+      onAlignmentChange(alignment);
+    }
+  };
+
+  // Render the font selector with loading state
+  const renderFontSelector = () => {
+    if (isLoading) {
+      return (
+        <div className="h-10 w-40 md:w-56 flex items-center justify-center bg-background border rounded-md px-3 py-2">
+          <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+          <span className="text-sm">Loading fonts...</span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="w-40 md:w-56">
+        <FontSelector
+          value={selectedFont}
+          onFontSelect={handleFontChange}
+          placeholder="Select font..."
+        />
+      </div>
+    );
+  };
+
+  return (
+    <TooltipProvider>
+      <div className="flex flex-wrap items-center gap-2 p-2 bg-muted/40 border rounded-md">
+        {/* Font family selector */}
+        {renderFontSelector()}
+        
+        {/* Font size selector */}
+        <Select value={fontSize.toString()} onValueChange={handleFontSizeChange}>
+          <SelectTrigger className="w-[70px]">
+            <SelectValue placeholder="Size" />
+          </SelectTrigger>
+          <SelectContent>
+            {fontSizes.map((size) => (
+              <SelectItem key={size} value={size.toString()}>
+                {size}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        
+        {showAdvancedOptions && (
+          <>
+            {/* Text style buttons */}
+            <div className="flex items-center">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={isBold ? "bg-muted" : ""}
+                    onClick={toggleBold}
+                  >
+                    <Bold className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Bold</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={isItalic ? "bg-muted" : ""}
+                    onClick={toggleItalic}
+                  >
+                    <Italic className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Italic</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={isUnderline ? "bg-muted" : ""}
+                    onClick={toggleUnderline}
+                  >
+                    <Underline className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Underline</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            
+            {/* Text alignment buttons */}
+            <div className="flex items-center">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={textAlignment === "left" ? "bg-muted" : ""}
+                    onClick={() => changeAlignment("left")}
+                  >
+                    <AlignLeft className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Align left</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={textAlignment === "center" ? "bg-muted" : ""}
+                    onClick={() => changeAlignment("center")}
+                  >
+                    <AlignCenter className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Align center</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={textAlignment === "right" ? "bg-muted" : ""}
+                    onClick={() => changeAlignment("right")}
+                  >
+                    <AlignRight className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Align right</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={textAlignment === "justify" ? "bg-muted" : ""}
+                    onClick={() => changeAlignment("justify")}
+                  >
+                    <AlignJustify className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Align justify</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </>
+        )}
+      </div>
+    </TooltipProvider>
+  );
+};
+
+export default FontToolbar;
