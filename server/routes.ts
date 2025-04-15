@@ -518,8 +518,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error('Invalid response format from Google Fonts API');
       }
       
+      // Limit to 1000 fonts for better performance
+      const limitedItems = data.items.slice(0, 1000);
+      
       // Create a simplified font list with just the info we need
-      const simplifiedFonts = data.items.map((font) => {
+      const simplifiedFonts = limitedItems.map((font) => {
         const category = font.category?.toLowerCase() || 'unknown';
         const fontFamily = font.family;
         

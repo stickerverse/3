@@ -58,13 +58,17 @@ class GoogleFontsService {
    * @param allFonts Array of all font families to load
    */
   async loadAllFontsInBatches(allFonts: string[]) {
+    // Limit to 1000 fonts maximum for better performance
+    const maxFonts = 1000;
+    const limitedFonts = allFonts.length > maxFonts ? allFonts.slice(0, maxFonts) : allFonts;
+    
     const batchSize = 15; // Load 15 fonts at a time
-    const totalFonts = allFonts.length;
+    const totalFonts = limitedFonts.length;
     let loadedCount = 0;
     
     // Process fonts in batches
     for (let i = 0; i < totalFonts; i += batchSize) {
-      const batch = allFonts.slice(i, i + batchSize);
+      const batch = limitedFonts.slice(i, i + batchSize);
       try {
         await this.loadFonts(batch);
         loadedCount += batch.length;
@@ -74,7 +78,7 @@ class GoogleFontsService {
       }
     }
     
-    console.log("All fonts loaded successfully");
+    console.log(`All fonts loaded successfully (limited to ${totalFonts} fonts)`);
   }
   
   /**
