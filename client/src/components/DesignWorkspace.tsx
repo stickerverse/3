@@ -233,9 +233,14 @@ export default function DesignWorkspace({
         <div className="mb-4">
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-lg font-medium">Local Font Library</h3>
-            <div className="flex items-center">
-              <span className="text-xs text-muted-foreground">
-                Fonts from your <code className="bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 rounded">/fonts</code> directory
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                <span>Local fonts from your</span>
+                <code className="bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 rounded font-mono">/fonts</code>
+                <span>directory</span>
+              </span>
+              <span className="text-[9px] bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded-full">
+                {526} fonts found
               </span>
             </div>
           </div>

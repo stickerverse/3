@@ -105,7 +105,7 @@ export default function SystemFontBrowser({ onClose, onFontSelected, currentFont
         
         // If scrolled to bottom - 100px, load more fonts
         if (scrollHeight - scrollTop <= clientHeight + 100) {
-          console.log("System fonts scroll triggered loading more fonts");
+          console.log("Scroll triggered font loading");
           
           // Check if we have more fonts to load
           if (endIndex < filteredFonts.length) {
@@ -165,52 +165,68 @@ export default function SystemFontBrowser({ onClose, onFontSelected, currentFont
             />
           </div>
 
-          <div 
-            ref={containerRef}
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[380px] overflow-y-auto p-1 rounded-lg"
-          >
-            {fontsToDisplay.length === 0 ? (
-              <div className="col-span-full text-center p-4 text-muted-foreground">
-                No fonts match your search
-              </div>
-            ) : (
-              fontsToDisplay.map((fontName, index) => (
-                <div 
-                  key={`system-browser-font-${index}-${fontName}`}
-                  className={`bg-white dark:bg-neutral-800 border ${currentFont === fontName ? 'border-primary border-2' : 'border-neutral-200 dark:border-neutral-700'} rounded-xl overflow-hidden shadow hover:shadow-md hover:border-primary/50 hover:scale-105 transition-all duration-200 cursor-pointer`}
-                  onClick={() => onFontSelected && onFontSelected(fontName)}
-                >
-                  <div
-                    className="flex items-center justify-center h-20 p-2 bg-white dark:bg-neutral-800 overflow-hidden"
-                    style={{ fontFamily: fontName }}
-                  >
-                    <span className="text-2xl">
-                      {previewText || "Aa"}
-                    </span>
-                  </div>
-                  <div className={`relative text-xs text-center p-1 border-t border-neutral-100 dark:border-neutral-700 truncate font-medium ${currentFont === fontName ? 'bg-primary/10 text-primary' : 'bg-neutral-50 dark:bg-neutral-900'}`}>
-                    <div className="flex justify-center items-center">
-                      <span className="truncate">{fontName}</span>
-                      <span className="ml-1 text-[7px] text-emerald-600 dark:text-emerald-400 opacity-70">local</span>
-                    </div>
-                  </div>
+          <div className="relative">
+            {loadedFonts.length > 24 && fontsToDisplay.length <= 24 && (
+              <div className="absolute bottom-0 left-0 w-full h-12 z-10 pointer-events-none flex justify-center items-center">
+                <div className="bg-white/80 dark:bg-neutral-800/80 text-xs text-neutral-600 dark:text-neutral-300 px-2 py-1 rounded-full shadow-sm flex items-center animate-pulse">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                  Scroll to see more fonts
                 </div>
-              ))
+              </div>
             )}
             
-            {/* Show loading indicator at the bottom while more fonts are available */}
-            {filteredFonts.length > fontsToDisplay.length && (
-              <div className="col-span-full flex justify-center py-2">
-                <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full"></div>
+            <div 
+              ref={containerRef}
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[380px] overflow-y-auto p-1 rounded-lg"
+            >
+              {fontsToDisplay.length === 0 ? (
+                <div className="col-span-full text-center p-4 text-muted-foreground">
+                  No fonts match your search
+                </div>
+              ) : (
+                fontsToDisplay.map((fontName, index) => (
+                  <div 
+                    key={`system-browser-font-${index}-${fontName}`}
+                    className={`bg-white dark:bg-neutral-800 border ${currentFont === fontName ? 'border-primary border-2' : 'border-neutral-200 dark:border-neutral-700'} rounded-xl overflow-hidden shadow hover:shadow-md hover:border-primary/50 hover:scale-105 transition-all duration-200 cursor-pointer`}
+                    onClick={() => onFontSelected && onFontSelected(fontName)}
+                  >
+                    <div
+                      className="flex items-center justify-center h-20 p-2 bg-white dark:bg-neutral-800 overflow-hidden relative"
+                      style={{ fontFamily: fontName }}
+                    >
+                      <span className="text-2xl relative z-10">
+                        {previewText || "Aa"}
+                      </span>
+                      <div className="absolute bottom-0 right-0 bg-gradient-to-l from-emerald-50/30 dark:from-emerald-900/20 to-transparent w-full h-1/2 opacity-60 pointer-events-none"></div>
+                    </div>
+                    <div className={`relative text-xs text-center p-1 border-t border-neutral-100 dark:border-neutral-700 truncate font-medium ${currentFont === fontName ? 'bg-primary/10 text-primary' : 'bg-neutral-50 dark:bg-neutral-900'}`}>
+                      <div className="flex justify-center items-center">
+                        <span className="truncate">{fontName}</span>
+                        <span className="ml-1 text-[7px] text-emerald-600 dark:text-emerald-400 opacity-70">local</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+              
+              {/* Show loading indicator at the bottom while more fonts are available */}
+              {filteredFonts.length > fontsToDisplay.length && (
+                <div className="col-span-full flex justify-center py-2">
+                  <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full"></div>
+                </div>
+              )}
+            </div>
+
+            {loadComplete && (
+              <div className="text-xs text-muted-foreground text-center mt-2 flex justify-center items-center gap-1">
+                <span>Showing {fontsToDisplay.length} of {filteredFonts.length} fonts from your</span> 
+                <span className="px-1 py-0.5 bg-neutral-100 dark:bg-neutral-800 rounded font-mono text-[9px]">/fonts</span>
+                <span>folder</span>
               </div>
             )}
           </div>
-
-          {loadComplete && (
-            <div className="text-xs text-muted-foreground text-center mt-2">
-              Showing {fontsToDisplay.length} of {filteredFonts.length} system fonts
-            </div>
-          )}
         </div>
       )}
     </div>
