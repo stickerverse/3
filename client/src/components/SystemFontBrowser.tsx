@@ -17,6 +17,9 @@ export default function SystemFontBrowser({ onClose, onFontSelected, currentFont
   const [previewText, setPreviewText] = useState('Aa Bb Cc');
   const [loadComplete, setLoadComplete] = useState(false);
   const [missingFontsFolder, setMissingFontsFolder] = useState(false);
+  const [fontsPerPage] = useState(50); // Number of fonts to display per page
+  const [currentPage, setCurrentPage] = useState(1);
+
 
   // Load fonts from the system (local fonts.json file)
   useEffect(() => {
@@ -25,7 +28,7 @@ export default function SystemFontBrowser({ onClose, onFontSelected, currentFont
       try {
         // First check if system fonts are loaded
         const systemFonts = await googleFontsService.getFontsByCategory('system');
-        
+
         if (systemFonts && systemFonts.length > 0) {
           setLoadedFonts(systemFonts);
           setLoadComplete(true);
@@ -33,7 +36,7 @@ export default function SystemFontBrowser({ onClose, onFontSelected, currentFont
           // Try to reload system fonts (force refresh from file)
           await googleFontsService.loadSystemFontsFromJson();
           const refreshedFonts = await googleFontsService.getFontsByCategory('system');
-          
+
           if (refreshedFonts && refreshedFonts.length > 0) {
             setLoadedFonts(refreshedFonts);
             setLoadComplete(true);
@@ -48,7 +51,7 @@ export default function SystemFontBrowser({ onClose, onFontSelected, currentFont
         setIsLoading(false);
       }
     }
-    
+
     loadSystemFonts();
   }, []);
 
@@ -58,6 +61,16 @@ export default function SystemFontBrowser({ onClose, onFontSelected, currentFont
         font.toLowerCase().includes(filterText.toLowerCase())
       )
     : loadedFonts;
+
+  // Pagination
+  const startIndex = (currentPage - 1) * fontsPerPage;
+  const endIndex = startIndex + fontsPerPage;
+  const fontsToDisplay = filteredFonts.slice(startIndex, endIndex);
+
+
+  const handleLoadMore = () => {
+    setCurrentPage(currentPage + 1);
+  };
 
   return (
     <div className="w-full">
@@ -94,14 +107,14 @@ export default function SystemFontBrowser({ onClose, onFontSelected, currentFont
               className="w-1/2"
             />
           </div>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[300px] overflow-y-auto p-1">
-            {filteredFonts.length === 0 ? (
+            {fontsToDisplay.length === 0 ? (
               <div className="col-span-full text-center p-4 text-muted-foreground">
                 No fonts match your search
               </div>
             ) : (
-              filteredFonts.map((fontName, index) => (
+              fontsToDisplay.map((fontName, index) => (
                 <div 
                   key={`system-browser-font-${index}-${fontName}`}
                   className={`bg-white dark:bg-neutral-800 border ${currentFont === fontName ? 'border-primary border-2' : 'border-neutral-200 dark:border-neutral-700'} rounded-xl overflow-hidden shadow hover:shadow-md hover:border-primary/50 hover:scale-105 transition-all duration-200 cursor-pointer`}
@@ -123,9 +136,15 @@ export default function SystemFontBrowser({ onClose, onFontSelected, currentFont
             )}
           </div>
 
+          {filteredFonts.length > fontsPerPage && (
+            <button onClick={handleLoadMore} className="mt-2 block mx-auto px-4 py-2 bg-primary text-white rounded">
+              Load More ({fontsToDisplay.length} of {filteredFonts.length})
+            </button>
+          )}
+
           {loadComplete && (
             <div className="text-xs text-muted-foreground text-center mt-2">
-              Showing {filteredFonts.length} of {loadedFonts.length} system fonts
+              Showing {fontsToDisplay.length} of {filteredFonts.length} system fonts
             </div>
           )}
         </div>

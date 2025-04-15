@@ -81,23 +81,23 @@ export default function PropertiesPanel({
   const [previewText, setPreviewText] = useState(text);
   const [allFonts, setAllFonts] = useState<string[]>([]);
   const [isLoadingFonts, setIsLoadingFonts] = useState(true);
-  
+
   // Fetch all fonts when component mounts
   useEffect(() => {
     const fetchFonts = async () => {
       try {
         setIsLoadingFonts(true);
-        
+
         // Fetch all available fonts from Google Fonts API
         const data = await fetchGoogleFonts();
-        
+
         // Get all unique font names from all categories
         const allFontNames = Array.from(new Set(
           data.fonts.map(font => font.family)
         )).sort();
-        
+
         setAllFonts(allFontNames);
-        
+
         // Pre-load the first 20 most popular fonts to ensure they display properly
         const popularFonts = data.fonts.slice(0, 20).map(font => font.family);
         WebFont.load({
@@ -105,14 +105,14 @@ export default function PropertiesPanel({
             families: popularFonts
           }
         });
-        
+
       } catch (error) {
         console.error('Failed to load fonts:', error);
       } finally {
         setIsLoadingFonts(false);
       }
     };
-    
+
     fetchFonts();
   }, []);
 
@@ -131,21 +131,21 @@ export default function PropertiesPanel({
 
   const handleFontChange = async (e: ChangeEvent<HTMLSelectElement>) => {
     const selectedFont = e.target.value;
-    
+
     // Show loading indicator for the selected font
     const tempElement = document.createElement('div');
     tempElement.style.fontFamily = selectedFont;
     tempElement.style.visibility = 'hidden';
     tempElement.textContent = text || 'Sample Text';
     document.body.appendChild(tempElement);
-    
+
     // Set the font immediately so the UI updates
     setFont(selectedFont);
-    
+
     try {
       // Ensure the font is loaded before applying it
       await loadFontIfNeeded(selectedFont);
-      
+
       if (selectedObj && selectedObj.type === 'text') {
         (selectedObj as fabric.Text).set({ fontFamily: selectedFont });
         canvas?.renderAll();
@@ -157,14 +157,14 @@ export default function PropertiesPanel({
       document.body.removeChild(tempElement);
     }
   };
-  
+
   // Function to load a font if it's not already loaded
   const loadFontIfNeeded = useCallback(async (fontName: string) => {
     // First check if the font is already loaded using our utility function
     if (isFontLoaded(fontName)) {
       return Promise.resolve();
     }
-    
+
     // Check if it's a local font (user uploaded)
     const hasLocalPrefix = fontName.startsWith('Local:');
     if (hasLocalPrefix) {
@@ -173,7 +173,7 @@ export default function PropertiesPanel({
         const localFonts = await fetch('/api/fonts/local');
         const localFontsList = await localFonts.json();
         const fontInfo = localFontsList.fonts.find((f: any) => f.family === fontName);
-        
+
         if (fontInfo && fontInfo.url) {
           await loadLocalFont(fontName, fontInfo.url);
           console.log('Loaded local font:', fontName);
@@ -183,11 +183,11 @@ export default function PropertiesPanel({
       } catch (error) {
         console.error('Error loading local font:', error);
       }
-      
+
       console.log('Falling back to web fonts for:', fontName);
       return Promise.resolve();
     }
-    
+
     // For Google fonts, use WebFont loader with multiple fallback methods
     return new Promise<void>((resolve, reject) => {
       // First check if the font is already loaded
@@ -197,7 +197,7 @@ export default function PropertiesPanel({
         resolve();
         return;
       }
-      
+
       // First try: Use WebFont.load
       WebFont.load({
         google: {
@@ -294,40 +294,33 @@ export default function PropertiesPanel({
     setColor(newColor);
     if (selectedObj) {
       if (newColor === "") {
-        // For "No Fill", restore the original font appearance
-        if (selectedObj.type === 'text') {
-          // Remove fill to show the font's native rendering
-          selectedObj.set({
-            fill: '#000000', // Use black as default text color for better visibility
-            textBackgroundColor: null,
-            // Preserve stroke for outline effect if active
-            stroke: textEffect === 'outline' ? strokeColor : undefined,
-            strokeWidth: textEffect === 'outline' ? strokeWidth : 0,
-            // Keep opacity setting
-            opacity: opacity / 100
-          });
-          
-          // If the background is dark, use white text instead for better visibility
-          const canvas = selectedObj.canvas;
-          if (canvas && canvas.backgroundColor && typeof canvas.backgroundColor === 'string') {
-            const bgColor = canvas.backgroundColor.toLowerCase();
-            if (bgColor === '#000000' || bgColor === 'black' || bgColor === '#111111' || 
-                bgColor === '#222222' || bgColor === '#333333' || bgColor === 'rgba(0,0,0,1)') {
-              selectedObj.set({ fill: '#ffffff' });
-            }
-          }
-        } else {
-          // For non-text objects
-          selectedObj.set({ 
-            fill: null,
-            opacity: opacity / 100 
-          });
+        // For "No Fill", set text to use its original appearance
+        const updateProps: Record<string, any> = {
+          fill: null,
+          textBackgroundColor: null
+        };
+
+        // Ensure the stroke is still visible if set
+        if (textEffect === 'outline') {
+          updateProps.stroke = strokeColor;
         }
+
+        // Set opacity but only if it's not default (100)
+        if (opacity !== 100) {
+          updateProps.opacity = opacity / 100;
+        }
+
+        // Apply all changes at once for better performance
+        selectedObj.set(updateProps);
       } else {
         // Normal color application
         selectedObj.set({ fill: newColor });
       }
-      canvas?.renderAll();
+
+      // Only render once per change
+      if (canvas) {
+        canvas.requestRenderAll();  // Use requestRenderAll instead of renderAll
+      }
     }
   };
 
@@ -342,7 +335,7 @@ export default function PropertiesPanel({
   const handleEffectClick = (effect: string) => {
     // Set the effect state
     setTextEffect(effect);
-    
+
     if (selectedObj) {
       if (effect === 'none') {
         // For 'none', remove all effects by resetting properties
@@ -363,7 +356,7 @@ export default function PropertiesPanel({
   const toggleFontPanel = () => {
     setShowFontPanel(!showFontPanel);
   };
-  
+
   const openFontPreviewGallery = () => {
     setShowFontPreview(true);
   };
@@ -373,7 +366,7 @@ export default function PropertiesPanel({
       <div className="border-b border-neutral-200 dark:border-neutral-800 p-3">
         <h3 className="font-medium">Properties</h3>
       </div>
-      
+
       {/* No selection state */}
       {!selectedObj && (
         <div className="p-4 flex-1 overflow-y-auto">
@@ -391,7 +384,7 @@ export default function PropertiesPanel({
           </div>
         </div>
       )}
-      
+
       {/* Text selection properties */}
       {selectedObj && selectedObj.type === 'text' && (
         <div className="p-4 flex-1 overflow-y-auto">
@@ -406,7 +399,7 @@ export default function PropertiesPanel({
                 onChange={handleTextChange}
               />
             </div>
-            
+
             {/* Font family */}
             <div>
               <label className="block text-sm font-medium mb-1">Font</label>
@@ -432,11 +425,11 @@ export default function PropertiesPanel({
                       onFontSelected={async (fontName) => {
                         // Set the font immediately so the UI updates
                         setFont(fontName);
-                        
+
                         try {
                           // Ensure the font is loaded before applying it
                           await loadFontIfNeeded(fontName);
-                          
+
                           // Apply the font to the selected object
                           if (selectedObj && selectedObj.type === 'text') {
                             (selectedObj as fabric.Text).set({ fontFamily: fontName });
@@ -451,7 +444,7 @@ export default function PropertiesPanel({
                   </div>
                 )}
               </div>
-              
+
               <div className="flex space-x-2 mt-1">
                 <button 
                   className="text-xs text-primary hover:text-primary/80 transition-colors flex items-center"
@@ -465,7 +458,7 @@ export default function PropertiesPanel({
                 </button>
               </div>
             </div>
-            
+
             {/* Font size */}
             <div>
               <div className="flex justify-between items-center mb-1">
@@ -480,7 +473,7 @@ export default function PropertiesPanel({
                 onValueChange={handleFontSizeChange}
               />
             </div>
-            
+
             {/* Color */}
             <div>
               <label className="block text-sm font-medium mb-1">Color</label>
@@ -535,7 +528,7 @@ export default function PropertiesPanel({
                   step={0.5}
                   onValueChange={handleStrokeWidthChange}
                 />
-                
+
                 <div className="mt-2">
                   <label className="block text-sm font-medium mb-1">Outline Color</label>
                   <ColorPicker 
@@ -549,7 +542,7 @@ export default function PropertiesPanel({
                 </div>
               </div>
             )}
-            
+
             {/* Opacity */}
             <div>
               <div className="flex justify-between items-center mb-1">
@@ -567,7 +560,7 @@ export default function PropertiesPanel({
           </div>
         </div>
       )}
-      
+
       {/* Buttons for selected object */}
       {selectedObj && (
         <div className="p-3 border-t border-neutral-200 dark:border-neutral-800 flex space-x-2">

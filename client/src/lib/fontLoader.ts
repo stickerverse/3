@@ -123,22 +123,40 @@ export async function fetchGoogleFonts(sort = 'popularity'): Promise<{
   }
 }
 
+// Keep track of loaded fonts to avoid reloading
+const loadedFontsCache = new Set<string>();
+
 // Load a batch of fonts
 export function loadFontBatch(fontFamilies: string[]): Promise<void> {
+  // Filter out already loaded fonts
+  const fontsToLoad = fontFamilies.filter(font => !loadedFontsCache.has(font));
+  
+  // If all fonts are already loaded, resolve immediately
+  if (fontsToLoad.length === 0) {
+    return Promise.resolve();
+  }
+  
   return new Promise((resolve, reject) => {
     WebFont.load({
       google: {
-        families: fontFamilies
+        families: fontsToLoad,
+        text: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' // Load only essential characters initially
       },
+      classes: false, // Don't add classes to improve performance
+      events: false,  // Disable events for better performance
       active: () => {
-        console.log('Fonts loaded:', fontFamilies.length, 'fonts');
+        console.log('Fonts loaded:', fontsToLoad.length, 'fonts');
+        // Add to cache
+        fontsToLoad.forEach(font => loadedFontsCache.add(font));
         resolve();
       },
       inactive: () => {
-        console.error('Failed to load fonts:', fontFamilies);
-        reject(new Error('Failed to load fonts'));
+        console.warn('Some fonts failed to load:', fontsToLoad);
+        // Still mark as attempted to avoid retrying constantly
+        fontsToLoad.forEach(font => loadedFontsCache.add(font));
+        resolve(); // Resolve instead of reject to avoid blocking UI
       },
-      timeout: 5000 // 5 second timeout
+      timeout: 3000 // Reduced timeout for better user experience
     });
   });
 }
