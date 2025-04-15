@@ -188,8 +188,11 @@ export default function SystemFontBrowser({ onClose, onFontSelected, currentFont
                       {previewText || "Aa"}
                     </span>
                   </div>
-                  <div className={`text-xs text-center p-1 border-t border-neutral-100 dark:border-neutral-700 truncate font-medium ${currentFont === fontName ? 'bg-primary/10 text-primary' : 'bg-neutral-50 dark:bg-neutral-900'}`}>
-                    {fontName}
+                  <div className={`relative text-xs text-center p-1 border-t border-neutral-100 dark:border-neutral-700 truncate font-medium ${currentFont === fontName ? 'bg-primary/10 text-primary' : 'bg-neutral-50 dark:bg-neutral-900'}`}>
+                    <div className="flex justify-center items-center">
+                      <span className="truncate">{fontName}</span>
+                      <span className="ml-1 text-[7px] text-emerald-600 dark:text-emerald-400 opacity-70">local</span>
+                    </div>
                   </div>
                 </div>
               ))
