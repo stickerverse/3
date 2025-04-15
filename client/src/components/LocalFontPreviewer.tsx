@@ -24,15 +24,48 @@ export default function LocalFontPreviewer({
     async function loadLocalFonts() {
       setIsLoading(true);
       try {
-        // Ensure system fonts are loaded
+        // Explicitly run the font scan to ensure fonts are loaded
+        const scanResponse = await fetch('/api/scan-fonts', { method: 'POST' });
+        if (!scanResponse.ok) {
+          console.warn('Font scan request failed, will try to use existing data');
+        }
+        
+        // Load system fonts - this also loads the fonts.json file
         await googleFontsService.loadSystemFontsFromJson();
-        const systemFonts = await googleFontsService.getFontsByCategory('system');
+        
+        // Get the fonts
+        const systemFonts = googleFontsService.getFontsByCategory('system');
+        console.log('Loading system fonts from fonts.json...');
         
         if (systemFonts && systemFonts.length > 0) {
+          console.log(`Found ${systemFonts.length} fonts in the system category`);
           setLocalFonts(systemFonts);
           setFilteredFonts(systemFonts);
         } else {
-          console.log('No local fonts found');
+          console.log('No local fonts found in the system category');
+          
+          // Try to directly read from fonts.json as a fallback
+          try {
+            const response = await fetch('/fonts.json');
+            if (response.ok) {
+              const fontPaths = await response.json();
+              if (Array.isArray(fontPaths) && fontPaths.length > 0) {
+                // Extract font names from paths
+                const fontNames = fontPaths.map(path => {
+                  const fileName = path.split('/').pop() || '';
+                  return fileName.split('.')[0]
+                    .replace(/([_-])/g, ' ')
+                    .replace(/([A-Z])/g, ' $1')
+                    .trim();
+                });
+                console.log(`Extracted ${fontNames.length} font names from fonts.json`);
+                setLocalFonts(fontNames);
+                setFilteredFonts(fontNames);
+              }
+            }
+          } catch (jsonError) {
+            console.error('Error parsing fonts.json directly:', jsonError);
+          }
         }
       } catch (error) {
         console.error('Error loading local fonts:', error);
