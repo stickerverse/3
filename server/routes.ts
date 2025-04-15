@@ -45,6 +45,22 @@ export async function registerRoutes(app: express.Express): Promise<Server> {
 
   // Serve fonts
   app.use("/fonts", express.static(path.resolve(import.meta.dirname, "..", "fonts")));
+  
+  // Serve fonts.json file
+  app.get("/fonts.json", (req, res) => {
+    const fontsJsonPath = path.resolve(import.meta.dirname, "..", "public", "fonts.json");
+    if (fs.existsSync(fontsJsonPath)) {
+      res.sendFile(fontsJsonPath);
+    } else {
+      // Fallback to root fonts.json if not in public folder
+      const rootFontsJsonPath = path.resolve(import.meta.dirname, "..", "fonts.json");
+      if (fs.existsSync(rootFontsJsonPath)) {
+        res.sendFile(rootFontsJsonPath);
+      } else {
+        res.status(404).json({ message: "fonts.json not found" });
+      }
+    }
+  });
 
   // Define routes for designs
 

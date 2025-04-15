@@ -533,11 +533,18 @@ class GoogleFontsService {
     try {
       console.log('Loading system fonts from fonts.json...');
       
+      console.log('Attempting to load fonts.json');
       // First check if fonts.json exists
-      const response = await fetch('/fonts.json');
+      const response = await fetch('/fonts.json', {
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+        cache: 'no-store'
+      });
+      
       if (!response.ok) {
+        console.error(`Failed to load fonts.json: ${response.status} ${response.statusText}`);
         throw new Error('No fonts.json file found');
       }
+      console.log('Successfully fetched fonts.json');
       
       // Parse the fonts.json file
       const fontPaths = await response.json();
