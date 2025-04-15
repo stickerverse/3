@@ -21,6 +21,10 @@ interface DesignWorkspaceProps {
   selectedObj: fabric.Object | null;
   canvas: fabric.Canvas | null;
   toggleTutorial: () => void;
+  toggleVinylProperties?: () => void;
+  dimensions?: { width: number, height: number } | null;
+  selectedSizeId?: number | null;
+  selectedMaterialId?: number | null;
 }
 
 export default function DesignWorkspace({
@@ -35,7 +39,11 @@ export default function DesignWorkspace({
   setCurrentDesignName,
   selectedObj,
   canvas,
-  toggleTutorial
+  toggleTutorial,
+  toggleVinylProperties,
+  dimensions,
+  selectedSizeId,
+  selectedMaterialId
 }: DesignWorkspaceProps) {
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 600, height: 400 });
@@ -96,7 +104,7 @@ export default function DesignWorkspace({
           </Select>
         </div>
         
-        <div className="flex items-center">
+        <div className="flex items-center space-x-2">
           <input 
             type="text" 
             value={currentDesignName} 
@@ -104,6 +112,23 @@ export default function DesignWorkspace({
             className="text-center bg-transparent border-0 font-medium focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none px-2 py-1"
             aria-label="Design Name"
           />
+          {toggleVinylProperties && (
+            <button
+              className="p-1.5 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 text-primary"
+              onClick={toggleVinylProperties}
+              title="Vinyl Properties"
+              aria-label="Vinyl Properties"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M8 18L5 21L2 18" />
+                <path d="M5 16V4.5C5 3.67 5.67 3 6.5 3H10" />
+                <rect x="12" y="3" width="8" height="6" rx="2" />
+                <path d="M16 22L19 19L22 22" />
+                <path d="M19 16V9" />
+                <rect x="9" y="13" width="8" height="6" rx="2" />
+              </svg>
+            </button>
+          )}
         </div>
         
         <div className="flex items-center space-x-1">
