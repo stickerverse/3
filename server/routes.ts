@@ -125,8 +125,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ message: "Google Fonts API key not configured" });
       }
       
-      const sort = req.query.sort || 'popularity';
-      const url = `https://www.googleapis.com/webfonts/v1/webfonts?key=${apiKey}&sort=${sort}`;
+      // Build query parameters according to the API documentation
+      const queryParams = new URLSearchParams();
+      queryParams.append('key', apiKey);
+      
+      // Support sorting (default to popularity)
+      const sort = req.query.sort as string || 'popularity';
+      if (['alpha', 'date', 'popularity', 'style', 'trending'].includes(sort)) {
+        queryParams.append('sort', sort);
+      }
+      
+      // Support category filtering
+      const category = req.query.category as string;
+      if (category) {
+        queryParams.append('category', category);
+      }
+      
+      // Support subset filtering
+      const subset = req.query.subset as string;
+      if (subset) {
+        queryParams.append('subset', subset);
+      }
+      
+      // Request WOFF2 capability for better performance
+      queryParams.append('capability', 'WOFF2');
+      
+      // Build the final URL
+      const url = `https://www.googleapis.com/webfonts/v1/webfonts?${queryParams.toString()}`;
+      
+      console.log(`Fetching Google Fonts API: ${url.replace(apiKey, '[REDACTED]')}`);
       
       const response = await fetch(url);
       
@@ -134,7 +161,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error(`Google Fonts API responded with status ${response.status}`);
       }
       
-      const data = await response.json();
+      const data = await response.json() as {
+        kind: string;
+        items: Array<{
+          family: string;
+          category: string;
+          variants: string[];
+          subsets: string[];
+          version: string;
+          lastModified: string;
+          files: Record<string, string>;
+        }>;
+      };
       
       // Group fonts by category for easier frontend processing
       const fontsByCategory: Record<string, string[]> = {
@@ -145,9 +183,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'monospace': []
       };
       
+      if (!data.items || !Array.isArray(data.items)) {
+        throw new Error('Invalid response format from Google Fonts API');
+      }
+      
       // Create a simplified font list with just the info we need
-      const simplifiedFonts = data.items.map((font: any) => {
-        const category = font.category.toLowerCase();
+      const simplifiedFonts = data.items.map((font) => {
+        const category = font.category?.toLowerCase() || 'unknown';
         const fontFamily = font.family;
         
         // Add to category lists
@@ -161,13 +203,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return {
           family: fontFamily,
           category: category,
-          variants: font.variants,
+          variants: font.variants || ['regular'],
+          lastModified: font.lastModified,
+          subsets: font.subsets || ['latin'],
+          version: font.version
         };
       });
       
       res.json({
         fonts: simplifiedFonts,
-        categories: fontsByCategory
+        categories: fontsByCategory,
+        total: simplifiedFonts.length
       });
     } catch (error) {
       console.error('Error fetching Google Fonts:', error);

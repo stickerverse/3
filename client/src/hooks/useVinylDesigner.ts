@@ -7,7 +7,7 @@ import { DesignTemplate } from "@/types/vinyl";
 import { tintColor } from "@/lib/colorUtils";
 import { applyTextEffect, initializeCanvas, removeTextEffect } from "@/lib/fabricUtils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { fontCategories, loadAllFonts, getFontSamples, loadFontsByCategory } from "@/lib/fontLoader";
+import { fontCategories, loadAllFonts, getFontSamples, loadFontsByCategory, fetchGoogleFonts, loadFontBatch } from "@/lib/fontLoader";
 import WebFont from "webfontloader";
 
 export default function useVinylDesigner() {

@@ -1,0 +1,209 @@
+Developer API 
+
+bookmark_border
+
+The Developer API gives access to the metadata for all families served by Google Fonts. It allows apps to query Google Fonts for the available font families. The REST API supplies data in the JSON format that includes the styles and scripts (called subsets in Google Fonts) in each family. The API can sort the list of families alphabetically, by date added, by number of styles, by trend, or by popularity.
+
+Audience
+This document is intended for web and application developers. Using the Developer API requires knowledge of JavaScript.
+
+A quick example
+To retrieve the dynamic list of fonts offered by the Google Fonts service, send the following request:
+
+
+https://www.googleapis.com/webfonts/v1/webfonts?key=YOUR-API-KEY
+A sample of the result would look like this:
+
+
+{
+ "kind": "webfonts#webfontList",
+ "items": [
+  [...]
+  {
+    "family": "Anonymous Pro",
+    "variants": [
+      "regular",
+      "italic",
+      "700",
+      "700italic"
+    ],
+    "subsets": [
+      "cyrillic",
+      "greek",
+      "latin",
+      "latin-ext"
+    ],
+    "version": "v21",
+    "lastModified": "2022-09-22",
+    "files": {
+      "regular": "http://fonts.gstatic.com/s/anonymouspro/v21/rP2Bp2a15UIB7Un-bOeISG3pLlw89CH98Ko.ttf",
+      "italic": "http://fonts.gstatic.com/s/anonymouspro/v21/rP2fp2a15UIB7Un-bOeISG3pHl428AP44Kqr2Q.ttf",
+      "700": "http://fonts.gstatic.com/s/anonymouspro/v21/rP2cp2a15UIB7Un-bOeISG3pFuAT0CnW7KOywKo.ttf",
+      "700italic": "http://fonts.gstatic.com/s/anonymouspro/v21/rP2ap2a15UIB7Un-bOeISG3pHl4OTCzc6IG30KqB9Q.ttf"
+    },
+    "category": "monospace",
+    "kind": "webfonts#webfont",
+    "menu": "http://fonts.gstatic.com/s/anonymouspro/v21/rP2Bp2a15UIB7Un-bOeISG3pHl028A.ttf"
+  },
+  {
+    "family": "Antic",
+    "variants": [
+      "regular"
+    ],
+    "subsets": [
+      "latin"
+    ],
+    "version": "v19",
+    "lastModified": "2022-09-22",
+    "files": {
+      "regular": "http://fonts.gstatic.com/s/antic/v19/TuGfUVB8XY5DRaZLodgzydtk.ttf"
+    },
+    "category": "sans-serif",
+    "kind": "webfonts#webfont",
+    "menu": "http://fonts.gstatic.com/s/antic/v19/TuGfUVB8XY5DRZZKq9w.ttf"
+  },
+  [...]
+ ]
+}
+Identifying your application to Google
+Your application needs to identify itself every time it sends a request to the Google Fonts Developer API, by including an API key with each request.
+
+Acquiring and using an API key 
+Get a Key
+Or create one in the Credentials page.
+
+After you have an API key, your application can append the query parameter key=yourAPIKey to all request URLs.
+
+The API key is safe for embedding in URLs; it doesn't need any encoding.
+
+Details
+The JSON response (refer to sample above) is composed of an array named "items" which contains objects with information about each font family.
+
+A family object is composed of the following fields:
+
+kind: The kind of object, a webfont object
+family: The name of the family
+subsets: A list of scripts supported by the family
+menu: A url to the family subset covering only the name of the family.
+variants: The different styles available for the family
+version: The font family version.
+axes: Axis range, Present only upon request(see below) for variable fonts.
+lastModified: The date (format "yyyy-MM-dd") the font family was modified for the last time.
+files: The font family files (with all supported scripts) for each one of the available variants.
+By combining the information for each family it is easy to create a Fonts API request. For example assuming we have a reference to the family object for Anonymous Pro:
+
+
+[...]
+
+var apiUrl = [];
+apiUrl.push('https://fonts.googleapis.com/css?family=');
+apiUrl.push(anonymousPro.family.replace(/ /g, '+'));
+if (contains('italic', anonymousPro.variants)) {
+  apiUrl.push(':');
+  apiUrl.push('italic');
+}
+if (contains('greek', anonymousPro.subsets)) {
+  apiUrl.push('&subset=');
+  apiUrl.push('greek');
+}
+
+// url: 'https://fonts.googleapis.com/css?family=Anonymous+Pro:italic&subset=greek'
+var url = apiUrl.join('');
+
+[...]
+Sorting
+The list of families is returned in no particular order by default. It is possible however to sort the list using the sort parameter:
+
+
+https://www.googleapis.com/webfonts/v1/webfonts?sort=popularity
+The possible sorting values are:
+
+alpha: Sort the list alphabetically
+date: Sort the list by date added (most recent font added or updated first)
+popularity: Sort the list by popularity (most popular family first)
+style: Sort the list by number of styles available (family with most styles first)
+trending: Sort the list by families seeing growth in usage (family seeing the most growth first)
+Filtering
+Query a specific family
+
+
+https://www.googleapis.com/webfonts/v1/webfonts?family=family_name
+All families that support Greek subset
+
+
+https://www.googleapis.com/webfonts/v1/webfonts?subset=subset_name
+Filter by font category
+
+
+https://www.googleapis.com/webfonts/v1/webfonts?category=category_name
+Optimization
+For retrieving font files compressed in woff2 format
+
+
+https://www.googleapis.com/webfonts/v1/webfonts?capability=WOFF2
+Variable Fonts
+Variable fonts offer continuous ranges of styles. By default, a combination of static fonts files are returned for variable fonts instantiated at standard positions. If capability=VF is set, The variable font file is returned instead of static ones along with the available axes range metadata. sample example:
+
+
+https://www.googleapis.com/webfonts/v1/webfonts?capability=VF
+Sample response:
+
+
+{
+ "kind": "webfonts#webfontList",
+ "items": [
+  [...]
+  {
+    "family": "Noto Sans Display",
+    "variants": [
+      "regular",
+      "italic"
+    ],
+    "subsets": [
+      "cyrillic",
+      "cyrillic-ext",
+      "greek",
+      "greek-ext",
+      "latin",
+      "latin-ext",
+      "vietnamese"
+    ],
+    "version": "v20",
+    "lastModified": "2022-09-22",
+    "files": {
+      "regular": "http://fonts.gstatic.com/s/notosansdisplay/v20/RLplK4fy6r6tOBEJg0IAKzqdFZVZxokvfn_BDLxR.ttf",
+      "italic": "http://fonts.gstatic.com/s/notosansdisplay/v20/RLpjK4fy6r6tOBEJg0IAKzqdFZVZxrktdHvjCaxRgew.ttf"
+    },
+    "category": "sans-serif",
+    "kind": "webfonts#webfont",
+    "menu": "http://fonts.gstatic.com/s/notosansdisplay/v20/RLpbK4fy6r6tOBEJg0IAKzqdFZVZxpMkXJMhnB9XjO1o90LuV-PT4Doq_AKp_3cKZTCa3g.ttf",
+    "axes": [
+      {
+        "tag": "wdth",
+        "start": 62.5,
+        "end": 100
+      },
+      {
+        "tag": "wght",
+        "start": 100,
+        "end": 900
+      }
+    ]
+  },
+  [...]
+ ]
+}
+API URL Specification
+webfonts?key=<your_key>[&family=<family>][&subset=<subset>][&capability=<capability>...][&sort=<sort>]
+
+your_key: Your developer API Key.
+
+family: Name of a font family.
+
+subset: Name of a font subset.
+
+category: serif | sans-serif | monospace | display | handwriting
+
+capability: VF | WOFF2.
+
+sort: alpha | date | popularity | style | trending.

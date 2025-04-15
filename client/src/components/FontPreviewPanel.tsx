@@ -122,7 +122,7 @@ export default function FontPreviewPanel({
       
       try {
         await loadFontsByCategory(selectedCategory);
-        setLoadedCategories(prev => new Set([...prev.values(), selectedCategory]));
+        setLoadedCategories(prev => new Set([...Array.from(prev), selectedCategory]));
       } catch (error) {
         console.error(`Error loading fonts for category ${selectedCategory}:`, error);
       } finally {
