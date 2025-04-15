@@ -12,6 +12,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import FontPreviewPanel from "@/components/FontPreviewPanel";
+import FontCarouselPicker from "@/components/FontCarouselPicker";
 import { 
   fetchGoogleFonts, 
   loadFontBatch, 

@@ -56,6 +56,8 @@ export default function Home() {
           toggleSettings={vinylDesigner.toggleSettings}
           selectedTool={vinylDesigner.selectedTool}
           showToolTips={vinylDesigner.showToolTips}
+          currentFont={vinylDesigner.font}
+          onSelectFont={vinylDesigner.setFont}
         />
 
         <DesignWorkspace 

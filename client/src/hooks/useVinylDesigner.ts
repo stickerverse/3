@@ -15,7 +15,46 @@ export default function useVinylDesigner() {
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
   const [color, setColor] = useState("#e74c3c");
   const [text, setText] = useState("Your Text Here");
-  const [font, setFont] = useState("Anton");
+  const [font, setFontState] = useState("Anton");
+  // Custom setFont function that also updates the selected object
+  const setFont = (newFont: string) => {
+    setFontState(newFont);
+    
+    // Update the selected object if it's a text object
+    if (canvas && selectedObj && (selectedObj.type === 'text' || selectedObj.type === 'textbox')) {
+      // Ensure the font is loaded before applying it
+      const loadAndApplyFont = async () => {
+        try {
+          if (typeof window !== 'undefined' && window.WebFont) {
+            window.WebFont.load({
+              google: {
+                families: [newFont]
+              },
+              active: () => {
+                (selectedObj as fabric.Text).set({ fontFamily: newFont });
+                canvas.renderAll();
+              },
+              inactive: () => {
+                console.warn(`Failed to load font: ${newFont}`);
+                (selectedObj as fabric.Text).set({ fontFamily: newFont });
+                canvas.renderAll();
+              }
+            });
+          } else {
+            (selectedObj as fabric.Text).set({ fontFamily: newFont });
+            canvas.renderAll();
+          }
+        } catch (error) {
+          console.error('Error loading font:', error);
+          // Still try to set the font even if there was an error loading it
+          (selectedObj as fabric.Text).set({ fontFamily: newFont });
+          canvas.renderAll();
+        }
+      };
+      
+      loadAndApplyFont();
+    }
+  };
   const [fontSize, setFontSize] = useState(40);
   const [selectedObj, setSelectedObj] = useState<fabric.Object | null>(null);
   const [opacity, setOpacity] = useState(100);
