@@ -294,17 +294,35 @@ export default function PropertiesPanel({
     setColor(newColor);
     if (selectedObj) {
       if (newColor === "") {
-        // For "No Fill", set text to use its original appearance
-        // First remove any applied fill
-        selectedObj.set({ 
-          fill: null,
-          // For text objects, ensure native font rendering
-          textBackgroundColor: null,
-          // Ensure the stroke is still visible if set
-          stroke: textEffect === 'outline' ? strokeColor : undefined,
-          // Keep other properties intact
-          opacity: opacity / 100
-        });
+        // For "No Fill", restore the original font appearance
+        if (selectedObj.type === 'text') {
+          // Remove fill to show the font's native rendering
+          selectedObj.set({
+            fill: '#000000', // Use black as default text color for better visibility
+            textBackgroundColor: null,
+            // Preserve stroke for outline effect if active
+            stroke: textEffect === 'outline' ? strokeColor : undefined,
+            strokeWidth: textEffect === 'outline' ? strokeWidth : 0,
+            // Keep opacity setting
+            opacity: opacity / 100
+          });
+          
+          // If the background is dark, use white text instead for better visibility
+          const canvas = selectedObj.canvas;
+          if (canvas && canvas.backgroundColor && typeof canvas.backgroundColor === 'string') {
+            const bgColor = canvas.backgroundColor.toLowerCase();
+            if (bgColor === '#000000' || bgColor === 'black' || bgColor === '#111111' || 
+                bgColor === '#222222' || bgColor === '#333333' || bgColor === 'rgba(0,0,0,1)') {
+              selectedObj.set({ fill: '#ffffff' });
+            }
+          }
+        } else {
+          // For non-text objects
+          selectedObj.set({ 
+            fill: null,
+            opacity: opacity / 100 
+          });
+        }
       } else {
         // Normal color application
         selectedObj.set({ fill: newColor });
