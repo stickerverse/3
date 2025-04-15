@@ -125,13 +125,8 @@ export default function FontPreviewPanel({
     let fonts: string[] = [];
     
     if (selectedCategory === "all") {
-      if (searchQuery) {
-        // If searching, include all fonts
-        fonts = allFonts;
-      } else {
-        // If not searching, just show popular fonts to avoid overwhelming the UI
-        fonts = popularFonts.map(font => font.family);
-      }
+      // Always include all fonts in the "all" category
+      fonts = allFonts;
     } else {
       // Get fonts for the selected category
       fonts = allCategories[selectedCategory] || [];
@@ -143,7 +138,7 @@ export default function FontPreviewPanel({
     }
     
     setFilteredFonts(fonts);
-  }, [searchQuery, selectedCategory, allCategories, allFonts, popularFonts, isLoadingCategories]);
+  }, [searchQuery, selectedCategory, allCategories, allFonts, isLoadingCategories]);
 
   // Load fonts for the selected category when tab changes
   useEffect(() => {
@@ -290,7 +285,7 @@ export default function FontPreviewPanel({
         ) : (
           <Tabs defaultValue="all" value={selectedCategory} onValueChange={setSelectedCategory} className="flex-1 flex flex-col">
             <TabsList className="flex flex-wrap justify-start mb-2">
-              <TabsTrigger value="all">Popular Fonts</TabsTrigger>
+              <TabsTrigger value="all">All Fonts</TabsTrigger>
               {Object.keys(allCategories).map(category => (
                 <TabsTrigger key={category} value={category}>
                   {category.charAt(0).toUpperCase() + category.slice(1)}
