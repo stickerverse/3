@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
+import fetch from "node-fetch";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Define routes for designs
@@ -112,6 +113,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).end();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete design" });
+    }
+  });
+  
+  // Get Google Fonts
+  app.get("/api/fonts", async (req, res) => {
+    try {
+      const apiKey = process.env.GOOGLE_FONTS_API_KEY;
+      
+      if (!apiKey) {
+        return res.status(500).json({ message: "Google Fonts API key not configured" });
+      }
+      
+      const sort = req.query.sort || 'popularity';
+      const url = `https://www.googleapis.com/webfonts/v1/webfonts?key=${apiKey}&sort=${sort}`;
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`Google Fonts API responded with status ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Group fonts by category for easier frontend processing
+      const fontsByCategory: Record<string, string[]> = {
+        'serif': [],
+        'sans-serif': [],
+        'display': [],
+        'handwriting': [],
+        'monospace': []
+      };
+      
+      // Create a simplified font list with just the info we need
+      const simplifiedFonts = data.items.map((font: any) => {
+        const category = font.category.toLowerCase();
+        const fontFamily = font.family;
+        
+        // Add to category lists
+        if (fontsByCategory[category]) {
+          fontsByCategory[category].push(fontFamily);
+        } else {
+          // In case there's a category we didn't anticipate
+          fontsByCategory[category] = [fontFamily];
+        }
+        
+        return {
+          family: fontFamily,
+          category: category,
+          variants: font.variants,
+        };
+      });
+      
+      res.json({
+        fonts: simplifiedFonts,
+        categories: fontsByCategory
+      });
+    } catch (error) {
+      console.error('Error fetching Google Fonts:', error);
+      res.status(500).json({ message: "Failed to fetch Google Fonts" });
     }
   });
 

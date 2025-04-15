@@ -46,14 +46,17 @@ export default function useVinylDesigner() {
   
   // Initialize Google Fonts
   useEffect(() => {
-    // Load initial batch of fonts
+    // Load initial batch of fonts for the UI
     const loadInitialFonts = async () => {
       try {
+        // Fetch font data from Google Fonts API
+        await fetchGoogleFonts();
+        
         // Load sample fonts from each category for initial rendering
         const fontSamples = getFontSamples(2);
         await loadFontBatch(fontSamples);
         
-        // Start loading all fonts in the background
+        // Start loading popular fonts in the background
         loadAllFonts().catch(err => {
           console.error('Failed to load all fonts:', err);
         });
@@ -65,26 +68,14 @@ export default function useVinylDesigner() {
     };
     
     loadInitialFonts();
-  }, []);
-  
-  // Function to load a batch of fonts
-  const loadFontBatch = async (fonts: string[]) => {
-    return new Promise<void>((resolve, reject) => {
-      WebFont.load({
-        google: {
-          families: fonts
-        },
-        active: () => {
-          console.log('Font batch loaded:', fonts);
-          resolve();
-        },
-        inactive: () => {
-          console.error('Failed to load font batch:', fonts);
-          reject(new Error('Failed to load fonts'));
-        }
-      });
+    
+    // Show toast to notify user about Google Fonts integration
+    toast({
+      title: "Google Fonts Integration",
+      description: "Access to 1,000+ beautiful fonts is now available in the font selector!",
+      duration: 5000,
     });
-  };
+  }, []);
   
   // Initialize canvas with advanced options
   useEffect(() => {
