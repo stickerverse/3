@@ -274,7 +274,21 @@ export default function FontGallery({
             value={customText}
             onChange={(e) => setCustomText(e.target.value)}
             className="w-full"
+            autoFocus
           />
+        </div>
+        <div className="flex justify-between items-center mt-3">
+          <div className="text-xs text-neutral-500">
+            {customText ? 'Preview text applied to all fonts' : 'Default "Aa" showing in previews'}
+          </div>
+          {customText && (
+            <button
+              onClick={() => setCustomText('')}
+              className="text-xs text-primary hover:text-primary/80 transition-colors"
+            >
+              Clear text
+            </button>
+          )}
         </div>
       </div>
       
@@ -326,15 +340,19 @@ export default function FontGallery({
             >
               <div 
                 className={`
-                  p-6 flex items-center justify-center ${customText && customText.length > 20 ? 'h-44' : 'h-36'} 
+                  p-4 flex items-center justify-center ${customText && customText.length > 20 ? 'h-44' : 'h-36'} 
                   bg-white dark:bg-neutral-800 rounded-t-2xl transition-all duration-200
                   ${font === currentFont ? 'bg-primary/5 dark:bg-primary/10' : ''}
+                  ${customText ? 'overflow-hidden' : ''}
                 `} 
                 style={{ fontFamily: font }}
               >
                 <div className={`
-                  ${customText && customText.length > 10 ? 'text-3xl' : 'text-5xl'} 
-                  overflow-hidden text-center relative
+                  ${!customText ? 'text-5xl' : 
+                    customText.length < 5 ? 'text-5xl' : 
+                    customText.length < 10 ? 'text-4xl' : 
+                    customText.length < 20 ? 'text-3xl' : 'text-2xl'} 
+                  overflow-hidden text-center relative w-full px-2
                   ${hoveredFont === font ? 'text-primary scale-110 transition-all duration-200' : ''}
                   ${font === currentFont ? 'text-primary font-bold' : ''}
                 `}>
@@ -343,8 +361,10 @@ export default function FontGallery({
                     ${hoveredFont === font ? animationStyles[font] || 'animate-float' : ''}
                     ${hoveredFont === font && font.length > 15 ? 'text-4xl' : ''}
                     ${hoveredFont === font ? getPreviewStyle(font) : ''}
-                    ${hoveredFont !== font && font === currentFont ? 'bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent' : ''}
-                    ${customText && customText.length > 40 ? 'max-w-full break-words' : ''}
+                    ${hoveredFont !== font && font === currentFont ? 'bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent ring-2 ring-primary/20 rounded-md px-2 py-1' : ''}
+                    ${customText ? 'max-w-full break-words px-1' : ''}
+                    ${!hoveredFont && customText ? 'py-2 px-3 bg-white/10 dark:bg-black/10 rounded-md' : ''}
+                    ${!hoveredFont && customText ? 'leading-tight tracking-tight' : ''}
                   `}>
                     {hoveredFont === font 
                       ? animationText 
