@@ -4,6 +4,14 @@ interface SystemFontBrowserProps {
   currentFont?: string; // Add current font prop to highlight selected font
 }
 
+import { useState, useEffect } from "react";
+
+interface SystemFontBrowserProps {
+  onClose?: () => void;
+  onFontSelected?: (fontName: string) => void;
+  currentFont?: string; // Add current font prop to highlight selected font
+}
+
 export default function SystemFontBrowser({ onClose, onFontSelected, currentFont }: SystemFontBrowserProps) {
   const [loadedFonts, setLoadedFonts] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
