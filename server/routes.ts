@@ -518,8 +518,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error('Invalid response format from Google Fonts API');
       }
       
+      // Get the requested font set (if specified)
+      const fontSet = req.query.fontSet as string;
+      
+      // Define popular and trending sets of fonts
+      const fontSets: Record<string, string[]> = {
+        'popular': ['Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Oswald', 'Raleway', 'Nunito', 
+                    'Poppins', 'Ubuntu', 'Playfair Display', 'Merriweather', 'Roboto Condensed'],
+        'display': ['Anton', 'Bebas Neue', 'Archivo Black', 'Bangers', 'Bungee', 'Fascinate', 
+                    'Lobster', 'Permanent Marker', 'Righteous', 'Russo One'],
+        'handwriting': ['Dancing Script', 'Pacifico', 'Caveat', 'Satisfy', 'Great Vibes', 'Kaushan Script',
+                      'Sacramento', 'Yellowtail', 'Allura', 'Courgette'],
+        'monospace': ['Roboto Mono', 'Source Code Pro', 'Fira Mono', 'Space Mono', 'Ubuntu Mono',
+                     'PT Mono', 'Courier Prime', 'IBM Plex Mono', 'Inconsolata', 'JetBrains Mono']
+      };
+      
+      // Filter fonts by set if requested
+      let filteredItems = [...data.items];
+      if (fontSet && fontSets[fontSet]) {
+        // Only keep fonts from the requested set
+        filteredItems = filteredItems.filter(font => 
+          fontSets[fontSet].includes(font.family)
+        );
+      } else if (category) {
+        // Filter by category if no specific set was requested
+        filteredItems = filteredItems.filter(font => 
+          font.category?.toLowerCase() === category.toLowerCase()
+        );
+      }
+      
       // Limit to 1000 fonts for better performance
-      const limitedItems = data.items.slice(0, 1000);
+      const limitedItems = filteredItems.slice(0, 1000);
       
       // Create a simplified font list with just the info we need
       const simplifiedFonts = limitedItems.map((font) => {

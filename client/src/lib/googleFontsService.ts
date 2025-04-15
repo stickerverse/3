@@ -35,15 +35,30 @@ class GoogleFontsService {
   
   /**
    * Initialize the font service
+   * @param {string} fontSet - Optional font set to load (popular, display, etc.)
    */
-  async init() {
+  async init(fontSet?: string) {
     console.log("Initializing Google Fonts service");
+    
+    // Clear font cache if switching font sets
+    if (fontSet) {
+      this.fontCache = null;
+      this.loadedFonts.clear();
+      this.categories = {
+        'serif': [],
+        'sans-serif': [],
+        'display': [],
+        'handwriting': [],
+        'monospace': []
+      };
+    }
+    
     // Load popular fonts initially for better UX
     await this.loadFonts(this.popularFonts);
     console.log("Initial fonts loaded successfully");
     
-    // Start loading all fonts in the background
-    this.fetchGoogleFonts().then(data => {
+    // Start loading all fonts (or specific font set) in the background
+    this.fetchGoogleFonts(fontSet).then(data => {
       // Get all font families
       const allFonts = data.fonts.map((font: any) => font.family);
       // Load fonts in smaller batches to prevent timeout issues
@@ -132,17 +147,24 @@ class GoogleFontsService {
   
   /**
    * Fetch Google Fonts data from the API
+   * @param {string} fontSet - Optional font set to filter by (popular, display, etc.)
    * @returns {Promise} - Resolves with font data
    */
-  async fetchGoogleFonts() {
-    // Return cached data if available
-    if (this.fontCache) {
+  async fetchGoogleFonts(fontSet?: string) {
+    // Return cached data if available and no specific font set requested
+    if (this.fontCache && !fontSet) {
       return this.fontCache;
     }
     
     try {
+      // Build URL with query parameters if needed
+      let url = '/api/fonts';
+      if (fontSet) {
+        url += `?fontSet=${fontSet}`;
+      }
+      
       // In our application, we have a real API endpoint
-      const response = await fetch('/api/fonts');
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch fonts from API');
       }
