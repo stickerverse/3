@@ -12,35 +12,25 @@ export async function registerRoutes(app: express.Express): Promise<Server> {
   // Serve standalone font previewer
   app.get("/standalone-font-previewer", (req, res) => {
     const htmlPath = path.resolve(import.meta.dirname, "..", "index.html");
-    let html = fs.readFileSync(htmlPath, "utf-8");
-
-    // Add message posting capability to the previewer
-    const scriptToAdd = `
-    <script>
-      // Add functionality to communicate with parent window
-      document.addEventListener('DOMContentLoaded', () => {
-        const fontBoxes = document.querySelectorAll('.font-box');
-        fontBoxes.forEach(box => {
-          box.addEventListener('click', () => {
-            const fontName = box.querySelector('.font-name').textContent;
-            // Send message to parent window
-            if (window.parent) {
-              window.parent.postMessage({
-                type: 'FONT_SELECTED',
-                fontFamily: fontName
-              }, '*');
-            }
-          });
-        });
-      });
-    </script>
-    `;
-
-    // Insert the script before the closing body tag
-    html = html.replace('</body>', `${scriptToAdd}</body>`);
-
-    // Serve the modified HTML
-    res.send(html);
+    
+    if (!fs.existsSync(htmlPath)) {
+      console.error("Error: index.html not found at", htmlPath);
+      return res.status(404).send("Font previewer not found");
+    }
+    
+    try {
+      let html = fs.readFileSync(htmlPath, "utf-8");
+      
+      // Set appropriate headers
+      res.setHeader('Content-Type', 'text/html');
+      res.setHeader('Cache-Control', 'no-cache');
+      
+      // Serve the HTML
+      res.send(html);
+    } catch (error) {
+      console.error("Error serving font previewer:", error);
+      res.status(500).send("Error loading font previewer");
+    }
   });
 
   // Serve fonts

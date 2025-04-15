@@ -228,6 +228,23 @@ export default function DesignWorkspace({
           </div>
         </div>
         
+        {/* Standalone Font Previewer */}
+        <div className="mb-4">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-medium">Font Preview Gallery</h3>
+            <div className="flex items-center">
+              <span className="text-xs text-muted-foreground">
+                Click on a font to apply it to selected text
+              </span>
+            </div>
+          </div>
+          <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-3">
+            <StandaloneFontPreviewer 
+              onFontSelected={handleFontSelection} 
+            />
+          </div>
+        </div>
+        
         {/* Google Fonts Gallery */}
         <FontGallery
           visible={showFontGallery}

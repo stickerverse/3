@@ -24,7 +24,7 @@ const StandaloneFontPreviewer: React.FC<StandaloneFontPreviewerProps> = ({
     window.addEventListener('message', handleMessage);
     
     return () => {
-      window.addEventListener('message', handleMessage);
+      window.removeEventListener('message', handleMessage);
     };
   }, [onFontSelected]);
 
@@ -35,6 +35,8 @@ const StandaloneFontPreviewer: React.FC<StandaloneFontPreviewerProps> = ({
         src="/standalone-font-previewer" 
         className="w-full h-[600px]"
         title="Font Previewer"
+        loading="eager"
+        sandbox="allow-same-origin allow-scripts"
       />
     </div>
   );

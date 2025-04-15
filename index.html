@@ -1,529 +1,359 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Font Previewer</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-        background-color: #f5f5f5;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Font Previewer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
 
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-      }
+    body {
+      background-color: #f9f9f9;
+      color: #333;
+      padding: 20px;
+    }
 
-      .editor-area {
-        background-color: #fff;
-        border-radius: 8px;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-      }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-      #editor-canvas {
-        width: 100%;
-        height: 200px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 15px;
-        font-size: 24px;
-        box-sizing: border-box;
-        resize: none;
-      }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
 
-      .font-gallery {
-        background-color: #fff;
-        border-radius: 8px;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 15px;
-        max-height: 500px;
-        overflow-y: auto;
-      }
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
-      .font-box {
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 10px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        height: 100px;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
+    .search-box {
+      width: 100%;
+      max-width: 400px;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
 
-      .font-box:hover {
-        border-color: #aaa;
-        transform: translateY(-2px);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      }
+    .filter-btn {
+      padding: 8px 16px;
+      background-color: #4a6cf7;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
 
-      .font-box.selected {
-        border-color: #007bff;
-        border-width: 2px;
-        background-color: #f0f7ff;
-      }
+    .filter-btn:hover {
+      background-color: #3a5ce5;
+    }
 
-      .font-name {
-        font-size: 12px;
-        color: #666;
-        margin-bottom: 5px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        font-family: Arial, sans-serif;
-      }
+    .font-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
 
-      .font-preview {
-        flex-grow: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        font-size: 16px;
-        overflow: hidden;
+    .font-box {
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .font-box:hover {
+      border-color: #4a6cf7;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .font-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .font-name {
+      font-weight: bold;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .font-preview {
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      overflow: hidden;
+      font-size: 22px;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .font-type {
+      font-size: 12px;
+      color: #777;
+      align-self: flex-end;
+    }
+
+    .no-fonts {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+      grid-column: 1 / -1;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+
+    @media (max-width: 768px) {
+      .font-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       }
 
       .controls {
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 15px;
-      }
-
-      .loading {
-        text-align: center;
-        padding: 40px;
-        font-size: 18px;
-        color: #666;
-      }
-
-      .control-group {
-        display: flex;
+        flex-direction: column;
         align-items: center;
       }
 
-      .control-group label {
-        margin-right: 10px;
-        white-space: nowrap;
+      .search-box {
+        width: 100%;
+      }
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #1a1a1a;
+        color: #f0f0f0;
       }
 
-      #font-size {
-        width: 60px;
+      .font-box {
+        background-color: #2a2a2a;
+        border-color: #444;
       }
 
-      #filter-input {
-        padding: 5px 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        width: 200px;
+      .font-name {
+        color: #f0f0f0;
       }
 
-      #loading-progress {
-        margin-top: 10px;
-        font-size: 14px;
-        color: #666;
+      .search-box {
+        background-color: #2a2a2a;
+        color: #f0f0f0;
+        border-color: #444;
       }
 
-      .no-results {
-        grid-column: 1 / -1;
-        text-align: center;
-        padding: 20px;
-        color: #666;
+      .no-fonts, .loading {
+        color: #aaa;
       }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Font Previewer</h1>
 
-      .error {
-        color: #d9534f;
-        font-weight: bold;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1>Font Previewer</h1>
-
-      <div class="controls">
-        <div class="control-group">
-          <label for="font-size">Font Size:</label>
-          <input type="number" id="font-size" min="8" max="72" value="24" />
-        </div>
-
-        <div class="control-group">
-          <label for="filter-input">Filter Fonts:</label>
-          <input type="text" id="filter-input" placeholder="Search fonts..." />
-        </div>
-      </div>
-
-      <div class="editor-area">
-        <textarea
-          id="editor-canvas"
-          placeholder="Type your text here to preview it in different fonts..."
-        >
-Sample Text</textarea
-        >
-      </div>
-
-      <h2>Available Fonts (<span id="font-count">0</span>)</h2>
-      <div id="font-gallery" class="font-gallery">
-        <div class="loading">
-          Loading fonts from local folder...
-          <div id="loading-progress"></div>
-        </div>
-      </div>
+    <div class="controls">
+      <input type="text" class="search-box" id="searchInput" placeholder="Search fonts...">
+      <button class="filter-btn" id="filterOpenType">OTF</button>
+      <button class="filter-btn" id="filterTrueType">TTF</button>
+      <button class="filter-btn" id="resetFilter">All Fonts</button>
     </div>
 
-    <script>
-      // Configuration
-      const FONTS_FOLDER = "/fonts"; // Path to your local fonts folder
-      const FONT_EXTENSIONS = [".ttf", ".otf", ".woff", ".woff2"];
+    <div class="font-grid" id="fontGrid">
+      <div class="loading">Loading fonts...</div>
+    </div>
+  </div>
 
-      // Variables
-      let loadedFonts = [];
-      let filteredFonts = [];
-      let selectedFontIndex = -1;
-      let editorText = "Sample Text";
+  <script>
+    const fontGrid = document.getElementById('fontGrid');
+    const searchInput = document.getElementById('searchInput');
+    const filterOTF = document.getElementById('filterOpenType');
+    const filterTTF = document.getElementById('filterTrueType');
+    const resetFilter = document.getElementById('resetFilter');
 
-      // DOM Elements
-      const editorCanvas = document.getElementById("editor-canvas");
-      const fontGallery = document.getElementById("font-gallery");
-      const fontSizeInput = document.getElementById("font-size");
-      const loadingProgress = document.getElementById("loading-progress");
-      const fontCountElement = document.getElementById("font-count");
-      const filterInput = document.getElementById("filter-input");
+    let allFonts = [];
+    let sampleText = 'The quick brown fox jumps over the lazy dog';
 
-      // Initialize
-      document.addEventListener("DOMContentLoaded", async () => {
-        // Set up event listeners
-        editorCanvas.addEventListener("input", updatePreviews);
-        fontSizeInput.addEventListener("change", updateFontSize);
-        filterInput.addEventListener("input", filterFonts);
-
-        try {
-          // Load fonts from the local folder
-          await loadFontsFromLocalFolder();
-          updatePreviews();
-        } catch (error) {
-          console.error("Error loading fonts:", error);
-          fontGallery.innerHTML = `<div class="loading error">Error loading fonts: ${error.message}</div>`;
+    // Load fonts from the server
+    async function loadFonts() {
+      try {
+        const response = await fetch('/fonts.json');
+        if (!response.ok) {
+          throw new Error('Failed to load fonts');
         }
-      });
 
-      // Load fonts from the local folder
-      async function loadFontsFromLocalFolder() {
-        try {
-          // First try to load fonts from fonts.json
-          const fontFiles = await loadFontsFromJson();
+        let fontData = await response.json();
+        // Handle both array format and object format
+        allFonts = Array.isArray(fontData) ? fontData : fontData.fonts || [];
 
-          if (fontFiles.length === 0) {
-            throw new Error("No font files found");
-          }
+        // Convert font file names to display names
+        allFonts = allFonts.map(font => {
+          // If it's already an object, return it
+          if (typeof font === 'object') return font;
 
-          // Clear the gallery
-          fontGallery.innerHTML = "";
+          // Convert file name to display name
+          const fileName = font;
+          const extension = fileName.split('.').pop().toLowerCase();
+          let displayName = fileName.replace(`.${extension}`, '');
 
-          // Process each font file
-          let loadedCount = 0;
-          const totalCount = fontFiles.length;
+          // Format the display name
+          displayName = displayName
+            .replace(/([A-Z])/g, ' $1') // Add spaces before capital letters
+            .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
+            .replace(/-/g, ' ') // Replace hyphens with spaces
+            .trim();
 
-          for (const fontFile of fontFiles) {
-            try {
-              // Get font information
-              const fontName = getFontNameFromPath(fontFile);
-              const fontUrl = `${FONTS_FOLDER}/${fontFile}`;
+          return {
+            name: displayName,
+            file: fileName,
+            type: extension
+          };
+        });
 
-              // Create a font face rule
-              const fontFaceRule = `
-              @font-face {
-                font-family: '${fontName}';
-                src: url('${fontUrl}') format('${getFormatFromExtension(getExtension(fontFile))}');
-                font-weight: normal;
-                font-style: normal;
-              }
-            `;
+        renderFonts(allFonts);
+        loadFontStyles(allFonts);
+      } catch (error) {
+        console.error('Error loading fonts:', error);
+        fontGrid.innerHTML = `<div class="no-fonts">Error loading fonts: ${error.message}</div>`;
+      }
+    }
 
-              // Add the font face to the document
-              const style = document.createElement("style");
-              style.textContent = fontFaceRule;
-              document.head.appendChild(style);
+    function renderFonts(fonts) {
+      if (fonts.length === 0) {
+        fontGrid.innerHTML = '<div class="no-fonts">No fonts found matching your search.</div>';
+        return;
+      }
 
-              // Add the font to the loaded fonts array
-              loadedFonts.push({
-                name: fontName,
-                family: fontName,
-                url: fontUrl,
-                path: fontFile,
-              });
+      fontGrid.innerHTML = fonts.map(font => {
+        const fontName = font.name || font;
+        const fontFile = font.file || font;
+        const fontType = font.type || fontFile.split('.').pop();
 
-              // Update progress
-              loadedCount++;
-              loadingProgress.textContent = `Loaded ${loadedCount} of ${totalCount} fonts`;
-            } catch (error) {
-              console.warn(`Failed to load font ${fontFile}:`, error);
-            }
-          }
-
-          // Update the filtered fonts
-          filteredFonts = [...loadedFonts];
-
-          // Update the font count
-          fontCountElement.textContent = loadedFonts.length;
-
-          // Create font preview boxes
-          createFontBoxes();
-
-          // Select the first font
-          if (loadedFonts.length > 0) {
-            selectFont(0);
-          }
-        } catch (error) {
-          console.error("Error loading fonts from local folder:", error);
-          fontGallery.innerHTML = `
-          <div class="loading error">
-            Error loading fonts from the local folder. Please make sure you have fonts in the "/fonts" folder 
-            and run the scan-fonts.js script to generate fonts.json.
+        return `
+          <div class="font-box" data-font="${fontName}" data-type="${fontType}">
+            <div class="font-header">
+              <span class="font-name">${fontName}</span>
+            </div>
+            <div class="font-preview" style="font-family: '${fontName}';">
+              ${sampleText}
+            </div>
+            <span class="font-type">${fontType.toUpperCase()}</span>
           </div>
         `;
-          throw error;
-        }
-      }
+      }).join('');
 
-      // Load fonts from fonts.json
-      async function loadFontsFromJson() {
-        try {
-          const response = await fetch("/fonts.json");
-
-          if (!response.ok) {
-            throw new Error(
-              `Failed to load fonts.json (${response.status}: ${response.statusText})`,
-            );
+      // Add click handlers to font boxes
+      document.querySelectorAll('.font-box').forEach(box => {
+        box.addEventListener('click', () => {
+          const fontName = box.dataset.font;
+          // Send message to parent if in iframe
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({
+              type: 'FONT_SELECTED',
+              fontFamily: fontName
+            }, '*');
           }
 
-          return await response.json();
-        } catch (error) {
-          console.error("Error loading fonts.json:", error);
+          // Visual feedback for selection
+          document.querySelectorAll('.font-box').forEach(b => {
+            b.style.borderColor = '';
+            b.style.backgroundColor = '';
+          });
+          box.style.borderColor = '#4a6cf7';
+          box.style.backgroundColor = '#f0f4ff';
+        });
+      });
+    }
 
-          // Try to scan the folder manually
-          return await scanFontsFolder();
-        }
-      }
-
-      // Scan the fonts folder for font files
-      async function scanFontsFolder() {
-        console.log("Trying to scan fonts folder manually...");
-
-        // This is a client-side implementation, which has limitations
-        // In a real Replit application, this should be done server-side
-
-        // Try some common font file names
-        const fontFiles = [];
-        const commonFontNames = [
-          "Arial",
-          "Helvetica",
-          "Times",
-          "Verdana",
-          "Roboto",
-          "OpenSans",
-          "Montserrat",
-          "Lato",
-          "Font1",
-          "Font2",
-          "Font3",
-          "Font4",
-          "Font5",
-        ];
-
-        for (const fontName of commonFontNames) {
-          for (const ext of FONT_EXTENSIONS) {
-            const fileName = `${fontName}${ext}`;
-            try {
-              const response = await fetch(`${FONTS_FOLDER}/${fileName}`, {
-                method: "HEAD",
-              });
-              if (response.ok) {
-                fontFiles.push(fileName);
-              }
-            } catch (error) {
-              // Ignore errors - file probably doesn't exist
-            }
+    function loadFontStyles(fonts) {
+      const fontFaces = fonts.map(font => {
+        const fontName = font.name || font;
+        const fontFile = font.file || font;
+        return `
+          @font-face {
+            font-family: '${fontName}';
+            src: url('/fonts/${fontFile}') format('${getFontFormat(fontFile)}');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
           }
-        }
+        `;
+      }).join('\n');
 
-        if (fontFiles.length === 0) {
-          console.warn("Could not find any font files through manual scanning");
-        }
+      const styleElement = document.createElement('style');
+      styleElement.textContent = fontFaces;
+      document.head.appendChild(styleElement);
+    }
 
-        return fontFiles;
+    function getFontFormat(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      switch (ext) {
+        case 'ttf': return 'truetype';
+        case 'otf': return 'opentype';
+        case 'woff': return 'woff';
+        case 'woff2': return 'woff2';
+        default: return 'truetype';
       }
+    }
 
-      // Create font preview boxes for all filtered fonts
-      function createFontBoxes() {
-        // Clear the gallery
-        fontGallery.innerHTML = "";
+    // Event listeners for filtering
+    searchInput.addEventListener('input', filterFonts);
+    filterOTF.addEventListener('click', () => filterByType('otf'));
+    filterTTF.addEventListener('click', () => filterByType('ttf'));
+    resetFilter.addEventListener('click', () => {
+      searchInput.value = '';
+      renderFonts(allFonts);
+    });
 
-        // If no fonts are found
-        if (filteredFonts.length === 0) {
-          fontGallery.innerHTML =
-            '<div class="no-results">No fonts match your filter</div>';
-          return;
-        }
+    function filterFonts() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const filteredFonts = allFonts.filter(font => {
+        const fontName = (font.name || font).toLowerCase();
+        return fontName.includes(searchTerm);
+      });
+      renderFonts(filteredFonts);
+    }
 
-        // Create a box for each font
-        filteredFonts.forEach((font, index) => {
-          createFontBox(font.name, index);
-        });
+    function filterByType(type) {
+      const filteredFonts = allFonts.filter(font => {
+        const fontType = (font.type || (font.file || font).split('.').pop()).toLowerCase();
+        return fontType === type;
+      });
+      renderFonts(filteredFonts);
+    }
+
+    // Initialize
+    loadFonts();
+
+    // Allow parent to set sample text
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'SET_SAMPLE_TEXT') {
+        sampleText = event.data.text;
+        renderFonts(allFonts);
       }
-
-      // Create a single font preview box
-      function createFontBox(fontName, index) {
-        const fontBox = document.createElement("div");
-        fontBox.className = "font-box";
-        fontBox.dataset.index = index;
-
-        const nameElement = document.createElement("div");
-        nameElement.className = "font-name";
-        nameElement.textContent = fontName;
-
-        const previewElement = document.createElement("div");
-        previewElement.className = "font-preview";
-        previewElement.style.fontFamily = `'${fontName}', sans-serif`;
-        previewElement.textContent = editorText;
-
-        fontBox.appendChild(nameElement);
-        fontBox.appendChild(previewElement);
-
-        fontBox.addEventListener("click", () => {
-          selectFont(index);
-        });
-
-        fontGallery.appendChild(fontBox);
-      }
-
-      // Select a font
-      function selectFont(index) {
-        if (index < 0 || index >= filteredFonts.length) {
-          return;
-        }
-
-        // Remove selection from previous font
-        if (selectedFontIndex !== -1) {
-          const prevBox = document.querySelector(
-            `.font-box[data-index="${selectedFontIndex}"]`,
-          );
-          if (prevBox) {
-            prevBox.classList.remove("selected");
-          }
-        }
-
-        // Set new selection
-        selectedFontIndex = index;
-        const selectedFont = filteredFonts[index];
-
-        // Update editor font
-        editorCanvas.style.fontFamily = `'${selectedFont.family}', sans-serif`;
-
-        // Update selection visual
-        const currentBox = document.querySelector(
-          `.font-box[data-index="${index}"]`,
-        );
-        if (currentBox) {
-          currentBox.classList.add("selected");
-
-          // Scroll to make selected font visible if needed
-          currentBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
-        }
-      }
-
-      // Filter fonts based on search term
-      function filterFonts() {
-        const searchTerm = filterInput.value.toLowerCase();
-
-        if (searchTerm === "") {
-          // If search is empty, show all fonts
-          filteredFonts = [...loadedFonts];
-        } else {
-          // Filter fonts by name
-          filteredFonts = loadedFonts.filter((font) =>
-            font.name.toLowerCase().includes(searchTerm),
-          );
-        }
-
-        // Update font count
-        fontCountElement.textContent = filteredFonts.length;
-
-        // Recreate font preview boxes
-        createFontBoxes();
-
-        // Reset selection if needed
-        if (filteredFonts.length > 0) {
-          selectFont(0);
-        } else {
-          selectedFontIndex = -1;
-        }
-      }
-
-      // Update font previews when text changes
-      function updatePreviews() {
-        editorText = editorCanvas.value || "Sample Text";
-
-        // Update all preview elements
-        const previewElements = document.querySelectorAll(".font-preview");
-        previewElements.forEach((element) => {
-          element.textContent = editorText;
-        });
-      }
-
-      // Update font size
-      function updateFontSize() {
-        const fontSize = fontSizeInput.value;
-
-        // Update all preview elements
-        const previewElements = document.querySelectorAll(".font-preview");
-        previewElements.forEach((element) => {
-          element.style.fontSize = `${fontSize}px`;
-        });
-      }
-
-      // Helper function to get font name from file path
-      function getFontNameFromPath(path) {
-        // Extract filename without extension
-        const fileName = path.split("/").pop().split(".")[0];
-
-        // Clean up the name
-        return fileName
-          .replace(/[_-]/g, " ") // Replace underscores and hyphens with spaces
-          .replace(/([A-Z])/g, " $1") // Add spaces before capital letters
-          .trim();
-      }
-
-      // Helper function to get file extension
-      function getExtension(path) {
-        return path.split(".").pop().toLowerCase();
-      }
-
-      // Helper function to get font format based on file extension
-      function getFormatFromExtension(ext) {
-        switch (ext) {
-          case "ttf":
-            return "truetype";
-          case "otf":
-            return "opentype";
-          case "woff":
-            return "woff";
-          case "woff2":
-            return "woff2";
-          default:
-            return "truetype";
-        }
-      }
-    </script>
-  </body>
+    });
+  </script>
+</body>
 </html>
