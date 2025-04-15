@@ -356,17 +356,19 @@ export default function FontGallery({
                   ${hoveredFont === font ? 'text-primary scale-110 transition-all duration-200' : ''}
                   ${font === currentFont ? 'text-primary font-bold' : ''}
                 `}>
-                  <span className={`
-                    inline-block transition-all duration-300 
-                    ${hoveredFont === font ? animationStyles[font] || 'animate-float' : ''}
-                    ${hoveredFont === font && font.length > 15 ? 'text-4xl' : ''}
-                    ${hoveredFont === font ? getPreviewStyle(font) : ''}
-                    ${hoveredFont !== font && font === currentFont ? 'bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent ring-2 ring-primary/20 rounded-md px-2 py-1' : ''}
-                    ${customText ? 'max-w-full break-words px-1' : ''}
-                    ${!hoveredFont && customText ? 'py-2 px-3 bg-white/10 dark:bg-black/10 rounded-md' : ''}
-                    ${!hoveredFont && customText ? 'leading-tight tracking-tight' : ''}
-                    w-full block truncate
-                  `}>
+                  <span 
+                    className={`
+                      inline-block transition-all duration-300 w-full block
+                      ${hoveredFont === font ? animationStyles[font] || 'animate-float' : ''}
+                      ${hoveredFont === font && font.length > 15 ? 'text-4xl' : ''}
+                      ${hoveredFont === font ? getPreviewStyle(font) : ''}
+                      ${hoveredFont !== font && font === currentFont ? 'bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent ring-2 ring-primary/20 rounded-md px-2 py-1' : ''}
+                      ${customText ? 'max-w-full break-words px-1' : ''}
+                      ${!hoveredFont && customText ? 'py-2 px-3 bg-white/10 dark:bg-black/10 rounded-md' : ''}
+                      ${!hoveredFont && customText ? 'leading-tight tracking-tight' : ''}
+                      ${customText && customText.length > 30 ? 'text-ellipsis break-all' : 'truncate'}
+                    `}
+                  >
                     {hoveredFont === font 
                       ? animationText 
                       : customText 
