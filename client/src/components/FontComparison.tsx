@@ -71,7 +71,8 @@ export default function FontComparison({
         setIsLoading(true);
         
         // First, get system fonts (local fonts)
-        const systemFonts = await googleFontsService.getFontsByCategory('system') || [];
+        await googleFontsService.ensureSystemFontsLoaded();
+        const systemFonts = googleFontsService.getSystemFonts() || [];
         
         // Then get Google Fonts
         const data = await googleFontsService.fetchGoogleFonts("all");
