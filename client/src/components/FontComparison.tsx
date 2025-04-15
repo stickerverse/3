@@ -70,19 +70,37 @@ export default function FontComparison({
         // Load fonts from all categories
         setIsLoading(true);
         
-        // First, get system fonts (local fonts)
-        await googleFontsService.ensureSystemFontsLoaded();
-        const systemFonts = googleFontsService.getSystemFonts() || [];
+        // First, get system fonts (local fonts) from the service
+        const systemFonts = googleFontsService.categories['system'] || [];
+        
+        // If system fonts aren't loaded yet, try to load them from fonts.json
+        if (systemFonts.length === 0) {
+          try {
+            await googleFontsService.loadSystemFontsFromJson();
+          } catch (err) {
+            console.warn('Could not load system fonts, will proceed with Google Fonts only');
+          }
+        }
+        
+        // Get the updated system fonts
+        const updatedSystemFonts = googleFontsService.categories['system'] || [];
         
         // Then get Google Fonts
-        const data = await googleFontsService.fetchGoogleFonts("all");
-        const googleFontsList = data.fonts ? data.fonts.map((font: any) => font.family) : [];
+        let googleFontsList: string[] = [];
+        try {
+          const data = await googleFontsService.fetchGoogleFonts("all");
+          googleFontsList = data.fonts ? data.fonts.map((font: any) => font.family) : [];
+        } catch (err) {
+          console.warn('Could not load Google Fonts, will proceed with system fonts only');
+        }
         
         // Combine all available fonts, filtering out duplicates
-        const combinedFonts = [...systemFonts, ...googleFontsList];
+        const combinedFonts = [...updatedSystemFonts, ...googleFontsList];
         const allFonts = combinedFonts.filter((font, index) => combinedFonts.indexOf(font) === index);
         
-        console.log(`Font comparison tool loaded ${allFonts.length} fonts (${systemFonts.length} system, ${googleFontsList.length} Google)`);
+        console.log(`Font comparison tool loaded ${allFonts.length} fonts (${updatedSystemFonts.length} system, ${googleFontsList.length} Google)`);
+        
+        // Set available fonts for the dropdown
         setAvailableFonts(allFonts);
         
         // Initialize with current font if provided and not already in comparison list
@@ -95,12 +113,18 @@ export default function FontComparison({
         
         // Preload the fonts that are in the comparison
         if (comparisonFonts.length > 0) {
-          await googleFontsService.loadFonts(comparisonFonts);
+          try {
+            await googleFontsService.loadFonts(comparisonFonts);
+          } catch (err) {
+            console.warn('Error preloading comparison fonts, but will continue:', err);
+          }
         }
         
         setIsLoading(false);
       } catch (error) {
         console.error('Error loading fonts for comparison:', error);
+        // Even on error, provide at least some fonts
+        setAvailableFonts(googleFontsService.popularFonts);
         setIsLoading(false);
       }
     }
