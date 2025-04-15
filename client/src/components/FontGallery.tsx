@@ -76,39 +76,64 @@ export default function FontGallery({
   useEffect(() => {
     if (!galleryRef.current || !visible) return;
 
+    // Create a debounce function to not call the scroll handler too often
+    let scrollTimeout: NodeJS.Timeout | null = null;
+    
     const handleScroll = () => {
-      const container = galleryRef.current;
-      if (!container) return;
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+      
+      scrollTimeout = setTimeout(() => {
+        const container = galleryRef.current;
+        if (!container) return;
 
-      const { scrollTop, scrollHeight, clientHeight } = container;
+        const { scrollTop, scrollHeight, clientHeight } = container;
+        
+        // If scrolled to bottom - 300px (load earlier), load more fonts
+        if (scrollHeight - scrollTop <= clientHeight + 300) {
+          console.log("Scroll triggered font loading");
+          
+          // Load next batch of fonts
+          const currentLength = displayFonts.length;
+          if (currentLength < fonts.length) {
+            // Get the appropriate source of fonts based on active category
+            const filteredFonts = activeCategory === "all"
+              ? fonts
+              : categories[activeCategory] || [];
 
-      // If scrolled to bottom - 200px, load more fonts
-      if (scrollHeight - scrollTop <= clientHeight + 200) {
-        // Load next batch of fonts
-        const currentLength = displayFonts.length;
-        if (currentLength < fonts.length) {
-          const filteredFonts = activeCategory === "all"
-            ? fonts
-            : categories[activeCategory] || [];
+            // Apply search filter if any
+            const searchFiltered = searchQuery
+              ? filteredFonts.filter(font => font.toLowerCase().includes(searchQuery.toLowerCase()))
+              : filteredFonts;
 
-          const searchFiltered = searchQuery
-            ? filteredFonts.filter(font => font.toLowerCase().includes(searchQuery.toLowerCase()))
-            : filteredFonts;
-
-          const nextBatch = searchFiltered.slice(currentLength, currentLength + 20);
-          if (nextBatch.length > 0) {
-            setDisplayFonts(prev => [...prev, ...nextBatch]);
-            // Preload these fonts
-            googleFontsService.loadFonts(nextBatch);
+            // Get next batch, increase to 30 fonts per load for smoother experience
+            const nextBatch = searchFiltered.slice(currentLength, currentLength + 30);
+            if (nextBatch.length > 0) {
+              console.log(`Loading ${nextBatch.length} more fonts`);
+              
+              // Update displayed fonts
+              setDisplayFonts(prev => [...prev, ...nextBatch]);
+              
+              // Preload these fonts for display
+              googleFontsService.loadFonts(nextBatch);
+            }
           }
         }
-      }
+      }, 150); // Small debounce to prevent firing too many times
     };
 
     const containerRef = galleryRef.current;
     containerRef.addEventListener("scroll", handleScroll);
+    
+    // Initial check to see if we need to load more fonts right away
+    // (helpful if the container is large enough that scrolling isn't needed yet)
+    handleScroll();
 
     return () => {
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
       containerRef.removeEventListener("scroll", handleScroll);
     };
   }, [displayFonts, fonts, categories, activeCategory, searchQuery, visible]);

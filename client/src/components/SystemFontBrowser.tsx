@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge'; 
 import googleFontsService from '../lib/googleFontsService';
@@ -19,7 +19,8 @@ export default function SystemFontBrowser({ onClose, onFontSelected, currentFont
   const [missingFontsFolder, setMissingFontsFolder] = useState(false);
   const [fontsPerPage] = useState(50); // Number of fonts to display per page
   const [currentPage, setCurrentPage] = useState(1);
-
+  const containerRef = useRef<HTMLDivElement>(null);
+  
 
   // Load fonts from the system (local fonts.json file)
   useEffect(() => {
