@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Type, Upload, Edit, ListFilter } from 'lucide-react';
+import { Type, Upload, Edit, ListFilter, Github } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FontGallery from './FontGallery';
 import FontUploader from './FontUploader';
+import GitHubFontBrowser from './GitHubFontBrowser';
 import googleFontsService from '../lib/googleFontsService';
+import githubFontService from '../lib/githubFontService';
 
 interface FontPreviewPanelProps {
   showFontPreview: boolean;
@@ -110,6 +112,10 @@ export default function FontPreviewPanel({
               <TabsList className="w-full">
                 <TabsTrigger value="all">All Fonts</TabsTrigger>
                 <TabsTrigger value="local">My Uploaded Fonts</TabsTrigger>
+                <TabsTrigger value="github">
+                  <Github className="h-4 w-4 mr-1" />
+                  GitHub Fonts
+                </TabsTrigger>
                 <TabsTrigger value="popular">Popular</TabsTrigger>
                 <TabsTrigger value="serif">Serif</TabsTrigger>
                 <TabsTrigger value="sans-serif">Sans Serif</TabsTrigger>
@@ -169,6 +175,18 @@ export default function FontPreviewPanel({
                     </Button>
                   </div>
                 )}
+              </TabsContent>
+              
+              <TabsContent value="github" className="m-0">
+                <GitHubFontBrowser 
+                  onFontsLoaded={(fontNames) => {
+                    // When GitHub fonts are loaded, update the categories
+                    if (fontNames.length > 0) {
+                      // Set the current font to the first font loaded
+                      setFont(fontNames[0]);
+                    }
+                  }}
+                />
               </TabsContent>
               
               <TabsContent value="popular" className="m-0">

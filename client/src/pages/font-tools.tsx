@@ -86,7 +86,7 @@ export default function FontToolsPage() {
               Upload Font
             </Button>
             <Button onClick={() => setShowFontPreview(true)}>
-              <FontBold className="h-4 w-4 mr-2" />
+              <FontIcon className="h-4 w-4 mr-2" />
               Browse Fonts
             </Button>
           </CardFooter>
@@ -141,7 +141,7 @@ export default function FontToolsPage() {
               onClick={() => setShowFontPreview(true)}
               className="flex-1"
             >
-              <FontBold className="h-4 w-4 mr-2" />
+              <FontIcon className="h-4 w-4 mr-2" />
               Browse All Fonts
             </Button>
           </div>
