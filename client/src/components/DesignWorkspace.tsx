@@ -224,10 +224,7 @@ export default function DesignWorkspace({
             </div>
           </div>
           <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-3">
-            <SystemFontBrowser 
-              onFontSelected={handleFontSelection}
-              currentFont={getCurrentFont() || "Arial"}
-            />
+            <SystemFontBrowser onFontSelected={handleFontSelection} />
           </div>
         </div>
         
