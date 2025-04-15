@@ -117,6 +117,262 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Vinyl Size Routes
+  
+  // Get all vinyl sizes
+  app.get("/api/vinyl-sizes", async (req, res) => {
+    try {
+      const sizes = await storage.getAllVinylSizes();
+      res.json(sizes);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch vinyl sizes" });
+    }
+  });
+  
+  // Get default vinyl size
+  app.get("/api/vinyl-sizes/default", async (req, res) => {
+    try {
+      const size = await storage.getDefaultVinylSize();
+      if (!size) {
+        return res.status(404).json({ message: "No default vinyl size found" });
+      }
+      res.json(size);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch default vinyl size" });
+    }
+  });
+  
+  // Get a vinyl size by ID
+  app.get("/api/vinyl-sizes/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid vinyl size ID" });
+      }
+      
+      const size = await storage.getVinylSize(id);
+      if (!size) {
+        return res.status(404).json({ message: "Vinyl size not found" });
+      }
+      
+      res.json(size);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch vinyl size" });
+    }
+  });
+  
+  // Create a new vinyl size
+  app.post("/api/vinyl-sizes", async (req, res) => {
+    try {
+      // Validate request body
+      const sizeSchema = z.object({
+        name: z.string().min(1),
+        width: z.number().int().positive(),
+        height: z.number().int().positive(),
+        description: z.string().optional(),
+        recommendedFor: z.string().optional(),
+        default: z.boolean().optional()
+      });
+      
+      const validationResult = sizeSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid vinyl size data", 
+          errors: validationResult.error.format() 
+        });
+      }
+      
+      const size = await storage.createVinylSize(validationResult.data);
+      res.status(201).json(size);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create vinyl size" });
+    }
+  });
+  
+  // Update a vinyl size
+  app.put("/api/vinyl-sizes/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid vinyl size ID" });
+      }
+      
+      // Validate request body
+      const sizeSchema = z.object({
+        name: z.string().min(1).optional(),
+        width: z.number().int().positive().optional(),
+        height: z.number().int().positive().optional(),
+        description: z.string().optional(),
+        recommendedFor: z.string().optional(),
+        default: z.boolean().optional()
+      });
+      
+      const validationResult = sizeSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid vinyl size data", 
+          errors: validationResult.error.format() 
+        });
+      }
+      
+      const size = await storage.updateVinylSize(id, validationResult.data);
+      if (!size) {
+        return res.status(404).json({ message: "Vinyl size not found" });
+      }
+      
+      res.json(size);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update vinyl size" });
+    }
+  });
+  
+  // Delete a vinyl size
+  app.delete("/api/vinyl-sizes/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid vinyl size ID" });
+      }
+      
+      const success = await storage.deleteVinylSize(id);
+      if (!success) {
+        return res.status(404).json({ message: "Vinyl size not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete vinyl size" });
+    }
+  });
+  
+  // Vinyl Material Routes
+  
+  // Get all vinyl materials
+  app.get("/api/vinyl-materials", async (req, res) => {
+    try {
+      const materials = await storage.getAllVinylMaterials();
+      res.json(materials);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch vinyl materials" });
+    }
+  });
+  
+  // Get default vinyl material
+  app.get("/api/vinyl-materials/default", async (req, res) => {
+    try {
+      const material = await storage.getDefaultVinylMaterial();
+      if (!material) {
+        return res.status(404).json({ message: "No default vinyl material found" });
+      }
+      res.json(material);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch default vinyl material" });
+    }
+  });
+  
+  // Get a vinyl material by ID
+  app.get("/api/vinyl-materials/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid vinyl material ID" });
+      }
+      
+      const material = await storage.getVinylMaterial(id);
+      if (!material) {
+        return res.status(404).json({ message: "Vinyl material not found" });
+      }
+      
+      res.json(material);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch vinyl material" });
+    }
+  });
+  
+  // Create a new vinyl material
+  app.post("/api/vinyl-materials", async (req, res) => {
+    try {
+      // Validate request body
+      const materialSchema = z.object({
+        name: z.string().min(1),
+        type: z.string().min(1),
+        color: z.string().optional(),
+        durability: z.string().optional(),
+        description: z.string().optional(),
+        default: z.boolean().optional()
+      });
+      
+      const validationResult = materialSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid vinyl material data", 
+          errors: validationResult.error.format() 
+        });
+      }
+      
+      const material = await storage.createVinylMaterial(validationResult.data);
+      res.status(201).json(material);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create vinyl material" });
+    }
+  });
+  
+  // Update a vinyl material
+  app.put("/api/vinyl-materials/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid vinyl material ID" });
+      }
+      
+      // Validate request body
+      const materialSchema = z.object({
+        name: z.string().min(1).optional(),
+        type: z.string().min(1).optional(),
+        color: z.string().optional(),
+        durability: z.string().optional(),
+        description: z.string().optional(),
+        default: z.boolean().optional()
+      });
+      
+      const validationResult = materialSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid vinyl material data", 
+          errors: validationResult.error.format() 
+        });
+      }
+      
+      const material = await storage.updateVinylMaterial(id, validationResult.data);
+      if (!material) {
+        return res.status(404).json({ message: "Vinyl material not found" });
+      }
+      
+      res.json(material);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update vinyl material" });
+    }
+  });
+  
+  // Delete a vinyl material
+  app.delete("/api/vinyl-materials/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid vinyl material ID" });
+      }
+      
+      const success = await storage.deleteVinylMaterial(id);
+      if (!success) {
+        return res.status(404).json({ message: "Vinyl material not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete vinyl material" });
+    }
+  });
+  
   // Upload local font file
   app.post("/api/fonts/upload", async (req, res) => {
     try {
