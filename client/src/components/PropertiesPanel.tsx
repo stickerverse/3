@@ -12,6 +12,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import FontPreviewPanel from "@/components/FontPreviewPanel";
+import { fetchGoogleFonts, loadFontBatch } from "@/lib/fontLoader";
+import WebFont from "webfontloader";
 
 interface PropertiesPanelProps {
   selectedObj: fabric.Object | null;
@@ -71,6 +73,42 @@ export default function PropertiesPanel({
   const [selectedFontCategory, setSelectedFontCategory] = useState<string | null>(null);
   const [showFontPreview, setShowFontPreview] = useState(false);
   const [previewText, setPreviewText] = useState(text);
+  const [allFonts, setAllFonts] = useState<string[]>([]);
+  const [isLoadingFonts, setIsLoadingFonts] = useState(true);
+  
+  // Fetch all fonts when component mounts
+  useEffect(() => {
+    const fetchFonts = async () => {
+      try {
+        setIsLoadingFonts(true);
+        
+        // Fetch all available fonts from Google Fonts API
+        const data = await fetchGoogleFonts();
+        
+        // Get all unique font names from all categories
+        const allFontNames = Array.from(new Set(
+          data.fonts.map(font => font.family)
+        )).sort();
+        
+        setAllFonts(allFontNames);
+        
+        // Pre-load the first 20 most popular fonts to ensure they display properly
+        const popularFonts = data.fonts.slice(0, 20).map(font => font.family);
+        WebFont.load({
+          google: {
+            families: popularFonts
+          }
+        });
+        
+      } catch (error) {
+        console.error('Failed to load fonts:', error);
+      } finally {
+        setIsLoadingFonts(false);
+      }
+    };
+    
+    fetchFonts();
+  }, []);
 
   // Update previewText when text changes
   useEffect(() => {
@@ -86,10 +124,36 @@ export default function PropertiesPanel({
   };
 
   const handleFontChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    setFont(e.target.value);
+    const selectedFont = e.target.value;
+    
+    // Ensure the font is loaded before applying it
+    loadFontIfNeeded(selectedFont);
+    
+    setFont(selectedFont);
     if (selectedObj && selectedObj.type === 'text') {
-      (selectedObj as fabric.Text).set({ fontFamily: e.target.value });
+      (selectedObj as fabric.Text).set({ fontFamily: selectedFont });
       canvas?.renderAll();
+    }
+  };
+  
+  // Function to load a font if it's not already loaded
+  const loadFontIfNeeded = (fontName: string) => {
+    // Check if the font is already loaded in the document
+    const isFontAvailable = document.fonts && document.fonts.check(`12px "${fontName}"`);
+    
+    if (!isFontAvailable) {
+      WebFont.load({
+        google: {
+          families: [fontName]
+        },
+        active: () => {
+          console.log(`Font loaded: ${fontName}`);
+          canvas?.renderAll();
+        },
+        inactive: () => {
+          console.warn(`Failed to load font: ${fontName}`);
+        }
+      });
     }
   };
 
@@ -192,20 +256,40 @@ export default function PropertiesPanel({
             <div>
               <label className="block text-sm font-medium mb-1">Font</label>
               <div className="relative">
-                <select 
-                  className="w-full p-2 pr-8 border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-800 appearance-none focus:ring-2 focus:ring-primary focus:border-transparent" 
-                  value={font}
-                  onChange={handleFontChange}
-                >
-                  <option style={{ fontFamily: 'Anton' }} value="Anton">Anton</option>
-                  <option style={{ fontFamily: 'Bebas Neue' }} value="Bebas Neue">Bebas Neue</option>
-                  <option style={{ fontFamily: 'Montserrat' }} value="Montserrat">Montserrat</option>
-                  <option style={{ fontFamily: 'Pacifico' }} value="Pacifico">Pacifico</option>
-                  <option style={{ fontFamily: 'Permanent Marker' }} value="Permanent Marker">Permanent Marker</option>
-                  <option style={{ fontFamily: 'Oswald' }} value="Oswald">Oswald</option>
-                  <option style={{ fontFamily: 'Roboto' }} value="Roboto">Roboto</option>
-                  <option style={{ fontFamily: 'Lato' }} value="Lato">Lato</option>
-                </select>
+                {isLoadingFonts ? (
+                  <div className="w-full p-2 pr-8 border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-800 flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                    <span className="text-sm">Loading fonts...</span>
+                  </div>
+                ) : (
+                  <select 
+                    className="w-full p-2 pr-8 border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-800 appearance-none focus:ring-2 focus:ring-primary focus:border-transparent" 
+                    value={font}
+                    onChange={handleFontChange}
+                  >
+                    {allFonts.map(fontName => (
+                      <option 
+                        key={fontName} 
+                        style={{ fontFamily: fontName }} 
+                        value={fontName}
+                      >
+                        {fontName}
+                      </option>
+                    ))}
+                    {allFonts.length === 0 && (
+                      <>
+                        <option style={{ fontFamily: 'Anton' }} value="Anton">Anton</option>
+                        <option style={{ fontFamily: 'Bebas Neue' }} value="Bebas Neue">Bebas Neue</option>
+                        <option style={{ fontFamily: 'Montserrat' }} value="Montserrat">Montserrat</option>
+                        <option style={{ fontFamily: 'Pacifico' }} value="Pacifico">Pacifico</option>
+                        <option style={{ fontFamily: 'Permanent Marker' }} value="Permanent Marker">Permanent Marker</option>
+                        <option style={{ fontFamily: 'Oswald' }} value="Oswald">Oswald</option>
+                        <option style={{ fontFamily: 'Roboto' }} value="Roboto">Roboto</option>
+                        <option style={{ fontFamily: 'Lato' }} value="Lato">Lato</option>
+                      </>
+                    )}
+                  </select>
+                )}
                 <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                   <svg className="w-5 h-5 text-neutral-400" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -252,6 +336,7 @@ export default function PropertiesPanel({
                                 className={`text-sm text-left p-1 rounded ${font === fontName ? 'bg-primary/10 text-primary' : 'hover:bg-neutral-100 dark:hover:bg-neutral-700'}`}
                                 style={{ fontFamily: fontName }}
                                 onClick={() => {
+                                  loadFontIfNeeded(fontName);
                                   setFont(fontName);
                                   if (selectedObj && selectedObj.type === 'text') {
                                     (selectedObj as fabric.Text).set({ fontFamily: fontName });
