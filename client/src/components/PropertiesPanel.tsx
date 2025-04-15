@@ -307,9 +307,22 @@ export default function PropertiesPanel({
   };
 
   const handleEffectClick = (effect: string) => {
+    // Set the effect state
     setTextEffect(effect);
+    
     if (selectedObj) {
-      applyTextEffect(selectedObj, effect);
+      if (effect === 'none') {
+        // For 'none', remove all effects by resetting properties
+        selectedObj.set({
+          shadow: null,
+          stroke: effect === 'outline' ? strokeColor : undefined,
+          strokeWidth: effect === 'outline' ? strokeWidth : 0,
+          fill: color
+        });
+      } else {
+        // Apply the selected effect
+        applyTextEffect(selectedObj, effect, { strokeColor, color });
+      }
       canvas?.renderAll();
     }
   };
