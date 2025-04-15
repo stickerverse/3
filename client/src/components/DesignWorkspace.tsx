@@ -12,6 +12,7 @@ import FontShowcase from "@/components/FontShowcase";
 import FontCarouselPicker from "@/components/FontCarouselPicker";
 import FontGallery from "@/components/FontGallery";
 import GitHubFontPreviewer from "@/components/GitHubFontPreviewer";
+import StandaloneFontPreviewer from './StandaloneFontPreviewer'; // Added import for StandaloneFontPreviewer
 import googleFontsService from "@/lib/googleFontsService";
 import { loadFontBatch, isFontLoaded } from "@/lib/fontLoader"; 
 
@@ -141,7 +142,7 @@ export default function DesignWorkspace({
             </button>
           )}
         </div>
-        
+
         {showFontShowcase && ( 
           <FontShowcase 
             isOpen={showFontShowcase} 
@@ -217,7 +218,7 @@ export default function DesignWorkspace({
             defaultText={selectedObj && selectedObj.type === 'text' ? (selectedObj as fabric.Text).text : "Sample Text"}
           />
         </div>
-        
+
         <FontGallery
           visible={showFontGallery}
           currentFont={getCurrentFont() || "Arial"}
