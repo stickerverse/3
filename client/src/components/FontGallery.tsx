@@ -343,7 +343,7 @@ export default function FontGallery({
                   p-4 flex items-center justify-center ${customText && customText.length > 20 ? 'h-44' : 'h-36'} 
                   bg-white dark:bg-neutral-800 rounded-t-2xl transition-all duration-200
                   ${font === currentFont ? 'bg-primary/5 dark:bg-primary/10' : ''}
-                  ${customText ? 'overflow-hidden' : ''}
+                  overflow-hidden
                 `} 
                 style={{ fontFamily: font }}
               >
@@ -365,6 +365,7 @@ export default function FontGallery({
                     ${customText ? 'max-w-full break-words px-1' : ''}
                     ${!hoveredFont && customText ? 'py-2 px-3 bg-white/10 dark:bg-black/10 rounded-md' : ''}
                     ${!hoveredFont && customText ? 'leading-tight tracking-tight' : ''}
+                    w-full block truncate
                   `}>
                     {hoveredFont === font 
                       ? animationText 
