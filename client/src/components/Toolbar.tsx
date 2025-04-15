@@ -31,7 +31,8 @@ export default function Toolbar({
     onClick, 
     label, 
     icon, 
-    active = false 
+    active 
+    = false 
   }: { 
     onClick: () => void; 
     label: string; 
