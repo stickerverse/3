@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, ChevronRight, Search, Type, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, Type } from "lucide-react";
 import googleFontsService from "../lib/googleFontsService";
 
 interface FontCarouselPickerProps {
@@ -200,16 +200,6 @@ export default function FontCarouselPicker({
         <div className="space-y-4 p-3">
           <div className="flex items-center justify-between">
             <h4 className="font-medium text-sm">Font Selection</h4>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-7 w-7 p-0" 
-                onClick={() => setIsOpen(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
           
           <div className="relative">
