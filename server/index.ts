@@ -1,7 +1,7 @@
 
 import express from 'express';
 import cors from 'cors';
-import { apiRouter } from './routes';
+import { registerRoutes } from './routes';
 import { createViteDevServer } from './vite';
 import path from 'path';
 import fs from 'fs';
@@ -57,8 +57,10 @@ const scanFonts = () => {
 // Run font scan on startup
 scanFonts();
 
-// API Routes
-app.use('/api', apiRouter);
+// Register API routes
+registerRoutes(app).then(() => {
+  console.log('Routes registered successfully');
+});
 
 // Serve static files from the public directory
 app.use(express.static('public'));
