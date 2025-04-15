@@ -435,7 +435,7 @@ export default function FontGallery({
                 `}>
                   <span 
                     style={{ 
-                      fontFamily: (googleFontsService.isFontLoaded(font) || categories['github']?.includes(font))
+                      fontFamily: googleFontsService.isFontLoaded(font)
                         ? `"${font}", sans-serif` 
                         : 'system-ui, sans-serif'
                     }}
@@ -446,8 +446,7 @@ export default function FontGallery({
                       ${hoveredFont !== font && font === currentFont ? 'bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent ring-2 ring-primary/20 rounded-md px-2 py-1' : ''}
                       ${customText ? 'px-1' : ''}
                       ${!hoveredFont && customText ? 'py-2 px-3 bg-white/10 dark:bg-black/10 rounded-md' : ''}
-                      ${!googleFontsService.isFontLoaded(font) && !categories['github']?.includes(font) ? 'opacity-70' : ''}
-                      ${categories['github']?.includes(font) ? 'font-bold' : ''}
+                      ${!googleFontsService.isFontLoaded(font) ? 'opacity-70' : ''}
                     `}
                   >
                     {hoveredFont === font 
