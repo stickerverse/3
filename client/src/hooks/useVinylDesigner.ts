@@ -41,6 +41,12 @@ export default function useVinylDesigner() {
   const [showTemplates, setShowTemplates] = useState(false);
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
   
+  // Vinyl properties
+  const [showVinylProperties, setShowVinylProperties] = useState(false);
+  const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null);
+  const [selectedMaterialId, setSelectedMaterialId] = useState<number | null>(null);
+  const [dimensions, setDimensions] = useState<{ width: number, height: number } | null>(null);
+  
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
   
@@ -570,6 +576,21 @@ export default function useVinylDesigner() {
         const design = await response.json();
         loadCanvasFromJson(design.data);
         setCurrentDesignName(design.name);
+        
+        // If design has size and material info, update the state
+        if (design.sizeId) {
+          setSelectedSizeId(design.sizeId);
+        }
+        
+        if (design.materialId) {
+          setSelectedMaterialId(design.materialId);
+        }
+        
+        if (design.dimensions) {
+          setDimensions(design.dimensions);
+          updateCanvasDimensions(design.dimensions.width, design.dimensions.height);
+        }
+        
         return design;
       } else {
         throw new Error('Failed to load design');
@@ -583,6 +604,104 @@ export default function useVinylDesigner() {
       });
       throw error;
     }
+  };
+  
+  // Fetch vinyl sizes from API
+  const fetchVinylSizes = async () => {
+    try {
+      const response = await apiRequest('GET', '/api/vinyl-sizes', undefined);
+      
+      if (response.ok) {
+        return await response.json();
+      } else {
+        console.error('Failed to fetch vinyl sizes:', response.statusText);
+        throw new Error('Failed to fetch vinyl sizes');
+      }
+    } catch (error) {
+      console.error('Error fetching vinyl sizes:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch vinyl sizes. Please try again.",
+        variant: "destructive"
+      });
+      return [];
+    }
+  };
+  
+  // Fetch vinyl materials from API
+  const fetchVinylMaterials = async () => {
+    try {
+      const response = await apiRequest('GET', '/api/vinyl-materials', undefined);
+      
+      if (response.ok) {
+        return await response.json();
+      } else {
+        console.error('Failed to fetch vinyl materials:', response.statusText);
+        throw new Error('Failed to fetch vinyl materials');
+      }
+    } catch (error) {
+      console.error('Error fetching vinyl materials:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch vinyl materials. Please try again.",
+        variant: "destructive"
+      });
+      return [];
+    }
+  };
+  
+  // Set canvas dimensions based on selected vinyl size
+  const updateCanvasDimensions = (width: number, height: number) => {
+    if (!canvas) return;
+    
+    const scale = Math.min(600 / width, 400 / height);
+    const scaledWidth = width * scale;
+    const scaledHeight = height * scale;
+    
+    canvas.setWidth(scaledWidth);
+    canvas.setHeight(scaledHeight);
+    canvas.setDimensions({ width: scaledWidth, height: scaledHeight });
+    canvas.renderAll();
+    
+    // Update canvas size state
+    setDimensions({ width, height });
+    
+    // Apply zoom
+    if (zoom !== 100) {
+      canvas.setZoom(zoom / 100);
+    }
+    
+    // Toast notification
+    toast({
+      title: "Canvas Updated",
+      description: `Canvas size set to ${width}mm × ${height}mm`,
+    });
+  };
+  
+  // Toggle vinyl properties dialog
+  const toggleVinylProperties = () => {
+    setShowVinylProperties(!showVinylProperties);
+  };
+  
+  // Save vinyl properties
+  const saveVinylProperties = (properties: {
+    sizeId: number | null,
+    materialId: number | null,
+    dimensions: { width: number, height: number } | null
+  }) => {
+    setSelectedSizeId(properties.sizeId);
+    setSelectedMaterialId(properties.materialId);
+    
+    if (properties.dimensions) {
+      updateCanvasDimensions(properties.dimensions.width, properties.dimensions.height);
+    }
+    
+    setShowVinylProperties(false);
+    
+    toast({
+      title: "Properties Updated",
+      description: "Vinyl properties have been updated",
+    });
   };
 
   return {
