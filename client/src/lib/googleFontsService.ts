@@ -1,8 +1,9 @@
 import WebFont from 'webfontloader';
 
 /**
- * Google Fonts Integration Service
- * Provides functionality to load and manage Google Fonts in the application
+ * Font Integration Service
+ * Provides functionality to load and manage fonts in the application
+ * Supports both Google Fonts and locally uploaded fonts
  */
 class GoogleFontsService {
   // Default popular fonts to display initially
@@ -15,6 +16,7 @@ class GoogleFontsService {
   
   // Font categories for organization
   categories: Record<string, string[]> = {
+    'local': [],     // New category for local fonts
     'serif': [],
     'sans-serif': [],
     'display': [],
@@ -28,9 +30,62 @@ class GoogleFontsService {
   // Track loaded fonts to avoid reloading
   loadedFonts: Set<string> = new Set();
   
+  // Map to store local font URLs
+  localFontUrls: Map<string, string> = new Map();
+  
   constructor() {
+    // Load any local fonts from localStorage
+    this.loadLocalFontsFromStorage();
+    
     // Initialize with popular fonts
     this.init();
+  }
+  
+  /**
+   * Load any previously saved local fonts from localStorage
+   */
+  private loadLocalFontsFromStorage() {
+    try {
+      const savedFonts = localStorage.getItem('localFonts');
+      if (savedFonts) {
+        const fontData = JSON.parse(savedFonts);
+        
+        // Restore the local fonts category
+        if (Array.isArray(fontData.fontNames)) {
+          this.categories['local'] = fontData.fontNames;
+        }
+        
+        // Restore the URL mapping
+        if (fontData.urlMap) {
+          for (const [fontName, url] of Object.entries(fontData.urlMap)) {
+            this.localFontUrls.set(fontName, url as string);
+          }
+        }
+        
+        // Now load each font
+        if (this.categories['local'].length > 0) {
+          for (const fontName of this.categories['local']) {
+            const url = this.localFontUrls.get(fontName);
+            if (url) {
+              try {
+                // Create and load the font
+                const fontFace = new FontFace(fontName, `url(${url})`);
+                fontFace.load().then(loadedFace => {
+                  document.fonts.add(loadedFace);
+                  this.loadedFonts.add(fontName);
+                }).catch(err => {
+                  console.error(`Failed to load local font ${fontName}:`, err);
+                });
+              } catch (err) {
+                console.error(`Error creating FontFace for ${fontName}:`, err);
+              }
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error loading local fonts from storage:", error);
+    }
   }
   
   /**
@@ -333,6 +388,80 @@ class GoogleFontsService {
   async getFontsByCategory(category: string) {
     await this.fetchGoogleFonts();
     return this.categories[category] || [];
+  }
+
+  /**
+   * Register a locally uploaded font
+   * @param fontName The name/family of the font
+   * @param url The object URL or data URL of the font file
+   * @returns True if registration was successful
+   */
+  registerLocalFont(fontName: string, url: string): boolean {
+    try {
+      // Add to local fonts category
+      if (!this.categories['local']) {
+        this.categories['local'] = [];
+      }
+      
+      // Don't add duplicates
+      if (!this.categories['local'].includes(fontName)) {
+        this.categories['local'].push(fontName);
+      }
+      
+      // Store the URL mapping
+      this.localFontUrls.set(fontName, url);
+      
+      // Mark as loaded
+      this.loadedFonts.add(fontName);
+      
+      // Save to localStorage
+      this.saveLocalFontsToStorage();
+      
+      return true;
+    } catch (error) {
+      console.error("Error registering local font:", error);
+      return false;
+    }
+  }
+  
+  /**
+   * Save local fonts to localStorage for persistence
+   */
+  private saveLocalFontsToStorage(): void {
+    try {
+      // Convert the Map to a plain object for JSON serialization
+      const urlMap: Record<string, string> = {};
+      this.localFontUrls.forEach((url, fontName) => {
+        urlMap[fontName] = url;
+      });
+      
+      const fontData = {
+        fontNames: this.categories['local'] || [],
+        urlMap
+      };
+      
+      localStorage.setItem('localFonts', JSON.stringify(fontData));
+    } catch (error) {
+      console.error("Error saving local fonts to storage:", error);
+    }
+  }
+  
+  /**
+   * Check if a font is a local font
+   * @param fontFamily The font family name to check
+   * @returns True if it's a local font
+   */
+  isLocalFont(fontFamily: string): boolean {
+    return this.categories['local']?.includes(fontFamily) || false;
+  }
+  
+  /**
+   * Get the URL for a local font
+   * @param fontFamily The font family name
+   * @returns The URL or undefined if not found
+   */
+  getLocalFontUrl(fontFamily: string): string | undefined {
+    return this.localFontUrls.get(fontFamily);
   }
 }
 

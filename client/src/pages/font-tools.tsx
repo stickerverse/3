@@ -1,178 +1,209 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import FontSettingsPanel from "../components/FontSettingsPanel";
-import googleFontsService from "../lib/googleFontsService";
+import { Type as FontIcon, Upload, Edit3 } from 'lucide-react';
+import FontGallery from '../components/FontGallery';
+import FontCarouselPicker from '../components/FontCarouselPicker';
+import FontUploader from '../components/FontUploader';
+import FontPreviewPanel from '../components/FontPreviewPanel';
+import googleFontsService from '../lib/googleFontsService';
 
 export default function FontToolsPage() {
-  const [currentFontSet, setCurrentFontSet] = useState<string>("all");
-  const [loadedFonts, setLoadedFonts] = useState<number>(0);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [fonts, setFonts] = useState<any[]>([]);
-  const [filteredFonts, setFilteredFonts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<Record<string, string[]>>({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [currentFont, setCurrentFont] = useState("Arial");
+  const [previewText, setPreviewText] = useState("The quick brown fox jumps over the lazy dog");
+  const [showFontPreview, setShowFontPreview] = useState(false);
+  const [showFontUploader, setShowFontUploader] = useState(false);
+  const [fontCategories, setFontCategories] = useState<Record<string, string[]>>({});
   
   useEffect(() => {
-    loadFonts(currentFontSet);
-  }, [currentFontSet]);
+    const loadFontData = async () => {
+      // Load font categories
+      await googleFontsService.fetchGoogleFonts();
+      setFontCategories(googleFontsService.categories);
+    };
+    
+    loadFontData();
+  }, []);
   
-  useEffect(() => {
-    // Filter fonts based on search query
-    if (searchQuery.trim() === "") {
-      setFilteredFonts(fonts.slice(0, 100)); // Only show first 100 for performance
-    } else {
-      const filtered = fonts.filter(font => 
-        font.family.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredFonts(filtered.slice(0, 100));
-    }
-  }, [searchQuery, fonts]);
+  const handleFontSelected = (font: string) => {
+    setCurrentFont(font);
+  };
   
-  async function loadFonts(fontSet: string) {
-    setIsLoading(true);
-    try {
-      // Re-initialize the font service with the selected font set
-      await googleFontsService.init(fontSet);
-      
-      // Get the loaded font data
-      const data = await googleFontsService.fetchGoogleFonts(fontSet);
-      setFonts(data.fonts);
-      setFilteredFonts(data.fonts.slice(0, 100));
-      setCategories(data.categories);
-      setLoadedFonts(data.total);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error loading fonts:", error);
-      setIsLoading(false);
-    }
-  }
-  
-  const handleFontSetSelected = (fontSet: string) => {
-    setCurrentFontSet(fontSet);
+  const handleFontUploaded = (font: { family: string, fileName: string, url: string }) => {
+    setCurrentFont(font.family);
+    // Update categories after upload
+    setFontCategories({...googleFontsService.categories});
   };
   
   return (
-    <div className="container mx-auto py-6 px-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-        <h1 className="text-2xl sm:text-3xl font-bold">Font Management</h1>
-        <FontSettingsPanel 
-          onFontSetSelected={handleFontSetSelected} 
-          currentFontSet={currentFontSet} 
-        />
+    <div className="container mx-auto p-6 max-w-4xl">
+      <div className="mb-8 text-center">
+        <h1 className="text-3xl font-bold mb-2">Font Management Tools</h1>
+        <p className="text-lg text-muted-foreground">
+          Browse, preview, and select fonts for your designs
+        </p>
       </div>
       
-      <Card className="mb-6">
-        <CardHeader className="pb-3">
-          <CardTitle>Font Library Status</CardTitle>
-          <CardDescription>
-            {isLoading 
-              ? "Loading fonts..." 
-              : `${loadedFonts} fonts available in the current set`}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="text-sm font-medium">Current Font Set:</div>
-              <div className="bg-primary/10 text-primary rounded-full px-3 py-1 text-sm font-medium">
-                {currentFontSet === "all" ? "All Fonts" : 
-                 currentFontSet === "popular" ? "Popular Fonts" :
-                 currentFontSet === "display" ? "Display Fonts" :
-                 currentFontSet === "handwriting" ? "Handwriting Fonts" :
-                 currentFontSet === "monospace" ? "Monospace Fonts" : 
-                 currentFontSet}
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        <Card>
+          <CardHeader>
+            <CardTitle>Current Selection</CardTitle>
+            <CardDescription>
+              The currently selected font and preview text
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-6">
+              <Label htmlFor="previewText">Preview Text</Label>
+              <Input
+                id="previewText"
+                value={previewText}
+                onChange={(e) => setPreviewText(e.target.value)}
+                placeholder="Type to preview..."
+                className="mb-2"
+              />
             </div>
             
-            <Input
-              placeholder="Search fonts..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="max-w-sm"
-            />
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList className="w-full flex-wrap">
-          <TabsTrigger value="all">All Fonts</TabsTrigger>
-          <TabsTrigger value="serif">Serif</TabsTrigger>
-          <TabsTrigger value="sans-serif">Sans Serif</TabsTrigger>
-          <TabsTrigger value="display">Display</TabsTrigger>
-          <TabsTrigger value="handwriting">Handwriting</TabsTrigger>
-          <TabsTrigger value="monospace">Monospace</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="all" className="py-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {isLoading ? (
-              <div className="col-span-full py-10 text-center">Loading fonts...</div>
-            ) : filteredFonts.length > 0 ? (
-              filteredFonts.map((font) => (
-                <FontPreviewCard key={font.family} font={font} />
-              ))
-            ) : (
-              <div className="col-span-full py-10 text-center">No fonts found matching your search criteria.</div>
-            )}
-          </div>
-        </TabsContent>
-        
-        {Object.keys(categories).map(category => (
-          <TabsContent key={category} value={category} className="py-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {isLoading ? (
-                <div className="col-span-full py-10 text-center">Loading fonts...</div>
-              ) : (
-                filteredFonts
-                  .filter(font => font.category === category)
-                  .map((font) => (
-                    <FontPreviewCard key={font.family} font={font} />
-                  ))
-              )}
+            <div className="p-4 border rounded-md mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm text-muted-foreground">Font Preview</span>
+                <span className="text-sm font-medium">{currentFont}</span>
+              </div>
+              <div
+                className="text-3xl p-4 text-center"
+                style={{ fontFamily: currentFont }}
+              >
+                {previewText || "The quick brown fox"}
+              </div>
             </div>
-          </TabsContent>
-        ))}
-      </Tabs>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button variant="outline" onClick={() => setShowFontUploader(true)}>
+              <Upload className="h-4 w-4 mr-2" />
+              Upload Font
+            </Button>
+            <Button onClick={() => setShowFontPreview(true)}>
+              <FontBold className="h-4 w-4 mr-2" />
+              Browse Fonts
+            </Button>
+          </CardFooter>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Font Selector</CardTitle>
+            <CardDescription>
+              Choose from popular fonts
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <FontCarouselPicker 
+              currentFont={currentFont}
+              onFontSelected={handleFontSelected}
+              sampleText={previewText}
+            />
+          </CardContent>
+          <CardFooter>
+            <Button 
+              variant="secondary" 
+              onClick={() => setShowFontPreview(true)}
+              className="w-full"
+            >
+              <Edit3 className="h-4 w-4 mr-2" />
+              Show All Available Fonts
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+      
+      <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg border">
+        <h2 className="text-xl font-bold mb-4">Local Font Management</h2>
+        <div className="mb-6">
+          <p className="text-muted-foreground mb-4">
+            You can upload your own font files to use in your designs. Supported formats include TTF, OTF, WOFF, and WOFF2.
+          </p>
+          
+          <div className="flex flex-col md:flex-row gap-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowFontUploader(true)}
+              className="flex-1"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Upload Font File
+            </Button>
+            
+            <Button
+              variant="default"
+              onClick={() => setShowFontPreview(true)}
+              className="flex-1"
+            >
+              <FontBold className="h-4 w-4 mr-2" />
+              Browse All Fonts
+            </Button>
+          </div>
+        </div>
+        
+        {fontCategories['local'] && fontCategories['local'].length > 0 ? (
+          <div className="border rounded-md p-4">
+            <h3 className="text-lg font-medium mb-4">Your Uploaded Fonts</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {fontCategories['local'].map(font => (
+                <button
+                  key={font}
+                  className={`
+                    p-4 border rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 
+                    ${currentFont === font ? 'border-primary bg-primary/5' : ''}
+                    transition-colors
+                  `}
+                  onClick={() => setCurrentFont(font)}
+                >
+                  <div 
+                    className="text-2xl mb-2 truncate"
+                    style={{ fontFamily: font }}
+                  >
+                    {previewText || "Aa Bb Cc"}
+                  </div>
+                  <div className="text-sm text-muted-foreground truncate">
+                    {font}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="text-center p-8 border border-dashed rounded-md">
+            <p className="text-muted-foreground mb-4">
+              You haven't uploaded any custom fonts yet.
+            </p>
+            <Button onClick={() => setShowFontUploader(true)}>
+              <Upload className="h-4 w-4 mr-2" />
+              Upload Your First Font
+            </Button>
+          </div>
+        )}
+      </div>
+      
+      {/* Font Preview Panel */}
+      <FontPreviewPanel 
+        showFontPreview={showFontPreview}
+        setShowFontPreview={setShowFontPreview}
+        previewText={previewText}
+        setPreviewText={setPreviewText}
+        currentFont={currentFont}
+        setFont={setCurrentFont}
+        fontCategories={fontCategories}
+      />
+      
+      {/* Font Uploader */}
+      <FontUploader 
+        showUploader={showFontUploader}
+        setShowUploader={setShowFontUploader}
+        onFontUploaded={handleFontUploaded}
+      />
     </div>
-  );
-}
-
-function FontPreviewCard({ font }: { font: any }) {
-  return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg">{font.family}</CardTitle>
-        <CardDescription className="text-xs capitalize">
-          {font.category} • {font.variants.length} variants
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div 
-          className="text-2xl h-16 overflow-hidden" 
-          style={{ fontFamily: font.family }}
-        >
-          The quick brown fox jumps over the lazy dog
-        </div>
-        <div 
-          className="text-sm mt-2 overflow-hidden" 
-          style={{ fontFamily: font.family }}
-        >
-          ABCDEFGHIJKLMNOPQRSTUVWXYZ
-          <br />
-          abcdefghijklmnopqrstuvwxyz
-          <br />
-          0123456789.,!?@#$%^&*()
-        </div>
-      </CardContent>
-      <CardFooter>
-        <Button size="sm" variant="outline" className="w-full">
-          Select Font
-        </Button>
-      </CardFooter>
-    </Card>
   );
 }
