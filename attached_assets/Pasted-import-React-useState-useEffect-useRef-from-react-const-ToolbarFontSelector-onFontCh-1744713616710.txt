@@ -1,0 +1,259 @@
+import React, { useState, useEffect, useRef } from 'react';
+
+const ToolbarFontSelector = ({ onFontChange, currentFont = 'Arial, sans-serif' }) => {
+  // Array of font options (can be expanded)
+  const fonts = [
+    { name: 'Arial', family: 'Arial, sans-serif', category: 'Sans-serif' },
+    { name: 'Helvetica', family: 'Helvetica, sans-serif', category: 'Sans-serif' },
+    { name: 'Times New Roman', family: 'Times New Roman, serif', category: 'Serif' },
+    { name: 'Georgia', family: 'Georgia, serif', category: 'Serif' },
+    { name: 'Courier New', family: 'Courier New, monospace', category: 'Monospace' },
+    { name: 'Verdana', family: 'Verdana, sans-serif', category: 'Sans-serif' },
+    { name: 'Trebuchet MS', family: 'Trebuchet MS, sans-serif', category: 'Sans-serif' },
+    { name: 'Impact', family: 'Impact, sans-serif', category: 'Display' },
+    { name: 'Comic Sans MS', family: 'Comic Sans MS, cursive', category: 'Handwriting' },
+    { name: 'Palatino', family: 'Palatino, serif', category: 'Serif' },
+    { name: 'Garamond', family: 'Garamond, serif', category: 'Serif' },
+    { name: 'Bookman', family: 'Bookman, serif', category: 'Serif' },
+    { name: 'Tahoma', family: 'Tahoma, sans-serif', category: 'Sans-serif' },
+    { name: 'Lucida Console', family: 'Lucida Console, monospace', category: 'Monospace' }
+  ];
+
+  // Find the current font object based on the currentFont prop
+  const findCurrentFont = () => {
+    const found = fonts.find(font => font.family === currentFont);
+    return found || fonts[0]; // Default to first font if not found
+  };
+
+  // State for dropdown and selected font
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedFont, setSelectedFont] = useState(findCurrentFont);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const dropdownRef = useRef(null);
+
+  // Extract unique categories on component mount
+  useEffect(() => {
+    const uniqueCategories = ['All', ...new Set(fonts.map(font => font.category))];
+    setCategories(uniqueCategories);
+  }, []);
+
+  // Update selected font when currentFont prop changes
+  useEffect(() => {
+    setSelectedFont(findCurrentFont());
+  }, [currentFont]);
+
+  // Filter fonts based on search query and selected category
+  const filteredFonts = fonts.filter(font => {
+    const matchesSearch = font.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || font.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  // Handle font selection
+  const handleSelectFont = (font) => {
+    setSelectedFont(font);
+    setIsOpen(false);
+    // Call the parent component's callback with the selected font family
+    if (onFontChange) {
+      onFontChange(font.family);
+    }
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Group fonts by category for the dropdown
+  const groupedFonts = {};
+  if (selectedCategory === 'All') {
+    filteredFonts.forEach(font => {
+      if (!groupedFonts[font.category]) {
+        groupedFonts[font.category] = [];
+      }
+      groupedFonts[font.category].push(font);
+    });
+  } else {
+    groupedFonts[selectedCategory] = filteredFonts;
+  }
+
+  return (
+    <div className="relative inline-block" ref={dropdownRef}>
+      {/* Font selector button */}
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center min-w-36 h-10 bg-white border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        aria-haspopup="true"
+        aria-expanded={isOpen}
+      >
+        <span className="mr-2" style={{ fontFamily: selectedFont.family }}>
+          {selectedFont.name}
+        </span>
+        <svg className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      
+      {/* Dropdown menu */}
+      {isOpen && (
+        <div className="absolute z-50 mt-1 w-64 bg-white border border-gray-300 rounded shadow-lg">
+          {/* Search box */}
+          <div className="p-2 border-b border-gray-200">
+            <input
+              type="text"
+              placeholder="Search fonts..."
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+          
+          {/* Category filter */}
+          <div className="p-2 border-b border-gray-200 flex flex-wrap gap-1">
+            {categories.map((category) => (
+              <button
+                key={category}
+                className={`px-2 py-1 text-xs rounded ${
+                  selectedCategory === category 
+                    ? 'bg-blue-500 text-white' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+                onClick={() => setSelectedCategory(category)}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+          
+          {/* Font list */}
+          <div className="max-h-60 overflow-y-auto">
+            {Object.keys(groupedFonts).length > 0 ? (
+              Object.entries(groupedFonts).map(([category, fonts]) => (
+                <div key={category}>
+                  {selectedCategory === 'All' && (
+                    <div className="px-3 py-1 bg-gray-100 text-xs font-semibold text-gray-500">
+                      {category}
+                    </div>
+                  )}
+                  {fonts.map((font, index) => (
+                    <div
+                      key={index}
+                      className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
+                      onClick={() => handleSelectFont(font)}
+                    >
+                      <span className="flex-1" style={{ fontFamily: font.family }}>
+                        {font.name}
+                      </span>
+                      {selectedFont.name === font.name && (
+                        <svg className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ))
+            ) : (
+              <div className="px-3 py-2 text-sm text-gray-500">No fonts found</div>
+            )}
+          </div>
+          
+          {/* Preview section */}
+          <div className="p-3 border-t border-gray-200">
+            <div className="text-xs text-gray-500 mb-1">Preview:</div>
+            <div 
+              className="p-2 border border-gray-200 rounded bg-gray-50 text-base"
+              style={{ fontFamily: selectedFont.family }}
+            >
+              The quick brown fox
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Example Toolbar component that incorporates the font selector
+const Toolbar = () => {
+  const [currentFont, setCurrentFont] = useState('Arial, sans-serif');
+  const [editorText, setEditorText] = useState('Select a font to see how your text will appear.');
+  
+  const handleFontChange = (fontFamily) => {
+    setCurrentFont(fontFamily);
+    // In a real implementation, you would update your editor state here
+  };
+  
+  return (
+    <div className="w-full max-w-4xl mx-auto">
+      {/* Toolbar */}
+      <div className="bg-gray-100 border border-gray-300 rounded-t p-2 flex items-center gap-2">
+        {/* Font selector */}
+        <ToolbarFontSelector 
+          onFontChange={handleFontChange} 
+          currentFont={currentFont} 
+        />
+        
+        {/* Additional toolbar options (placeholders) */}
+        <div className="h-10 px-3 py-1 border border-gray-300 rounded bg-white flex items-center">
+          <span className="text-sm">12pt</span>
+        </div>
+        
+        <div className="flex space-x-1">
+          <button className="h-10 w-10 flex items-center justify-center border border-gray-300 rounded bg-white">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <button className="h-10 w-10 flex items-center justify-center border border-gray-300 rounded bg-white">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h10M4 18h16" />
+            </svg>
+          </button>
+          <button className="h-10 w-10 flex items-center justify-center border border-gray-300 rounded bg-white">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M8 12h8M4 18h16" />
+            </svg>
+          </button>
+        </div>
+        
+        <div className="flex space-x-1">
+          <button className="h-10 w-10 flex items-center justify-center border border-gray-300 rounded bg-white">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
+          <button className="h-10 w-10 flex items-center justify-center border border-gray-300 rounded bg-white">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      {/* Editor area */}
+      <div 
+        className="border border-t-0 border-gray-300 rounded-b p-4 min-h-40"
+        style={{ fontFamily: currentFont }}
+      >
+        <div contentEditable="true" className="focus:outline-none">
+          {editorText}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Toolbar;

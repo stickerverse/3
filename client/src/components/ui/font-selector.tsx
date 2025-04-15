@@ -84,11 +84,9 @@ const FontSelector = ({
         categories[selectedCategory].includes(font)
       );
     }
-
-    // Limit to 100 fonts for better performance
-    if (filtered.length > 100) {
-      filtered = filtered.slice(0, 100);
-    }
+    
+    // No limit on the number of fonts returned
+    // Previously we were limiting to 100 fonts, but now we show all matches
 
     setFilteredFonts(filtered);
   }, [searchQuery, selectedCategory, fonts, categories]);

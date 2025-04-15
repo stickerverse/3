@@ -37,8 +37,44 @@ class GoogleFontsService {
    * Initialize the font service
    */
   async init() {
+    console.log("Initializing Google Fonts service");
     // Load popular fonts initially for better UX
     await this.loadFonts(this.popularFonts);
+    console.log("Initial fonts loaded successfully");
+    
+    // Start loading all fonts in the background
+    this.fetchGoogleFonts().then(data => {
+      // Get all font families
+      const allFonts = data.fonts.map((font: any) => font.family);
+      // Load fonts in smaller batches to prevent timeout issues
+      this.loadAllFontsInBatches(allFonts);
+    }).catch(err => {
+      console.error("Error loading all fonts:", err);
+    });
+  }
+  
+  /**
+   * Load all fonts in smaller batches to prevent timeout issues
+   * @param allFonts Array of all font families to load
+   */
+  async loadAllFontsInBatches(allFonts: string[]) {
+    const batchSize = 15; // Load 15 fonts at a time
+    const totalFonts = allFonts.length;
+    let loadedCount = 0;
+    
+    // Process fonts in batches
+    for (let i = 0; i < totalFonts; i += batchSize) {
+      const batch = allFonts.slice(i, i + batchSize);
+      try {
+        await this.loadFonts(batch);
+        loadedCount += batch.length;
+        console.log(`Fonts loaded: ${loadedCount} of ${totalFonts} fonts`);
+      } catch (error) {
+        console.error(`Error loading font batch ${i}-${i + batchSize}:`, error);
+      }
+    }
+    
+    console.log("All fonts loaded successfully");
   }
   
   /**
