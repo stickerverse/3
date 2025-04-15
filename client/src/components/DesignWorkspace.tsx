@@ -230,36 +230,18 @@ export default function DesignWorkspace({
       </div>
 
       <div className="px-4">
-        {/* Local Fonts Section */}
+        {/* Consolidated Local Font Section */}
         <div className="mb-4">
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-lg font-medium">Local Font Library</h3>
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground flex items-center gap-1">
-                <span>Local fonts from your</span>
+                <span>Fonts from your</span>
                 <code className="bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 rounded font-mono">/fonts</code>
                 <span>directory</span>
               </span>
               <span className="text-[9px] bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded-full">
-                {526} fonts found
-              </span>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-3">
-            <SystemFontBrowser 
-              onFontSelected={handleFontSelection} 
-              currentFont={getCurrentFont() || ""}
-            />
-          </div>
-        </div>
-        
-        {/* Local Font Previewer */}
-        <div className="mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg font-medium">Local Font Previewer</h3>
-            <div className="flex items-center">
-              <span className="text-xs text-muted-foreground">
-                Browse and select fonts from your local collection
+                {526} local fonts available
               </span>
             </div>
           </div>
