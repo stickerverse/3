@@ -21,11 +21,17 @@ const scanFonts = () => {
     console.log('Scanning fonts directory...');
     const fontsDir = path.join(process.cwd(), 'fonts');
     const fontsJsonPath = path.join(process.cwd(), 'public', 'fonts.json');
+    const fontsMetadataPath = path.join(process.cwd(), 'public', 'fonts-metadata.json');
     const fontsExists = fs.existsSync(fontsDir);
     
     if (!fontsExists) {
       console.log('Creating fonts directory...');
       fs.mkdirSync(fontsDir, { recursive: true });
+    }
+    
+    // Ensure public directory exists
+    if (!fs.existsSync(path.join(process.cwd(), 'public'))) {
+      fs.mkdirSync(path.join(process.cwd(), 'public'), { recursive: true });
     }
     
     console.log('Running font scan script...');
@@ -40,7 +46,7 @@ const scanFonts = () => {
       }
       console.log(`Font scan stdout: ${stdout}`);
       
-      // Also copy the fonts.json to public folder for client access
+      // Copy the fonts.json to public folder for client access
       try {
         if (fs.existsSync(path.join(process.cwd(), 'fonts.json'))) {
           const fontsJson = fs.readFileSync(path.join(process.cwd(), 'fonts.json'));
@@ -49,8 +55,17 @@ const scanFonts = () => {
         } else {
           console.error('fonts.json not found after scan');
         }
+        
+        // Copy the fonts-metadata.json to public folder
+        if (fs.existsSync(path.join(process.cwd(), 'fonts-metadata.json'))) {
+          const metadataJson = fs.readFileSync(path.join(process.cwd(), 'fonts-metadata.json'));
+          fs.writeFileSync(fontsMetadataPath, metadataJson);
+          console.log('Copied fonts-metadata.json to public folder');
+        } else {
+          console.error('fonts-metadata.json not found after scan');
+        }
       } catch (copyError) {
-        console.error('Error copying fonts.json to public folder:', copyError);
+        console.error('Error copying font files to public folder:', copyError);
       }
     });
   } catch (error) {

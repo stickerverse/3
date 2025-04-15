@@ -52,6 +52,22 @@ export async function registerRoutes(app: express.Express): Promise<Server> {
       }
     }
   });
+  
+  // Serve fonts-metadata.json file
+  app.get("/fonts-metadata.json", (req, res) => {
+    const metadataPath = path.resolve(import.meta.dirname, "..", "public", "fonts-metadata.json");
+    if (fs.existsSync(metadataPath)) {
+      res.sendFile(metadataPath);
+    } else {
+      // Fallback to root fonts-metadata.json
+      const rootMetadataPath = path.resolve(import.meta.dirname, "..", "fonts-metadata.json");
+      if (fs.existsSync(rootMetadataPath)) {
+        res.sendFile(rootMetadataPath);
+      } else {
+        res.status(404).json({ message: "fonts-metadata.json not found" });
+      }
+    }
+  });
 
   // Define routes for designs
 
