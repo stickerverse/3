@@ -177,7 +177,7 @@ export default function FontGallery({
       
       <div 
         ref={galleryRef}
-        className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 h-56 overflow-y-auto p-2 border rounded-md"
+        className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 h-60 overflow-y-auto p-2 border rounded-md"
       >
         {isLoading && displayFonts.length === 0 ? (
           <div className="col-span-full h-full flex items-center justify-center">
@@ -185,10 +185,10 @@ export default function FontGallery({
           </div>
         ) : displayFonts.length > 0 ? (
           displayFonts.map((font) => (
-            <div
+            <button
               key={font}
               className={`
-                p-3 border rounded-md cursor-pointer transition-all
+                p-3 border rounded-none cursor-pointer transition-all w-full block text-left
                 ${font === currentFont ? 'border-primary bg-primary/5' : 'border-neutral-200 dark:border-neutral-700 hover:border-primary/50'}
                 hover:shadow-md
               `}
@@ -199,13 +199,13 @@ export default function FontGallery({
               <div className="text-center" style={{ fontFamily: font }}>
                 <div className="text-xs text-muted-foreground mb-1 truncate font-sans">{font}</div>
                 <div className={`
-                  h-16 overflow-hidden flex items-center justify-center text-sm leading-tight
+                  h-20 overflow-hidden flex items-center justify-center text-base leading-tight
                   ${hoveredFont === font ? 'scale-105 text-primary transition-all duration-200' : ''}
                 `}>
                   {customText}
                 </div>
               </div>
-            </div>
+            </button>
           ))
         ) : (
           <div className="col-span-full h-full flex items-center justify-center text-muted-foreground">
