@@ -10,11 +10,9 @@ import {
 import Toolbar from "@/components/Toolbar"; 
 import FontShowcase from "@/components/FontShowcase"; 
 import FontCarouselPicker from "@/components/FontCarouselPicker";
-import FontGallery from "@/components/FontGallery";
-import SystemFontBrowser from "@/components/SystemFontBrowser";
+import FloatingFontPanel from "@/components/FloatingFontPanel";
 
 import StandaloneFontPreviewer from '@/components/StandaloneFontPreviewer'; 
-import LocalFontPreviewer from '@/components/LocalFontPreviewer'; // Add import for our new component
 import googleFontsService from "@/lib/googleFontsService";
 import { loadFontBatch, isFontLoaded } from "@/lib/fontLoader"; 
 
@@ -59,7 +57,6 @@ export default function DesignWorkspace({
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 600, height: 400 });
   const [showFontShowcase, setShowFontShowcase] = useState(false);
-  const [showFontGallery, setShowFontGallery] = useState(true); 
 
   const zoomIn = () => {
     if (zoom < 200) {
@@ -104,12 +101,22 @@ export default function DesignWorkspace({
       // First try to load the font
       if (!isFontLoaded(fontFamily)) {
         await loadFontBatch([fontFamily]);
+        
+        // Add a small delay to ensure font is fully loaded
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
       
-      // Apply the font to the text object
+      // Apply the font to the text object with enhanced settings for color fonts
       (activeObject as fabric.Text).set({
-        fontFamily: fontFamily
+        fontFamily: fontFamily,
+        fill: 'rgba(0,0,0,1)', // Use fully opaque fill to ensure color fonts show properly
+        paintFirst: 'fill'
       });
+      
+      // For color fonts, ensure we're using SVG text rendering
+      if (activeObject.type === 'text' || activeObject.type === 'textbox') {
+        (activeObject as any).setSvgRendering(true);
+      }
       
       console.log(`Applied font: ${fontFamily} to selected text`);
       
@@ -229,39 +236,11 @@ export default function DesignWorkspace({
         </div>
       </div>
 
-      <div className="px-4">
-        {/* Consolidated Local Font Section */}
-        <div className="mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg font-medium">Local Font Library</h3>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                <span>Fonts from your</span>
-                <code className="bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 rounded font-mono">/fonts</code>
-                <span>directory</span>
-              </span>
-              <span className="text-[9px] bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded-full">
-                {526} local fonts available
-              </span>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-3">
-            <LocalFontPreviewer 
-              onFontSelected={handleFontSelection}
-              currentFont={getCurrentFont() || ""}
-              previewText={selectedObj && selectedObj.type === 'text' ? (selectedObj as fabric.Text).text.substring(0, 10) : "Aa Bb Cc"}
-            />
-          </div>
-        </div>
-        
-        {/* Google Fonts Gallery */}
-        <FontGallery
-          visible={showFontGallery}
-          currentFont={getCurrentFont() || "Arial"}
-          onFontSelected={handleFontSelection}
-          sampleText={selectedObj && selectedObj.type === 'text' ? (selectedObj as fabric.Text).text : "Sample Text"}
-        />
-      </div>
+      {/* We've removed static font sections and replaced with floating panel */}
+      <FloatingFontPanel 
+        onFontSelected={handleFontSelection}
+        currentFont={getCurrentFont() || ""}
+      />
 
       <div className="bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 px-4 py-1 flex justify-between items-center text-xs text-neutral-500 dark:text-neutral-400">
         <div>Size: {canvasSize.width}px × {canvasSize.height}px</div>
@@ -272,14 +251,6 @@ export default function DesignWorkspace({
           >
             Need help? View Tutorial
           </button>
-          <div className="flex space-x-4">
-            <button 
-              className={`hover:text-primary transition-colors ${showFontGallery ? 'text-primary' : ''}`}
-              onClick={() => setShowFontGallery(!showFontGallery)}
-            >
-              {showFontGallery ? 'Hide Font Gallery' : 'Show Font Gallery'}
-            </button>
-          </div>
         </div>
         <div>
           {selectedObj ? (
