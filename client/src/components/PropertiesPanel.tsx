@@ -293,7 +293,8 @@ export default function PropertiesPanel({
   const handleColorChange = (newColor: string) => {
     setColor(newColor);
     if (selectedObj) {
-      selectedObj.set({ fill: newColor });
+      // If newColor is empty string, set fill to null for no color
+      selectedObj.set({ fill: newColor === "" ? null : newColor });
       canvas?.renderAll();
     }
   };
@@ -451,7 +452,20 @@ export default function PropertiesPanel({
             {/* Color */}
             <div>
               <label className="block text-sm font-medium mb-1">Color</label>
-              <ColorPicker color={color} onChange={handleColorChange} />
+              <div className="flex items-center gap-2">
+                <ColorPicker color={color} onChange={handleColorChange} />
+                <button
+                  className="flex items-center justify-center w-8 h-8 rounded-full border border-neutral-300 dark:border-neutral-700 relative overflow-hidden hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                  onClick={() => handleColorChange("")}
+                  title="No Fill"
+                >
+                  <div className="absolute inset-0 bg-white dark:bg-neutral-800 grid place-items-center">
+                    <div className="w-6 h-6 rounded-full border border-neutral-300 dark:border-neutral-700 relative">
+                      <div className="absolute top-1/2 left-0 w-full h-0.5 bg-red-500 rotate-45" />
+                    </div>
+                  </div>
+                </button>
+              </div>
             </div>
 
             {/* Text effects */}
