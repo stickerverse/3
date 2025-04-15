@@ -253,28 +253,29 @@ export default function FontGallery({
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-medium">Browse your fonts</h3>
         
-        <div className="flex items-center space-x-2">
-          <div className="relative w-64">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search fonts..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8"
-            />
-          </div>
-          
+        <div className="relative w-64">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Sample text..."
-            value={customText}
-            onChange={(e) => setCustomText(e.target.value)}
-            className="w-64"
+            placeholder="Search fonts..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8"
           />
         </div>
       </div>
       
       <div className="mb-6 bg-neutral-50 dark:bg-neutral-900 p-4 rounded-md border">
-        <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-2">Preview fonts with your own text ...</p>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-2">
+          Enter text below to preview it with all fonts
+        </p>
+        <div className="flex items-center space-x-2 mt-3">
+          <Input
+            placeholder="Type to preview fonts..."
+            value={customText}
+            onChange={(e) => setCustomText(e.target.value)}
+            className="w-full"
+          />
+        </div>
       </div>
       
       <Tabs defaultValue="all" className="w-full mb-4">
@@ -325,13 +326,15 @@ export default function FontGallery({
             >
               <div 
                 className={`
-                  p-6 flex items-center justify-center h-36 bg-white dark:bg-neutral-800 rounded-t-2xl
+                  p-6 flex items-center justify-center ${customText && customText.length > 20 ? 'h-44' : 'h-36'} 
+                  bg-white dark:bg-neutral-800 rounded-t-2xl transition-all duration-200
                   ${font === currentFont ? 'bg-primary/5 dark:bg-primary/10' : ''}
                 `} 
                 style={{ fontFamily: font }}
               >
                 <div className={`
-                  text-5xl overflow-hidden text-center relative
+                  ${customText && customText.length > 10 ? 'text-3xl' : 'text-5xl'} 
+                  overflow-hidden text-center relative
                   ${hoveredFont === font ? 'text-primary scale-110 transition-all duration-200' : ''}
                   ${font === currentFont ? 'text-primary font-bold' : ''}
                 `}>
@@ -341,8 +344,13 @@ export default function FontGallery({
                     ${hoveredFont === font && font.length > 15 ? 'text-4xl' : ''}
                     ${hoveredFont === font ? getPreviewStyle(font) : ''}
                     ${hoveredFont !== font && font === currentFont ? 'bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent' : ''}
+                    ${customText && customText.length > 40 ? 'max-w-full break-words' : ''}
                   `}>
-                    {hoveredFont === font ? animationText : "Aa"}
+                    {hoveredFont === font 
+                      ? animationText 
+                      : customText 
+                        ? (customText.length > 60 ? customText.substring(0, 60) + "..." : customText) 
+                        : "Aa"}
                   </span>
                   {hoveredFont === font && (
                     <span className="absolute top-full left-1/2 transform -translate-x-1/2 text-xs text-primary mt-1 whitespace-nowrap animate-pulse">
