@@ -49,6 +49,7 @@ export default function FontComparison({
   const [showLineHeight, setShowLineHeight] = useState<boolean>(false);
   const [lineHeight, setLineHeight] = useState<number>(1.5);
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [allCharacters, setAllCharacters] = useState<string>(
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{};':\",./<>?\\|`~"
   );
@@ -66,28 +67,54 @@ export default function FontComparison({
   useEffect(() => {
     async function loadFonts() {
       try {
-        // Load all categories of fonts
-        const systemFonts = googleFontsService.categories['system'] || [];
-        const googleFonts: string[] = []; // In a real app, you'd load these
+        // Load fonts from all categories
+        setIsLoading(true);
         
-        // Combine all available fonts
-        const allFonts = [...systemFonts, ...googleFonts];
+        // First, get system fonts (local fonts)
+        const systemFonts = await googleFontsService.getFontsByCategory('system') || [];
+        
+        // Then get Google Fonts
+        const data = await googleFontsService.fetchGoogleFonts("all");
+        const googleFontsList = data.fonts ? data.fonts.map((font: any) => font.family) : [];
+        
+        // Combine all available fonts, filtering out duplicates
+        const combinedFonts = [...systemFonts, ...googleFontsList];
+        const allFonts = combinedFonts.filter((font, index) => combinedFonts.indexOf(font) === index);
+        
+        console.log(`Font comparison tool loaded ${allFonts.length} fonts (${systemFonts.length} system, ${googleFontsList.length} Google)`);
         setAvailableFonts(allFonts);
         
-        // Initialize with current font if provided
+        // Initialize with current font if provided and not already in comparison list
         if (currentFont && !comparisonFonts.includes(currentFont)) {
-          setComparisonFonts([currentFont]);
+          setComparisonFonts(prev => [...prev, currentFont]);
         } else if (comparisonFonts.length === 0 && allFonts.length > 0) {
           // Default to first font if none selected
           setComparisonFonts([allFonts[0]]);
         }
+        
+        // Preload the fonts that are in the comparison
+        if (comparisonFonts.length > 0) {
+          await googleFontsService.loadFonts(comparisonFonts);
+        }
+        
+        setIsLoading(false);
       } catch (error) {
         console.error('Error loading fonts for comparison:', error);
+        setIsLoading(false);
       }
     }
     
     loadFonts();
-  }, [currentFont, comparisonFonts]);
+  }, [currentFont]);
+  
+  // Preload the currentFont whenever it changes
+  useEffect(() => {
+    if (currentFont) {
+      googleFontsService.loadFonts([currentFont]).catch(err => {
+        console.warn(`Failed to preload current font ${currentFont}:`, err);
+      });
+    }
+  }, [currentFont]);
 
   // Add a font to comparison
   const addFont = (font: string) => {
@@ -102,8 +129,16 @@ export default function FontComparison({
   };
 
   // Select a font from the comparison
-  const selectFont = (font: string) => {
+  const selectFont = async (font: string) => {
     if (onFontSelected) {
+      // Make sure the font is loaded before notifying parent
+      try {
+        await googleFontsService.loadFonts([font]);
+        console.log(`Preloaded font ${font} before selection`);
+      } catch (err) {
+        console.warn(`Failed to preload font ${font} before selection:`, err);
+      }
+      
       onFontSelected(font);
       setIsDialogOpen(false);
     }
@@ -271,9 +306,10 @@ export default function FontComparison({
             <div className="flex gap-2">
               <Select 
                 onValueChange={(font) => addFont(font)}
+                disabled={isLoading}
               >
                 <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Add font to comparison" />
+                  <SelectValue placeholder={isLoading ? "Loading fonts..." : "Add font to comparison"} />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
                   {availableFonts.map((font, index) => (
@@ -287,7 +323,12 @@ export default function FontComparison({
 
             {/* Font comparison section */}
             <div className="grid grid-cols-1 gap-3 max-h-[60vh] overflow-y-auto pr-2">
-              {comparisonFonts.length === 0 ? (
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center h-60 text-center">
+                  <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mb-4"></div>
+                  <p className="text-muted-foreground">Loading fonts...</p>
+                </div>
+              ) : comparisonFonts.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground border border-dashed rounded-md">
                   <p>Add fonts to start comparing</p>
                 </div>
