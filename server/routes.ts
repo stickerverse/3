@@ -52,7 +52,7 @@ export async function registerRoutes(app: express.Express): Promise<Server> {
       }
     }
   });
-  
+
   // Serve fonts-metadata.json file
   app.get("/fonts-metadata.json", (req, res) => {
     const metadataPath = path.resolve(import.meta.dirname, "..", "public", "fonts-metadata.json");

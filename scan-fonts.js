@@ -1,101 +1,123 @@
-const fs = require('fs');
-const path = require('path');
-const fontkit = require('fontkit');
+
+// scan-fonts.js - Run this script to generate a fonts.json file
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get current file directory in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Configuration
-const fontsDir = path.join(process.cwd(), 'fonts');
-const outputFile = path.join(process.cwd(), 'fonts.json');
-const publicOutputFile = path.join(process.cwd(), 'public', 'fonts.json');
-const metadataFile = path.join(process.cwd(), 'fonts-metadata.json');
-const publicMetadataFile = path.join(process.cwd(), 'public', 'fonts-metadata.json');
+const FONTS_FOLDER = path.join(__dirname, 'fonts');
+const OUTPUT_FILE = path.join(__dirname, 'public', 'fonts.json');
+const FONT_EXTENSIONS = ['.ttf', '.otf', '.woff', '.woff2'];
 
-console.log(`Scanning fonts folder: ${fontsDir}`);
-
-// Ensure the public directory exists
-if (!fs.existsSync(path.join(process.cwd(), 'public'))) {
-  fs.mkdirSync(path.join(process.cwd(), 'public'), { recursive: true });
+// Create public folder if it doesn't exist
+if (!fs.existsSync(path.join(__dirname, 'public'))) {
+  fs.mkdirSync(path.join(__dirname, 'public'));
 }
 
-// Read font directory recursively
-function scanFontsDir(dir) {
-  let fontPaths = [];
-  let metadata = [];
-
-  const files = fs.readdirSync(dir, { withFileTypes: true });
-
-  for (const file of files) {
-    const fullPath = path.join(dir, file.name);
-
-    if (file.isDirectory()) {
-      // Recursively scan subdirectories
-      const subDirFonts = scanFontsDir(fullPath);
-      fontPaths = [...fontPaths, ...subDirFonts.fontPaths];
-      metadata = [...metadata, ...subDirFonts.metadata];
-    } else if (/\.(ttf|otf|woff|woff2)$/i.test(file.name)) {
-      // This is a font file
-      const relativePath = path.relative(fontsDir, fullPath);
-      fontPaths.push(relativePath);
-
-      // Extract font metadata
-      try {
-        const font = fontkit.openSync(fullPath);
-        const fontInfo = {
-          path: relativePath,
-          name: font.fullName || font.familyName || file.name.replace(/\.(ttf|otf|woff|woff2)$/i, ''),
-          format: getFormatFromExtension(file.name)
-        };
-        metadata.push(fontInfo);
-      } catch (err) {
-        // If we can't read the font, still include it but with basic info
-        metadata.push({
-          path: relativePath,
-          name: file.name.replace(/\.(ttf|otf|woff|woff2)$/i, '')
-            .split(/[-_]/).map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' '),
-          format: getFormatFromExtension(file.name)
-        });
-      }
+// Function to scan the fonts folder
+function scanFontsFolder() {
+  console.log(`Scanning fonts folder: ${FONTS_FOLDER}`);
+  
+  // Check if the fonts folder exists
+  if (!fs.existsSync(FONTS_FOLDER)) {
+    console.error(`Fonts folder not found: ${FONTS_FOLDER}`);
+    return [];
+  }
+  
+  // Get all files in the fonts folder recursively
+  try {
+    const fontFiles = [];
+    
+    function scanDir(dir) {
+      const files = fs.readdirSync(dir);
+      
+      files.forEach(file => {
+        const filePath = path.join(dir, file);
+        const stat = fs.statSync(filePath);
+        
+        if (stat.isDirectory()) {
+          // Recursively scan subdirectories
+          scanDir(filePath);
+        } else {
+          // Check if it's a font file
+          const ext = path.extname(file).toLowerCase();
+          if (FONT_EXTENSIONS.includes(ext)) {
+            // Add relative path from fonts folder
+            const relativePath = path.relative(FONTS_FOLDER, filePath);
+            fontFiles.push(relativePath.replace(/\\/g, '/')); // Normalize path separators
+          }
+        }
+      });
     }
+    
+    scanDir(FONTS_FOLDER);
+    console.log(`Found ${fontFiles.length} font files`);
+    return fontFiles;
+  } catch (error) {
+    console.error(`Error scanning fonts folder: ${error.message}`);
+    return [];
   }
-
-  return { fontPaths, metadata };
 }
 
-// Get font format based on file extension
-function getFormatFromExtension(filename) {
-  const ext = path.extname(filename).toLowerCase();
+// Main function
+function main() {
+  // Scan the fonts folder
+  const fontFiles = scanFontsFolder();
+  
+  if (fontFiles.length === 0) {
+    console.warn('No font files found. Make sure your fonts are in the correct folder.');
+    return;
+  }
+  
+  // Write the font list to a JSON file
+  try {
+    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(fontFiles, null, 2));
+    console.log(`Wrote ${fontFiles.length} font files to ${OUTPUT_FILE}`);
+    
+    // Create a sample fonts metadata file with additional information
+    const fontsMetadata = fontFiles.map(fontFile => {
+      const name = path.basename(fontFile, path.extname(fontFile))
+        .replace(/[_-]/g, ' ') // Replace underscores and hyphens with spaces
+        .replace(/([A-Z])/g, ' $1') // Add spaces before capital letters
+        .trim();
+      
+      return {
+        path: fontFile,
+        name,
+        format: getFormatFromExtension(path.extname(fontFile).toLowerCase().substring(1))
+      };
+    });
+    
+    fs.writeFileSync(
+      path.join(__dirname, 'public', 'fonts-metadata.json'),
+      JSON.stringify(fontsMetadata, null, 2)
+    );
+    
+    console.log(`Also created fonts-metadata.json with additional font information`);
+  } catch (error) {
+    console.error(`Error writing font list to file: ${error.message}`);
+  }
+}
+
+// Helper function to get font format based on file extension
+function getFormatFromExtension(ext) {
   switch (ext) {
-    case '.ttf': return 'truetype';
-    case '.otf': return 'opentype';
-    case '.woff': return 'woff';
-    case '.woff2': return 'woff2';
-    default: return 'unknown';
+    case 'ttf': return 'truetype';
+    case 'otf': return 'opentype';
+    case 'woff': return 'woff';
+    case 'woff2': return 'woff2';
+    default: return 'truetype';
   }
 }
 
-// Scan fonts directory
-try {
-  const { fontPaths, metadata } = scanFontsDir(fontsDir);
+// Run the main function
+main();
 
-  console.log(`Found ${fontPaths.length} font files`);
-
-  // Write fonts.json
-  fs.writeFileSync(outputFile, JSON.stringify(fontPaths, null, 2));
-  console.log(`Wrote ${fontPaths.length} font files to ${outputFile}`);
-
-  // Copy to public folder
-  fs.writeFileSync(publicOutputFile, JSON.stringify(fontPaths, null, 2));
-  console.log(`Also copied to ${publicOutputFile}`);
-
-  // Write metadata
-  fs.writeFileSync(metadataFile, JSON.stringify(metadata, null, 2));
-  console.log(`Created fonts-metadata.json with ${metadata.length} entries`);
-
-  // Copy metadata to public folder
-  fs.writeFileSync(publicMetadataFile, JSON.stringify(metadata, null, 2));
-  console.log(`Also copied fonts-metadata.json to public folder`);
-
-  console.log('Done. Your fonts should now be available in the application.');
-} catch (error) {
-  console.error('Error scanning fonts:', error);
-  process.exit(1);
-}
+console.log('Done. To use this in your project:');
+console.log('1. The fonts.json and fonts-metadata.json files will be available in your public folder');
+console.log('2. These files will be automatically used by the FontService component');
+console.log('3. Your fonts should now appear in the font gallery under "Local Fonts"');
