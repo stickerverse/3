@@ -7,9 +7,10 @@ import { FilePlus } from 'lucide-react';
 interface SystemFontBrowserProps {
   onClose?: () => void;
   onFontSelected?: (fontName: string) => void;
+  currentFont?: string;
 }
 
-export default function SystemFontBrowser({ onClose, onFontSelected }: SystemFontBrowserProps) {
+export default function SystemFontBrowser({ onClose, onFontSelected, currentFont }: SystemFontBrowserProps) {
   const [loadedFonts, setLoadedFonts] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filterText, setFilterText] = useState('');
@@ -103,7 +104,7 @@ export default function SystemFontBrowser({ onClose, onFontSelected }: SystemFon
               filteredFonts.map((fontName, index) => (
                 <div 
                   key={`system-browser-font-${index}-${fontName}`}
-                  className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl overflow-hidden shadow hover:shadow-md hover:border-primary/50 hover:scale-105 transition-all duration-200 cursor-pointer"
+                  className={`bg-white dark:bg-neutral-800 border ${currentFont === fontName ? 'border-primary border-2' : 'border-neutral-200 dark:border-neutral-700'} rounded-xl overflow-hidden shadow hover:shadow-md hover:border-primary/50 hover:scale-105 transition-all duration-200 cursor-pointer`}
                   onClick={() => onFontSelected && onFontSelected(fontName)}
                 >
                   <div
@@ -114,7 +115,7 @@ export default function SystemFontBrowser({ onClose, onFontSelected }: SystemFon
                       {previewText || "Aa"}
                     </span>
                   </div>
-                  <div className="text-xs text-center p-1 border-t border-neutral-100 dark:border-neutral-700 truncate font-medium bg-neutral-50 dark:bg-neutral-900">
+                  <div className={`text-xs text-center p-1 border-t border-neutral-100 dark:border-neutral-700 truncate font-medium ${currentFont === fontName ? 'bg-primary/10 text-primary' : 'bg-neutral-50 dark:bg-neutral-900'}`}>
                     {fontName}
                   </div>
                 </div>

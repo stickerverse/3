@@ -93,21 +93,37 @@ export default function DesignWorkspace({
 
   const handleFontSelection = async (fontFamily: string) => {
     const activeObject = canvas?.getActiveObject();
-    if (!activeObject || activeObject.type !== 'textbox') return;
-
-    if (!isFontLoaded(fontFamily)) {
-      try {
-        await loadFontBatch([fontFamily]);
-      } catch (error) {
-        console.error(`Error loading font ${fontFamily}:`, error);
-      }
+    if (!activeObject || activeObject.type !== 'textbox' && activeObject.type !== 'text') {
+      // If no text object is selected, show a notification to the user
+      console.log('Please select a text object first to apply a font');
+      return;
     }
 
-    (activeObject as fabric.Textbox).set({
-      fontFamily: fontFamily
-    });
-
-    canvas?.renderAll();
+    try {
+      // First try to load the font
+      if (!isFontLoaded(fontFamily)) {
+        await loadFontBatch([fontFamily]);
+      }
+      
+      // Apply the font to the text object
+      (activeObject as fabric.Text).set({
+        fontFamily: fontFamily
+      });
+      
+      console.log(`Applied font: ${fontFamily} to selected text`);
+      
+      // Re-render the canvas to show the changes
+      canvas?.renderAll();
+      
+    } catch (error) {
+      console.error(`Error applying font ${fontFamily}:`, error);
+      
+      // Still try to apply even if there was an error loading
+      (activeObject as fabric.Text).set({
+        fontFamily: fontFamily
+      });
+      canvas?.renderAll();
+    }
   };
 
   const toggleFontShowcase = () => {
@@ -224,7 +240,10 @@ export default function DesignWorkspace({
             </div>
           </div>
           <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-3">
-            <SystemFontBrowser onFontSelected={handleFontSelection} />
+            <SystemFontBrowser 
+              onFontSelected={handleFontSelection} 
+              currentFont={getCurrentFont() || ""}
+            />
           </div>
         </div>
         
