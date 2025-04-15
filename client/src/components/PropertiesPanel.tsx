@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState, useEffect } from "react";
 import { fabric } from "fabric";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { textEffects } from "@/lib/textEffects";
@@ -11,6 +11,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import FontPreviewPanel from "@/components/FontPreviewPanel";
 
 interface PropertiesPanelProps {
   selectedObj: fabric.Object | null;
@@ -68,6 +69,13 @@ export default function PropertiesPanel({
   canvas
 }: PropertiesPanelProps) {
   const [selectedFontCategory, setSelectedFontCategory] = useState<string | null>(null);
+  const [showFontPreview, setShowFontPreview] = useState(false);
+  const [previewText, setPreviewText] = useState(text);
+
+  // Update previewText when text changes
+  useEffect(() => {
+    setPreviewText(text);
+  }, [text]);
 
   const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
@@ -136,6 +144,10 @@ export default function PropertiesPanel({
   const toggleFontPanel = () => {
     setShowFontPanel(!showFontPanel);
   };
+  
+  const openFontPreviewGallery = () => {
+    setShowFontPreview(true);
+  };
 
   return (
     <div className="w-full md:w-64 lg:w-72 bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800 flex flex-col h-full overflow-hidden transition-all">
@@ -201,15 +213,28 @@ export default function PropertiesPanel({
                 </div>
               </div>
               
-              <button 
-                className="mt-1 text-xs text-primary hover:text-primary/80 transition-colors flex items-center" 
-                onClick={toggleFontPanel}
-              >
-                <span>{showFontPanel ? "Hide font categories" : "Show more fonts"}</span>
-                <svg className={`w-3 h-3 ml-1 transition-transform ${showFontPanel ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </button>
+              <div className="flex space-x-2 mt-1">
+                <button 
+                  className="text-xs text-primary hover:text-primary/80 transition-colors flex items-center" 
+                  onClick={toggleFontPanel}
+                >
+                  <span>{showFontPanel ? "Hide font categories" : "Show more fonts"}</span>
+                  <svg className={`w-3 h-3 ml-1 transition-transform ${showFontPanel ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                
+                <button 
+                  className="text-xs text-primary hover:text-primary/80 transition-colors flex items-center"
+                  onClick={openFontPreviewGallery}
+                >
+                  <span>Preview All Fonts</span>
+                  <svg className="w-3 h-3 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                    <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
               
               {showFontPanel && (
                 <div className="mt-2 border border-neutral-100 dark:border-neutral-800 rounded p-2 bg-neutral-50 dark:bg-neutral-800">
@@ -354,6 +379,17 @@ export default function PropertiesPanel({
           </Button>
         </div>
       )}
+
+      {/* Font Preview Gallery */}
+      <FontPreviewPanel
+        showFontPreview={showFontPreview}
+        setShowFontPreview={setShowFontPreview}
+        previewText={previewText}
+        setPreviewText={setPreviewText}
+        currentFont={font}
+        setFont={setFont}
+        fontCategories={fontCategories}
+      />
     </div>
   );
 }
