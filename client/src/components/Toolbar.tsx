@@ -1,4 +1,5 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import FontCarouselPicker from "./FontCarouselPicker";
 
 interface ToolbarProps {
   addText: () => void;
@@ -9,6 +10,8 @@ interface ToolbarProps {
   toggleSettings: () => void;
   selectedTool: string | null;
   showToolTips: boolean;
+  currentFont?: string;
+  onSelectFont?: (font: string) => void;
 }
 
 export default function Toolbar({
@@ -19,7 +22,9 @@ export default function Toolbar({
   toggleLayers,
   toggleSettings,
   selectedTool,
-  showToolTips
+  showToolTips,
+  currentFont = "Roboto",
+  onSelectFont
 }: ToolbarProps) {
 
   const ToolButton = ({ 
@@ -63,8 +68,14 @@ export default function Toolbar({
     );
   };
 
+  const handleFontSelected = (font: string) => {
+    if (onSelectFont) {
+      onSelectFont(font);
+    }
+  };
+  
   return (
-    <div className="w-full md:w-16 md:min-h-screen bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 flex md:flex-col justify-around p-2 md:py-4">
+    <div className="w-full md:w-16 md:min-h-screen bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 flex md:flex-col items-center justify-around p-2 md:py-4">
       <ToolButton
         onClick={addText}
         label="Add Text"
@@ -75,6 +86,16 @@ export default function Toolbar({
           </svg>
         }
       />
+      
+      {/* Font selector for quick access - shown when text tool is active */}
+      {selectedTool === "text" && onSelectFont && (
+        <div className="hidden md:block w-full my-2">
+          <FontCarouselPicker
+            currentFont={currentFont}
+            onFontSelected={handleFontSelected}
+          />
+        </div>
+      )}
       
       <ToolButton
         onClick={addShape}

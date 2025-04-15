@@ -370,132 +370,44 @@ export default function PropertiesPanel({
                     <span className="text-sm">Loading fonts...</span>
                   </div>
                 ) : (
-                  <select 
-                    className="w-full p-2 pr-8 border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-800 appearance-none focus:ring-2 focus:ring-primary focus:border-transparent" 
-                    value={font}
-                    onChange={handleFontChange}
-                  >
-                    {allFonts.map(fontName => (
-                      <option 
-                        key={fontName} 
-                        style={{ fontFamily: fontName }} 
-                        value={fontName}
-                      >
-                        {fontName}
-                      </option>
-                    ))}
-                    {allFonts.length === 0 && (
-                      <>
-                        <option style={{ fontFamily: 'Anton' }} value="Anton">Anton</option>
-                        <option style={{ fontFamily: 'Bebas Neue' }} value="Bebas Neue">Bebas Neue</option>
-                        <option style={{ fontFamily: 'Montserrat' }} value="Montserrat">Montserrat</option>
-                        <option style={{ fontFamily: 'Pacifico' }} value="Pacifico">Pacifico</option>
-                        <option style={{ fontFamily: 'Permanent Marker' }} value="Permanent Marker">Permanent Marker</option>
-                        <option style={{ fontFamily: 'Oswald' }} value="Oswald">Oswald</option>
-                        <option style={{ fontFamily: 'Roboto' }} value="Roboto">Roboto</option>
-                        <option style={{ fontFamily: 'Lato' }} value="Lato">Lato</option>
-                      </>
-                    )}
-                  </select>
+                  <div className="w-full">
+                    <FontCarouselPicker
+                      currentFont={font}
+                      onFontSelected={async (fontName) => {
+                        // Set the font immediately so the UI updates
+                        setFont(fontName);
+                        
+                        try {
+                          // Ensure the font is loaded before applying it
+                          await loadFontIfNeeded(fontName);
+                          
+                          // Apply the font to the selected object
+                          if (selectedObj && selectedObj.type === 'text') {
+                            (selectedObj as fabric.Text).set({ fontFamily: fontName });
+                            canvas?.renderAll();
+                          }
+                        } catch (error) {
+                          console.error('Error loading font:', error);
+                        }
+                      }}
+                      sampleText={text || "The quick brown fox"}
+                    />
+                  </div>
                 )}
-                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                  <svg className="w-5 h-5 text-neutral-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </div>
               </div>
               
               <div className="flex space-x-2 mt-1">
                 <button 
-                  className="text-xs text-primary hover:text-primary/80 transition-colors flex items-center" 
-                  onClick={toggleFontPanel}
-                >
-                  <span>{showFontPanel ? "Hide font categories" : "Show more fonts"}</span>
-                  <svg className={`w-3 h-3 ml-1 transition-transform ${showFontPanel ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </button>
-                
-                <button 
                   className="text-xs text-primary hover:text-primary/80 transition-colors flex items-center"
                   onClick={openFontPreviewGallery}
                 >
-                  <span>Preview All Fonts</span>
+                  <span>Browse All Fonts</span>
                   <svg className="w-3 h-3 ml-1" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                     <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
                   </svg>
                 </button>
               </div>
-              
-              {showFontPanel && (
-                <div className="mt-2 border border-neutral-100 dark:border-neutral-800 rounded p-2 bg-neutral-50 dark:bg-neutral-800">
-                  <Accordion type="single" collapsible>
-                    {Object.entries(fontCategories).map(([category, fonts]) => (
-                      <AccordionItem key={category} value={category}>
-                        <AccordionTrigger className="text-sm py-1">
-                          {category.charAt(0).toUpperCase() + category.slice(1)}
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <div className="grid grid-cols-1 gap-1 max-h-40 overflow-y-auto">
-                            {fonts.map((fontName) => (
-                              <button
-                                key={fontName}
-                                className={`text-sm text-left p-1 rounded ${font === fontName ? 'bg-primary/10 text-primary' : 'hover:bg-neutral-100 dark:hover:bg-neutral-700'}`}
-                                style={{ fontFamily: fontName }}
-                                onClick={async () => {
-                                  // Show loading indicator for the selected font
-                                  const tempElement = document.createElement('div');
-                                  tempElement.style.fontFamily = fontName;
-                                  tempElement.style.visibility = 'hidden';
-                                  tempElement.textContent = text || 'Sample Text';
-                                  document.body.appendChild(tempElement);
-                                  
-                                  // Set the font immediately so the UI updates
-                                  setFont(fontName);
-                                  
-                                  try {
-                                    // Show loading indicator
-                                    const loadingIndicator = document.createElement('div');
-                                    loadingIndicator.style.position = 'fixed';
-                                    loadingIndicator.style.bottom = '10px';
-                                    loadingIndicator.style.right = '10px';
-                                    loadingIndicator.style.padding = '5px 10px';
-                                    loadingIndicator.style.background = 'rgba(0,0,0,0.7)';
-                                    loadingIndicator.style.color = 'white';
-                                    loadingIndicator.style.borderRadius = '4px';
-                                    loadingIndicator.textContent = `Loading font: ${fontName}...`;
-                                    document.body.appendChild(loadingIndicator);
-                                    
-                                    // Ensure the font is loaded before applying it
-                                    await loadFontIfNeeded(fontName);
-                                    
-                                    // Apply the font to the selected object
-                                    if (selectedObj && selectedObj.type === 'text') {
-                                      (selectedObj as fabric.Text).set({ fontFamily: fontName });
-                                      canvas?.renderAll();
-                                    }
-                                    
-                                    // Remove the loading indicator
-                                    document.body.removeChild(loadingIndicator);
-                                  } catch (error) {
-                                    console.error('Error loading font:', error);
-                                  } finally {
-                                    // Remove the temporary element
-                                    document.body.removeChild(tempElement);
-                                  }
-                                }}
-                              >
-                                {fontName}
-                              </button>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                </div>
-              )}
             </div>
             
             {/* Font size */}

@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/select";
 import Toolbar from "@/components/Toolbar"; 
 import FontShowcase from "@/components/FontShowcase"; 
+import FontCarouselPicker from "@/components/FontCarouselPicker";
+import googleFontsService from "@/lib/googleFontsService";
 import { loadFontBatch, isFontLoaded } from "@/lib/fontLoader"; 
 
 
