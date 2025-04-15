@@ -181,7 +181,7 @@ export default function FontGallery({
       
       <div 
         ref={galleryRef}
-        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 h-[450px] overflow-y-auto p-4 border rounded-md bg-neutral-50 dark:bg-neutral-900"
+        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 h-[480px] overflow-y-auto p-5 border rounded-lg bg-neutral-50 dark:bg-neutral-900"
       >
         {isLoading && displayFonts.length === 0 ? (
           <div className="col-span-full h-full flex items-center justify-center">
@@ -192,23 +192,36 @@ export default function FontGallery({
             <button
               key={font}
               className={`
-                bg-white dark:bg-neutral-800 border shadow-sm cursor-pointer transition-all w-full block overflow-hidden
-                ${font === currentFont ? 'border-primary ring-2 ring-primary/30' : 'border-neutral-200 dark:border-neutral-700 hover:border-primary/50'}
-                hover:shadow-md rounded-lg flex flex-col
+                bg-white dark:bg-neutral-800 cursor-pointer transition-all w-full block overflow-hidden
+                ${font === currentFont ? 
+                  'shadow-[0_0_0_2px] shadow-primary' : 
+                  'border border-neutral-200 dark:border-neutral-700 hover:border-primary/50'}
+                hover:scale-105 rounded-2xl flex flex-col shadow-lg hover:shadow-xl transform transition-all duration-200
               `}
               onClick={() => onFontSelected(font)}
               onMouseEnter={() => setHoveredFont(font)}
               onMouseLeave={() => setHoveredFont(null)}
             >
-              <div className="p-6 flex items-center justify-center h-32 bg-white dark:bg-neutral-800" style={{ fontFamily: font }}>
+              <div 
+                className={`
+                  p-6 flex items-center justify-center h-36 bg-white dark:bg-neutral-800 rounded-t-2xl
+                  ${font === currentFont ? 'bg-primary/5 dark:bg-primary/10' : ''}
+                `} 
+                style={{ fontFamily: font }}
+              >
                 <div className={`
-                  text-4xl overflow-hidden text-center
+                  text-5xl overflow-hidden text-center
                   ${hoveredFont === font ? 'text-primary scale-110 transition-all duration-200' : ''}
+                  ${font === currentFont ? 'text-primary font-bold' : ''}
                 `}>
                   Aa
                 </div>
               </div>
-              <div className="text-center p-2 border-t border-neutral-100 dark:border-neutral-700 truncate text-xs bg-neutral-50 dark:bg-neutral-900 font-sans">
+              <div className={`
+                text-center p-2 border-t border-neutral-100 dark:border-neutral-700 truncate text-xs
+                font-sans rounded-b-2xl
+                ${font === currentFont ? 'bg-primary/10 dark:bg-primary/20 text-primary font-medium' : 'bg-neutral-50 dark:bg-neutral-900'}
+              `}>
                 {font}
               </div>
             </button>
