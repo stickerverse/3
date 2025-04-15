@@ -8,6 +8,7 @@ import LayersPanel from "@/components/LayersPanel";
 import TemplateSelector from "@/components/TemplateSelector";
 import TutorialOverlay from "@/components/TutorialOverlay";
 import VinylPropertiesDialog from "@/components/VinylPropertiesDialog";
+import ImageUploader from "@/components/ImageUploader";
 
 export default function Home() {
   const vinylDesigner = useVinylDesigner();
@@ -132,6 +133,12 @@ export default function Home() {
         initialMaterialId={vinylDesigner.selectedMaterialId}
         initialDimensions={vinylDesigner.dimensions}
         onSave={vinylDesigner.saveVinylProperties}
+      />
+
+      <ImageUploader
+        isOpen={vinylDesigner.showImageUploader}
+        onClose={() => vinylDesigner.setShowImageUploader(false)}
+        onImageSelected={vinylDesigner.handleImageSelected}
       />
     </div>
   );
