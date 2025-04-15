@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { fabric } from "fabric";
 import { 
   Select,
@@ -7,6 +7,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Toolbar from "@/components/Toolbar"; 
+import FontShowcase from "@/components/FontShowcase"; 
+import { loadFontBatch, isFontLoaded } from "@/lib/fontLoader"; 
+
 
 interface DesignWorkspaceProps {
   canvasRef: React.RefObject<HTMLCanvasElement>;
@@ -47,6 +51,7 @@ export default function DesignWorkspace({
 }: DesignWorkspaceProps) {
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 600, height: 400 });
+  const [showFontShowcase, setShowFontShowcase] = useState(false); 
 
   const zoomIn = () => {
     if (zoom < 200) {
@@ -68,42 +73,61 @@ export default function DesignWorkspace({
     setCurrentDesignName(e.target.value);
   };
 
+  const handleAddImage = () => {
+  };
+
+  const getCurrentFont = useCallback(() => {
+    const activeObject = canvas?.getActiveObject();
+    if (activeObject && activeObject.type === 'textbox') {
+      return (activeObject as fabric.Textbox).fontFamily || '';
+    }
+    return '';
+  }, [canvas]);
+
+  const handleFontSelection = async (fontFamily: string) => {
+    const activeObject = canvas?.getActiveObject();
+    if (!activeObject || activeObject.type !== 'textbox') return;
+
+    if (!isFontLoaded(fontFamily)) {
+      try {
+        await loadFontBatch([fontFamily]);
+      } catch (error) {
+        console.error(`Error loading font ${fontFamily}:`, error);
+      }
+    }
+
+    (activeObject as fabric.Textbox).set({
+      fontFamily: fontFamily
+    });
+
+    canvas?.renderAll();
+  };
+
+  const toggleFontShowcase = () => {
+    setShowFontShowcase(!showFontShowcase);
+  }
+
   return (
     <div className="flex-1 flex flex-col h-full">
-      {/* Workspace controls */}
       <div className="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 p-2 flex justify-between items-center">
-        <div className="flex items-center space-x-2">
-          <button 
-            className="p-1.5 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800" 
-            onClick={undo}
-            aria-label="Undo"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z" />
-            </svg>
-          </button>
-          <button 
-            className="p-1.5 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800" 
-            onClick={redo}
-            aria-label="Redo"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z" />
-            </svg>
-          </button>
-          <div className="h-6 border-r border-neutral-200 dark:border-neutral-700 mx-1"></div>
-          
-          <Select value={view} onValueChange={handleViewChange}>
-            <SelectTrigger className="text-sm bg-neutral-100 dark:bg-neutral-800 border-0 rounded w-32">
-              <SelectValue placeholder="Select view" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Front">Front View</SelectItem>
-              <SelectItem value="Back">Back View</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
+        <Toolbar 
+          addText={handleAddImage} 
+          addShape={handleAddImage} 
+          addImage={handleAddImage}
+          toggleTemplates={() => {}} 
+          toggleLayers={() => {}} 
+          toggleSettings={() => {}} 
+          selectedTool={""} 
+          showToolTips={false} 
+          currentFont={getCurrentFont()}
+          onSelectFont={handleFontSelection}
+          toggleFontShowcase={toggleFontShowcase} 
+        />
+
+        {showFontShowcase && ( 
+          <FontShowcase onSelectFont={handleFontSelection} onClose={toggleFontShowcase} />
+        )}
+
         <div className="flex items-center space-x-2">
           <input 
             type="text" 
@@ -130,7 +154,7 @@ export default function DesignWorkspace({
             </button>
           )}
         </div>
-        
+
         <div className="flex items-center space-x-1">
           <button 
             className="p-1.5 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800" 
@@ -153,8 +177,7 @@ export default function DesignWorkspace({
           </button>
         </div>
       </div>
-      
-      {/* Canvas area */}
+
       <div className="flex-1 bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center p-4 overflow-auto">
         <div 
           ref={canvasContainerRef}
@@ -166,7 +189,6 @@ export default function DesignWorkspace({
             transformOrigin: 'center'
           }}
         >
-          {/* Canvas element */}
           <canvas 
             ref={canvasRef} 
             id="vinylCanvas" 
@@ -174,8 +196,7 @@ export default function DesignWorkspace({
             height={canvasSize.height} 
             className="w-full h-full"
           />
-          
-          {/* Grid overlay (shown when zoom > 100%) */}
+
           {zoom > 100 && (
             <div className="absolute inset-0 pointer-events-none opacity-10">
               <div className="grid grid-cols-12 h-full">
@@ -192,8 +213,7 @@ export default function DesignWorkspace({
           )}
         </div>
       </div>
-      
-      {/* Status bar */}
+
       <div className="bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 px-4 py-1 flex justify-between items-center text-xs text-neutral-500 dark:text-neutral-400">
         <div>Size: {canvasSize.width}px × {canvasSize.height}px</div>
         <div>
