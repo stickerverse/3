@@ -293,8 +293,22 @@ export default function PropertiesPanel({
   const handleColorChange = (newColor: string) => {
     setColor(newColor);
     if (selectedObj) {
-      // If newColor is empty string, set fill to null for no color
-      selectedObj.set({ fill: newColor === "" ? null : newColor });
+      if (newColor === "") {
+        // For "No Fill", set text to use its original appearance
+        // First remove any applied fill
+        selectedObj.set({ 
+          fill: null,
+          // For text objects, ensure native font rendering
+          textBackgroundColor: null,
+          // Ensure the stroke is still visible if set
+          stroke: textEffect === 'outline' ? strokeColor : undefined,
+          // Keep other properties intact
+          opacity: opacity / 100
+        });
+      } else {
+        // Normal color application
+        selectedObj.set({ fill: newColor });
+      }
       canvas?.renderAll();
     }
   };
