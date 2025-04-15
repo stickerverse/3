@@ -1,27 +1,2632 @@
 [
   {
-    "path": "system/OpenSans-Regular.ttf",
-    "name": "Open Sans Regular",
+    "path": "3d Jigsaw Puzzle Font 1 1.otf",
+    "name": "3d  Jigsaw  Puzzle  Font 1 1",
+    "format": "opentype"
+  },
+  {
+    "path": "3d Jigsaw Puzzle Font 2 1.otf",
+    "name": "3d  Jigsaw  Puzzle  Font 2 1",
+    "format": "opentype"
+  },
+  {
+    "path": "3d Jigsaw Puzzle Font 3 2.otf",
+    "name": "3d  Jigsaw  Puzzle  Font 3 2",
+    "format": "opentype"
+  },
+  {
+    "path": "Abstract.otf",
+    "name": "Abstract",
+    "format": "opentype"
+  },
+  {
+    "path": "Acratica-demo-font-FFP.otf",
+    "name": "Acratica demo font  F F P",
+    "format": "opentype"
+  },
+  {
+    "path": "Acto Stripe Regular Extra.otf",
+    "name": "Acto  Stripe  Regular  Extra",
+    "format": "opentype"
+  },
+  {
+    "path": "Acto Stripe Regular.otf",
+    "name": "Acto  Stripe  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "Adrenaline.ttf",
+    "name": "Adrenaline",
     "format": "truetype"
   },
   {
-    "path": "system/OpenSans-Bold.ttf",
-    "name": "Open Sans Bold",
+    "path": "Alander.ttf",
+    "name": "Alander",
     "format": "truetype"
   },
   {
-    "path": "system/OpenSans-Italic.ttf",
-    "name": "Open Sans Italic",
+    "path": "AlienTwits-zXY4.ttf",
+    "name": "Alien Twits z X Y4",
     "format": "truetype"
   },
   {
-    "path": "custom/CustomFont1.ttf",
-    "name": "Custom Font 1",
+    "path": "Aliensy.otf",
+    "name": "Aliensy",
+    "format": "opentype"
+  },
+  {
+    "path": "Aliensy.ttf",
+    "name": "Aliensy",
     "format": "truetype"
   },
   {
-    "path": "custom/CustomFont2.ttf",
-    "name": "Custom Font 2",
+    "path": "Aloeveradisplaycondensed-Black.ttf",
+    "name": "Aloeveradisplaycondensed  Black",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-BlackItalic.ttf",
+    "name": "Aloeveradisplaycondensed  Black Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-Bold.ttf",
+    "name": "Aloeveradisplaycondensed  Bold",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-BoldItalic.ttf",
+    "name": "Aloeveradisplaycondensed  Bold Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-ELightItalic.ttf",
+    "name": "Aloeveradisplaycondensed  E Light Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-ExBoldItalic.ttf",
+    "name": "Aloeveradisplaycondensed  Ex Bold Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-ExtraBold.ttf",
+    "name": "Aloeveradisplaycondensed  Extra Bold",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-ExtraLight.ttf",
+    "name": "Aloeveradisplaycondensed  Extra Light",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-Light.ttf",
+    "name": "Aloeveradisplaycondensed  Light",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-Lightitalic.ttf",
+    "name": "Aloeveradisplaycondensed  Lightitalic",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-Medium.ttf",
+    "name": "Aloeveradisplaycondensed  Medium",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-MediumItalic.ttf",
+    "name": "Aloeveradisplaycondensed  Medium Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-Regular.ttf",
+    "name": "Aloeveradisplaycondensed  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-RegularItalic.ttf",
+    "name": "Aloeveradisplaycondensed  Regular Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-SBoldItalic.ttf",
+    "name": "Aloeveradisplaycondensed  S Bold Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-SemiBold.ttf",
+    "name": "Aloeveradisplaycondensed  Semi Bold",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-Thin.ttf",
+    "name": "Aloeveradisplaycondensed  Thin",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplaycondensed-ThinItalic.ttf",
+    "name": "Aloeveradisplaycondensed  Thin Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "Aloeveradisplayoutline-BlackItalic.otf",
+    "name": "Aloeveradisplayoutline  Black Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "Aloeveradisplayoutline-BoldItalic.otf",
+    "name": "Aloeveradisplayoutline  Bold Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "Aloeveradisplayoutline-ELightItalic.otf",
+    "name": "Aloeveradisplayoutline  E Light Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "Aloeveradisplayoutline-ExtraBoldItalic.otf",
+    "name": "Aloeveradisplayoutline  Extra Bold Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "Aloeveradisplayoutline-LightItalic.otf",
+    "name": "Aloeveradisplayoutline  Light Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "Aloeveradisplayoutline-MediumItalic.otf",
+    "name": "Aloeveradisplayoutline  Medium Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "Aloeveradisplayoutline-RegularItalic.otf",
+    "name": "Aloeveradisplayoutline  Regular Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "Aloeveradisplayoutline-SemiBoldItalic.otf",
+    "name": "Aloeveradisplayoutline  Semi Bold Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "Aloeveradisplayoutline-ThinItalic.otf",
+    "name": "Aloeveradisplayoutline  Thin Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "Alphabet Blocks.otf",
+    "name": "Alphabet  Blocks",
+    "format": "opentype"
+  },
+  {
+    "path": "American Flag.otf",
+    "name": "American  Flag",
+    "format": "opentype"
+  },
+  {
+    "path": "Angry Slingshots.otf",
+    "name": "Angry  Slingshots",
+    "format": "opentype"
+  },
+  {
+    "path": "AnimalCute.ttf",
+    "name": "Animal Cute",
+    "format": "truetype"
+  },
+  {
+    "path": "Arco CleanBlue.otf",
+    "name": "Arco  Clean Blue",
+    "format": "opentype"
+  },
+  {
+    "path": "Arco CleanPurple.otf",
+    "name": "Arco  Clean Purple",
+    "format": "opentype"
+  },
+  {
+    "path": "Arco CleanRed.otf",
+    "name": "Arco  Clean Red",
+    "format": "opentype"
+  },
+  {
+    "path": "Arco FullBlue.otf",
+    "name": "Arco  Full Blue",
+    "format": "opentype"
+  },
+  {
+    "path": "Arco FullPurple.otf",
+    "name": "Arco  Full Purple",
+    "format": "opentype"
+  },
+  {
+    "path": "Arco FullRed.otf",
+    "name": "Arco  Full Red",
+    "format": "opentype"
+  },
+  {
+    "path": "Arco Shadow.otf",
+    "name": "Arco  Shadow",
+    "format": "opentype"
+  },
+  {
+    "path": "Autobahn.ttf",
+    "name": "Autobahn",
+    "format": "truetype"
+  },
+  {
+    "path": "Aversa Vectors.otf",
+    "name": "Aversa  Vectors",
+    "format": "opentype"
+  },
+  {
+    "path": "Aversa Vectors.ttf",
+    "name": "Aversa  Vectors",
+    "format": "truetype"
+  },
+  {
+    "path": "Aversa.otf",
+    "name": "Aversa",
+    "format": "opentype"
+  },
+  {
+    "path": "BEYNO.ttf",
+    "name": "B E Y N O",
+    "format": "truetype"
+  },
+  {
+    "path": "Baku Dots.otf",
+    "name": "Baku  Dots",
+    "format": "opentype"
+  },
+  {
+    "path": "Baku DotsShadow.otf",
+    "name": "Baku  Dots Shadow",
+    "format": "opentype"
+  },
+  {
+    "path": "Baku Outline.otf",
+    "name": "Baku  Outline",
+    "format": "opentype"
+  },
+  {
+    "path": "Baku Pink.otf",
+    "name": "Baku  Pink",
+    "format": "opentype"
+  },
+  {
+    "path": "Baku Red.otf",
+    "name": "Baku  Red",
+    "format": "opentype"
+  },
+  {
+    "path": "Baku Shadow.otf",
+    "name": "Baku  Shadow",
+    "format": "opentype"
+  },
+  {
+    "path": "Baku Yellow.otf",
+    "name": "Baku  Yellow",
+    "format": "opentype"
+  },
+  {
+    "path": "Bartfresom Regular.otf",
+    "name": "Bartfresom  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "Bartfresom Regular.ttf",
+    "name": "Bartfresom  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "Baskinsunshine.otf",
+    "name": "Baskinsunshine",
+    "format": "opentype"
+  },
+  {
+    "path": "Baskinsunshinecb1.otf",
+    "name": "Baskinsunshinecb1",
+    "format": "opentype"
+  },
+  {
+    "path": "Baskinsunshinecb2.otf",
+    "name": "Baskinsunshinecb2",
+    "format": "opentype"
+  },
+  {
+    "path": "Baskinsunshinecb3.otf",
+    "name": "Baskinsunshinecb3",
+    "format": "opentype"
+  },
+  {
+    "path": "Baskinsunshinecw.otf",
+    "name": "Baskinsunshinecw",
+    "format": "opentype"
+  },
+  {
+    "path": "Bigteeth.otf",
+    "name": "Bigteeth",
+    "format": "opentype"
+  },
+  {
+    "path": "Bigteeth.ttf",
+    "name": "Bigteeth",
+    "format": "truetype"
+  },
+  {
+    "path": "BillionDreams-vmgK9.ttf",
+    "name": "Billion Dreams vmg K9",
+    "format": "truetype"
+  },
+  {
+    "path": "Bingo-Italic.otf",
+    "name": "Bingo  Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "Bingo.otf",
+    "name": "Bingo",
+    "format": "opentype"
+  },
+  {
+    "path": "Bionix-Fat.otf",
+    "name": "Bionix  Fat",
+    "format": "opentype"
+  },
+  {
+    "path": "Bionix-Fat.ttf",
+    "name": "Bionix  Fat",
+    "format": "truetype"
+  },
+  {
+    "path": "Bird House.otf",
+    "name": "Bird  House",
+    "format": "opentype"
+  },
+  {
+    "path": "Black Monster.ttf",
+    "name": "Black  Monster",
+    "format": "truetype"
+  },
+  {
+    "path": "BlackAsteroids-rv80K.ttf",
+    "name": "Black Asteroids rv80 K",
+    "format": "truetype"
+  },
+  {
+    "path": "Blackpast.otf",
+    "name": "Blackpast",
+    "format": "opentype"
+  },
+  {
+    "path": "BloodyTerror-GOW9Z.ttf",
+    "name": "Bloody Terror  G O W9 Z",
+    "format": "truetype"
+  },
+  {
+    "path": "Brickson Free Trial.ttf",
+    "name": "Brickson  Free  Trial",
+    "format": "truetype"
+  },
+  {
+    "path": "Bringshoot Copy.otf",
+    "name": "Bringshoot  Copy",
+    "format": "opentype"
+  },
+  {
+    "path": "BrushNature-XG4GZ.ttf",
+    "name": "Brush Nature  X G4 G Z",
+    "format": "truetype"
+  },
+  {
+    "path": "CRISE.otf",
+    "name": "C R I S E",
+    "format": "opentype"
+  },
+  {
+    "path": "CRISE.ttf",
+    "name": "C R I S E",
+    "format": "truetype"
+  },
+  {
+    "path": "Candycane Color.otf",
+    "name": "Candycane  Color",
+    "format": "opentype"
+  },
+  {
+    "path": "Champion Street Graffiti.otf",
+    "name": "Champion  Street  Graffiti",
+    "format": "opentype"
+  },
+  {
+    "path": "Chapter Three.otf",
+    "name": "Chapter  Three",
+    "format": "opentype"
+  },
+  {
+    "path": "Chapterthreecolor.otf",
+    "name": "Chapterthreecolor",
+    "format": "opentype"
+  },
+  {
+    "path": "Chapterthreefiller.otf",
+    "name": "Chapterthreefiller",
+    "format": "opentype"
+  },
+  {
+    "path": "ChironSansHK-Regular.otf",
+    "name": "Chiron Sans H K  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "ChocolatestoryfreepersonaluseS-j9RPG.otf",
+    "name": "Chocolatestoryfreepersonaluse S j9 R P G",
+    "format": "opentype"
+  },
+  {
+    "path": "ChoretFudyng3D-3D.otf",
+    "name": "Choret Fudyng3 D 3 D",
+    "format": "opentype"
+  },
+  {
+    "path": "Christopher.ttf",
+    "name": "Christopher",
+    "format": "truetype"
+  },
+  {
+    "path": "Cinzel-VariableFont_wght.ttf",
+    "name": "Cinzel  Variable Font wght",
+    "format": "truetype"
+  },
+  {
+    "path": "Clinton semibold.ttf",
+    "name": "Clinton semibold",
+    "format": "truetype"
+  },
+  {
+    "path": "ClintonBold.ttf",
+    "name": "Clinton Bold",
+    "format": "truetype"
+  },
+  {
+    "path": "ClintonExtraBold.ttf",
+    "name": "Clinton Extra Bold",
+    "format": "truetype"
+  },
+  {
+    "path": "ColorCubes SVG.otf",
+    "name": "Color Cubes  S V G",
+    "format": "opentype"
+  },
+  {
+    "path": "ColorDots SVG.otf",
+    "name": "Color Dots  S V G",
+    "format": "opentype"
+  },
+  {
+    "path": "ColorTube Pro.otf",
+    "name": "Color Tube  Pro",
+    "format": "opentype"
+  },
+  {
+    "path": "Colorful Jigsaw Puzzle Font 1 1.otf",
+    "name": "Colorful  Jigsaw  Puzzle  Font 1 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Colorful Jigsaw Puzzle Font 2 1.otf",
+    "name": "Colorful  Jigsaw  Puzzle  Font 2 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Colorful Jigsaw Puzzle Font 3 1.otf",
+    "name": "Colorful  Jigsaw  Puzzle  Font 3 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Colorful Jigsaw Puzzle Font 4 1.otf",
+    "name": "Colorful  Jigsaw  Puzzle  Font 4 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Colorful Jigsaw Puzzle Font 5 1.otf",
+    "name": "Colorful  Jigsaw  Puzzle  Font 5 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Colorful Usa Flag.otf",
+    "name": "Colorful  Usa  Flag",
+    "format": "opentype"
+  },
+  {
+    "path": "Comic 2.otf",
+    "name": "Comic 2",
+    "format": "opentype"
+  },
+  {
+    "path": "Comic Jungle Extrude.ttf",
+    "name": "Comic  Jungle  Extrude",
+    "format": "truetype"
+  },
+  {
+    "path": "Comic Jungle.ttf",
+    "name": "Comic  Jungle",
+    "format": "truetype"
+  },
+  {
+    "path": "Comica Boom 3.otf",
+    "name": "Comica  Boom 3",
+    "format": "opentype"
+  },
+  {
+    "path": "Comodo-Regular.ttf",
+    "name": "Comodo  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "Cormorant-Italic-VariableFont_wght.ttf",
+    "name": "Cormorant  Italic  Variable Font wght",
+    "format": "truetype"
+  },
+  {
+    "path": "Cormorant-VariableFont_wght.ttf",
+    "name": "Cormorant  Variable Font wght",
+    "format": "truetype"
+  },
+  {
+    "path": "Cozy Season1.otf",
+    "name": "Cozy  Season1",
+    "format": "opentype"
+  },
+  {
+    "path": "Cozy Season2.otf",
+    "name": "Cozy  Season2",
+    "format": "opentype"
+  },
+  {
+    "path": "Cozy Season3.otf",
+    "name": "Cozy  Season3",
+    "format": "opentype"
+  },
+  {
+    "path": "Cozy Season4.otf",
+    "name": "Cozy  Season4",
+    "format": "opentype"
+  },
+  {
+    "path": "Cozy Season5.otf",
+    "name": "Cozy  Season5",
+    "format": "opentype"
+  },
+  {
+    "path": "Cozy Winter.otf",
+    "name": "Cozy  Winter",
+    "format": "opentype"
+  },
+  {
+    "path": "Crack 2.otf",
+    "name": "Crack 2",
+    "format": "opentype"
+  },
+  {
+    "path": "Crayon Blue.otf",
+    "name": "Crayon  Blue",
+    "format": "opentype"
+  },
+  {
+    "path": "Crayon Green.otf",
+    "name": "Crayon  Green",
+    "format": "opentype"
+  },
+  {
+    "path": "Crayon Orange.otf",
+    "name": "Crayon  Orange",
+    "format": "opentype"
+  },
+  {
+    "path": "Crayon Purple.otf",
+    "name": "Crayon  Purple",
+    "format": "opentype"
+  },
+  {
+    "path": "Crayon Red.otf",
+    "name": "Crayon  Red",
+    "format": "opentype"
+  },
+  {
+    "path": "Crayon Yellow.otf",
+    "name": "Crayon  Yellow",
+    "format": "opentype"
+  },
+  {
+    "path": "CreatoDisplay-Black.otf",
+    "name": "Creato Display  Black",
+    "format": "opentype"
+  },
+  {
+    "path": "CreatoDisplay-BlackItalic.otf",
+    "name": "Creato Display  Black Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "CreatoDisplay-Bold.otf",
+    "name": "Creato Display  Bold",
+    "format": "opentype"
+  },
+  {
+    "path": "CreatoDisplay-BoldItalic.otf",
+    "name": "Creato Display  Bold Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "CreatoDisplay-ExtraBold.otf",
+    "name": "Creato Display  Extra Bold",
+    "format": "opentype"
+  },
+  {
+    "path": "CreatoDisplay-ExtraBoldItalic.otf",
+    "name": "Creato Display  Extra Bold Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "CreatoDisplay-Light.otf",
+    "name": "Creato Display  Light",
+    "format": "opentype"
+  },
+  {
+    "path": "CreatoDisplay-LightItalic.otf",
+    "name": "Creato Display  Light Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "CreatoDisplay-Medium.otf",
+    "name": "Creato Display  Medium",
+    "format": "opentype"
+  },
+  {
+    "path": "CreatoDisplay-MediumItalic.otf",
+    "name": "Creato Display  Medium Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "CreatoDisplay-Regular.otf",
+    "name": "Creato Display  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "CreatoDisplay-RegularItalic.otf",
+    "name": "Creato Display  Regular Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "CreatoDisplay-Thin.otf",
+    "name": "Creato Display  Thin",
+    "format": "opentype"
+  },
+  {
+    "path": "CreatoDisplay-ThinItalic.otf",
+    "name": "Creato Display  Thin Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "Cropar.otf",
+    "name": "Cropar",
+    "format": "opentype"
+  },
+  {
+    "path": "Cute Kids Blue Font.otf",
+    "name": "Cute  Kids  Blue  Font",
+    "format": "opentype"
+  },
+  {
+    "path": "Cute Kids Pink Font.otf",
+    "name": "Cute  Kids  Pink  Font",
+    "format": "opentype"
+  },
+  {
+    "path": "Cybersonr Regular.otf",
+    "name": "Cybersonr  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-Black.otf",
+    "name": "D O V E N S Personal Use  Black",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-BlackSlant.otf",
+    "name": "D O V E N S Personal Use  Black Slant",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-Bold.otf",
+    "name": "D O V E N S Personal Use  Bold",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-BoldSlanted.otf",
+    "name": "D O V E N S Personal Use  Bold Slanted",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-ExtBdSlant.otf",
+    "name": "D O V E N S Personal Use  Ext Bd Slant",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-ExtLtSlant.otf",
+    "name": "D O V E N S Personal Use  Ext Lt Slant",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-ExtraBold.otf",
+    "name": "D O V E N S Personal Use  Extra Bold",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-ExtraLight.otf",
+    "name": "D O V E N S Personal Use  Extra Light",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-Light.otf",
+    "name": "D O V E N S Personal Use  Light",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-LightSlant.otf",
+    "name": "D O V E N S Personal Use  Light Slant",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-MedSlant.otf",
+    "name": "D O V E N S Personal Use  Med Slant",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-Medium.otf",
+    "name": "D O V E N S Personal Use  Medium",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-Regular.otf",
+    "name": "D O V E N S Personal Use  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-SemBdSlant.otf",
+    "name": "D O V E N S Personal Use  Sem Bd Slant",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-SemiBold.otf",
+    "name": "D O V E N S Personal Use  Semi Bold",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-Slanted.otf",
+    "name": "D O V E N S Personal Use  Slanted",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-Thin.otf",
+    "name": "D O V E N S Personal Use  Thin",
+    "format": "opentype"
+  },
+  {
+    "path": "DOVENSPersonalUse-ThinSlanted.otf",
+    "name": "D O V E N S Personal Use  Thin Slanted",
+    "format": "opentype"
+  },
+  {
+    "path": "Dalih.otf",
+    "name": "Dalih",
+    "format": "opentype"
+  },
+  {
+    "path": "DattermatterBoldPersoinalUseRegular-GOxqg.ttf",
+    "name": "Dattermatter Bold Persoinal Use Regular  G Oxqg",
+    "format": "truetype"
+  },
+  {
+    "path": "Death Battle.ttf",
+    "name": "Death  Battle",
+    "format": "truetype"
+  },
+  {
+    "path": "Death Note.otf",
+    "name": "Death  Note",
+    "format": "opentype"
+  },
+  {
+    "path": "Death Rattle Italic.otf",
+    "name": "Death  Rattle  Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "Death Rattle Italic.ttf",
+    "name": "Death  Rattle  Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "Death Rattle.otf",
+    "name": "Death  Rattle",
+    "format": "opentype"
+  },
+  {
+    "path": "Death Star Outlines.otf",
+    "name": "Death  Star  Outlines",
+    "format": "opentype"
+  },
+  {
+    "path": "Death Star.otf",
+    "name": "Death  Star",
+    "format": "opentype"
+  },
+  {
+    "path": "Denominary-Bold.otf",
+    "name": "Denominary  Bold",
+    "format": "opentype"
+  },
+  {
+    "path": "Denominary-ExtraLight.otf",
+    "name": "Denominary  Extra Light",
+    "format": "opentype"
+  },
+  {
+    "path": "Denominary-Light.otf",
+    "name": "Denominary  Light",
+    "format": "opentype"
+  },
+  {
+    "path": "Denominary-Medium.otf",
+    "name": "Denominary  Medium",
+    "format": "opentype"
+  },
+  {
+    "path": "Denominary-Regular.otf",
+    "name": "Denominary  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "Denominary-SemiBold.otf",
+    "name": "Denominary  Semi Bold",
+    "format": "opentype"
+  },
+  {
+    "path": "Denominary-Thin.otf",
+    "name": "Denominary  Thin",
+    "format": "opentype"
+  },
+  {
+    "path": "Desuzapro Italic.otf",
+    "name": "Desuzapro  Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "Diamonds History.ttf",
+    "name": "Diamonds  History",
+    "format": "truetype"
+  },
+  {
+    "path": "Dino.otf",
+    "name": "Dino",
+    "format": "opentype"
+  },
+  {
+    "path": "DirtyStains.otf",
+    "name": "Dirty Stains",
+    "format": "opentype"
+  },
+  {
+    "path": "DopeDisplay-Black.otf",
+    "name": "Dope Display  Black",
+    "format": "opentype"
+  },
+  {
+    "path": "DopeDisplay-BlackItalic.otf",
+    "name": "Dope Display  Black Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "DopeDisplay-Bold.otf",
+    "name": "Dope Display  Bold",
+    "format": "opentype"
+  },
+  {
+    "path": "DopeDisplay-BoldItalic.otf",
+    "name": "Dope Display  Bold Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "DopeDisplay-Italic.otf",
+    "name": "Dope Display  Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "DopeDisplay-Normal.otf",
+    "name": "Dope Display  Normal",
+    "format": "opentype"
+  },
+  {
+    "path": "Dragon Slayer Italic.otf",
+    "name": "Dragon  Slayer  Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "Dragon Slayer.otf",
+    "name": "Dragon  Slayer",
+    "format": "opentype"
+  },
+  {
+    "path": "EVILDEAD.TTF",
+    "name": "E V I L D E A D. T T F",
+    "format": "truetype"
+  },
+  {
+    "path": "Emberblaze Slant.otf",
+    "name": "Emberblaze  Slant",
+    "format": "opentype"
+  },
+  {
+    "path": "Emberblaze swash.otf",
+    "name": "Emberblaze swash",
+    "format": "opentype"
+  },
+  {
+    "path": "Emberblaze.otf",
+    "name": "Emberblaze",
+    "format": "opentype"
+  },
+  {
+    "path": "FEARLogo-Regular.otf",
+    "name": "F E A R Logo  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "FEARLogo-Regular.ttf",
+    "name": "F E A R Logo  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "FastHand-lgBMV.ttf",
+    "name": "Fast Hand lg B M V",
+    "format": "truetype"
+  },
+  {
+    "path": "Fellocity.otf",
+    "name": "Fellocity",
+    "format": "opentype"
+  },
+  {
+    "path": "Fellocity.ttf",
+    "name": "Fellocity",
+    "format": "truetype"
+  },
+  {
+    "path": "Fire.otf",
+    "name": "Fire",
+    "format": "opentype"
+  },
+  {
+    "path": "Florida Vibes by Turbologo.otf",
+    "name": "Florida  Vibes by  Turbologo",
+    "format": "opentype"
+  },
+  {
+    "path": "Flyhead-Bold.otf",
+    "name": "Flyhead  Bold",
+    "format": "opentype"
+  },
+  {
+    "path": "Flyhead-Light.otf",
+    "name": "Flyhead  Light",
+    "format": "opentype"
+  },
+  {
+    "path": "Flyhead.otf",
+    "name": "Flyhead",
+    "format": "opentype"
+  },
+  {
+    "path": "Fox Comic.otf",
+    "name": "Fox  Comic",
+    "format": "opentype"
+  },
+  {
+    "path": "Fraulein Hex.ttf",
+    "name": "Fraulein  Hex",
+    "format": "truetype"
+  },
+  {
+    "path": "Futura PT Heavy-normal-700-100.ttf",
+    "name": "Futura  P T  Heavy normal 700 100",
+    "format": "truetype"
+  },
+  {
+    "path": "Game Over Blue.otf",
+    "name": "Game  Over  Blue",
+    "format": "opentype"
+  },
+  {
+    "path": "Game Over Edge.otf",
+    "name": "Game  Over  Edge",
+    "format": "opentype"
+  },
+  {
+    "path": "Game Over Green.otf",
+    "name": "Game  Over  Green",
+    "format": "opentype"
+  },
+  {
+    "path": "Game Over Purple.otf",
+    "name": "Game  Over  Purple",
+    "format": "opentype"
+  },
+  {
+    "path": "Game Over Red.otf",
+    "name": "Game  Over  Red",
+    "format": "opentype"
+  },
+  {
+    "path": "Game Over Regular.otf",
+    "name": "Game  Over  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "Game Over Stack.otf",
+    "name": "Game  Over  Stack",
+    "format": "opentype"
+  },
+  {
+    "path": "Game Over Yellow.otf",
+    "name": "Game  Over  Yellow",
+    "format": "opentype"
+  },
+  {
+    "path": "GameOver BlueColor.ttf",
+    "name": "Game Over  Blue Color",
+    "format": "truetype"
+  },
+  {
+    "path": "GameOver Edge.ttf",
+    "name": "Game Over  Edge",
+    "format": "truetype"
+  },
+  {
+    "path": "GameOver GreenColor.ttf",
+    "name": "Game Over  Green Color",
+    "format": "truetype"
+  },
+  {
+    "path": "GameOver PurpleColor.ttf",
+    "name": "Game Over  Purple Color",
+    "format": "truetype"
+  },
+  {
+    "path": "GameOver RedColor.ttf",
+    "name": "Game Over  Red Color",
+    "format": "truetype"
+  },
+  {
+    "path": "GameOver Stack.ttf",
+    "name": "Game Over  Stack",
+    "format": "truetype"
+  },
+  {
+    "path": "GameOver YellowColor.ttf",
+    "name": "Game Over  Yellow Color",
+    "format": "truetype"
+  },
+  {
+    "path": "GameOver.ttf",
+    "name": "Game Over",
+    "format": "truetype"
+  },
+  {
+    "path": "Gebriel Regista Italic.otf",
+    "name": "Gebriel  Regista  Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "Gebriel Regista Italic.ttf",
+    "name": "Gebriel  Regista  Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "Gebriel Regista.otf",
+    "name": "Gebriel  Regista",
+    "format": "opentype"
+  },
+  {
+    "path": "Geometric.otf",
+    "name": "Geometric",
+    "format": "opentype"
+  },
+  {
+    "path": "Gibed.otf",
+    "name": "Gibed",
+    "format": "opentype"
+  },
+  {
+    "path": "Gibed.ttf",
+    "name": "Gibed",
+    "format": "truetype"
+  },
+  {
+    "path": "Glass Marbles.otf",
+    "name": "Glass  Marbles",
+    "format": "opentype"
+  },
+  {
+    "path": "Gloria.ttf",
+    "name": "Gloria",
+    "format": "truetype"
+  },
+  {
+    "path": "Gobble Giggles.otf",
+    "name": "Gobble  Giggles",
+    "format": "opentype"
+  },
+  {
+    "path": "Gradients.otf",
+    "name": "Gradients",
+    "format": "opentype"
+  },
+  {
+    "path": "Gradients02.otf",
+    "name": "Gradients02",
+    "format": "opentype"
+  },
+  {
+    "path": "Gradients03.otf",
+    "name": "Gradients03",
+    "format": "opentype"
+  },
+  {
+    "path": "Gradients04.otf",
+    "name": "Gradients04",
+    "format": "opentype"
+  },
+  {
+    "path": "Graffierz Poison Shadow.ttf",
+    "name": "Graffierz  Poison  Shadow",
+    "format": "truetype"
+  },
+  {
+    "path": "Graffierz Poison.ttf",
+    "name": "Graffierz  Poison",
+    "format": "truetype"
+  },
+  {
+    "path": "Grasstrack.otf",
+    "name": "Grasstrack",
+    "format": "opentype"
+  },
+  {
+    "path": "Grasstrack.ttf",
+    "name": "Grasstrack",
+    "format": "truetype"
+  },
+  {
+    "path": "Groning.otf",
+    "name": "Groning",
+    "format": "opentype"
+  },
+  {
+    "path": "Groovy.otf",
+    "name": "Groovy",
+    "format": "opentype"
+  },
+  {
+    "path": "Grovant.otf",
+    "name": "Grovant",
+    "format": "opentype"
+  },
+  {
+    "path": "Grovant.ttf",
+    "name": "Grovant",
+    "format": "truetype"
+  },
+  {
+    "path": "Gun Boy.otf",
+    "name": "Gun  Boy",
+    "format": "opentype"
+  },
+  {
+    "path": "Gun Boy.ttf",
+    "name": "Gun  Boy",
+    "format": "truetype"
+  },
+  {
+    "path": "HANGTHEDJ.ttf",
+    "name": "H A N G T H E D J",
+    "format": "truetype"
+  },
+  {
+    "path": "HabboFont.ttf",
+    "name": "Habbo Font",
+    "format": "truetype"
+  },
+  {
+    "path": "Habitual.ttf",
+    "name": "Habitual",
+    "format": "truetype"
+  },
+  {
+    "path": "Halloween 1.otf",
+    "name": "Halloween 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Halloween 2.otf",
+    "name": "Halloween 2",
+    "format": "opentype"
+  },
+  {
+    "path": "Halloween 3.otf",
+    "name": "Halloween 3",
+    "format": "opentype"
+  },
+  {
+    "path": "Halloween 4.otf",
+    "name": "Halloween 4",
+    "format": "opentype"
+  },
+  {
+    "path": "Halloween 5.otf",
+    "name": "Halloween 5",
+    "format": "opentype"
+  },
+  {
+    "path": "Hamburger Heaven.ttf",
+    "name": "Hamburger  Heaven",
+    "format": "truetype"
+  },
+  {
+    "path": "Hamilton Script.otf",
+    "name": "Hamilton  Script",
+    "format": "opentype"
+  },
+  {
+    "path": "HamsterlyDemoRegular.ttf",
+    "name": "Hamsterly Demo Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "Handdrawn Jigsaw Puzzle Font 1 1.otf",
+    "name": "Handdrawn  Jigsaw  Puzzle  Font 1 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Handdrawn Jigsaw Puzzle Font 2 1.otf",
+    "name": "Handdrawn  Jigsaw  Puzzle  Font 2 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Handdrawn Jigsaw Puzzle Font 3 1.otf",
+    "name": "Handdrawn  Jigsaw  Puzzle  Font 3 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Handdrawn Jigsaw Puzzle Font 4 1.otf",
+    "name": "Handdrawn  Jigsaw  Puzzle  Font 4 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Handdrawn Jigsaw Puzzle Font 5 1.otf",
+    "name": "Handdrawn  Jigsaw  Puzzle  Font 5 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Handdrawn Jigsaw Puzzle Font 6 1.otf",
+    "name": "Handdrawn  Jigsaw  Puzzle  Font 6 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Hershell™ Script Demo.otf",
+    "name": "Hershell™  Script  Demo",
+    "format": "opentype"
+  },
+  {
+    "path": "Hildaquin.otf",
+    "name": "Hildaquin",
+    "format": "opentype"
+  },
+  {
+    "path": "Hildaquin.ttf",
+    "name": "Hildaquin",
+    "format": "truetype"
+  },
+  {
+    "path": "History.ttf",
+    "name": "History",
+    "format": "truetype"
+  },
+  {
+    "path": "Hovel.ttf",
+    "name": "Hovel",
+    "format": "truetype"
+  },
+  {
+    "path": "Infantry.otf",
+    "name": "Infantry",
+    "format": "opentype"
+  },
+  {
+    "path": "Into The Wild.otf",
+    "name": "Into  The  Wild",
+    "format": "opentype"
+  },
+  {
+    "path": "Jigsaw Pastel Font 1 1.otf",
+    "name": "Jigsaw  Pastel  Font 1 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Jigsaw Pastel Font 2 1.otf",
+    "name": "Jigsaw  Pastel  Font 2 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Jigsaw Pastel Font 3 1.otf",
+    "name": "Jigsaw  Pastel  Font 3 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Jigsaw Puzzle Font 1.otf",
+    "name": "Jigsaw  Puzzle  Font 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Jigsaw Puzzle Font 2.otf",
+    "name": "Jigsaw  Puzzle  Font 2",
+    "format": "opentype"
+  },
+  {
+    "path": "Jigsaw Puzzle Font 3.otf",
+    "name": "Jigsaw  Puzzle  Font 3",
+    "format": "opentype"
+  },
+  {
+    "path": "Jungledise Regular.otf",
+    "name": "Jungledise  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "Jungledise Regular.ttf",
+    "name": "Jungledise  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "Kids Chalk Font 1 1.otf",
+    "name": "Kids  Chalk  Font 1 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Kids Chalk Font 2 1.otf",
+    "name": "Kids  Chalk  Font 2 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Kids Chalk Font 3.otf",
+    "name": "Kids  Chalk  Font 3",
+    "format": "opentype"
+  },
+  {
+    "path": "Kids Chalk Font 4.otf",
+    "name": "Kids  Chalk  Font 4",
+    "format": "opentype"
+  },
+  {
+    "path": "Kids Chalk Font 5.otf",
+    "name": "Kids  Chalk  Font 5",
+    "format": "opentype"
+  },
+  {
+    "path": "Kontes Compressed Bold.ttf",
+    "name": "Kontes  Compressed  Bold",
+    "format": "truetype"
+  },
+  {
+    "path": "Kontes Compressed.otf",
+    "name": "Kontes  Compressed",
+    "format": "opentype"
+  },
+  {
+    "path": "Kontes Compressed.ttf",
+    "name": "Kontes  Compressed",
+    "format": "truetype"
+  },
+  {
+    "path": "Kontes.otf",
+    "name": "Kontes",
+    "format": "opentype"
+  },
+  {
+    "path": "Korosu.otf",
+    "name": "Korosu",
+    "format": "opentype"
+  },
+  {
+    "path": "Korosu.ttf",
+    "name": "Korosu",
+    "format": "truetype"
+  },
+  {
+    "path": "Krunc-Regular.ttf",
+    "name": "Krunc  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "LUSER.otf",
+    "name": "L U S E R",
+    "format": "opentype"
+  },
+  {
+    "path": "LUSER.ttf",
+    "name": "L U S E R",
+    "format": "truetype"
+  },
+  {
+    "path": "Launch.otf",
+    "name": "Launch",
+    "format": "opentype"
+  },
+  {
+    "path": "Lazer84.ttf",
+    "name": "Lazer84",
+    "format": "truetype"
+  },
+  {
+    "path": "Lieben_Font_Light.ttf",
+    "name": "Lieben  Font  Light",
+    "format": "truetype"
+  },
+  {
+    "path": "Lieben_Font_Regular.ttf",
+    "name": "Lieben  Font  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "Lighting.otf",
+    "name": "Lighting",
+    "format": "opentype"
+  },
+  {
+    "path": "Lost In Space Extra.otf",
+    "name": "Lost  In  Space  Extra",
+    "format": "opentype"
+  },
+  {
+    "path": "Lost In Space Regular.otf",
+    "name": "Lost  In  Space  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "Lost In Space Regular.ttf",
+    "name": "Lost  In  Space  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "Love Mama Blue.otf",
+    "name": "Love  Mama  Blue",
+    "format": "opentype"
+  },
+  {
+    "path": "Love Mama Pink.otf",
+    "name": "Love  Mama  Pink",
+    "format": "opentype"
+  },
+  {
+    "path": "Love Mama Purple.otf",
+    "name": "Love  Mama  Purple",
+    "format": "opentype"
+  },
+  {
+    "path": "Love Mama Yellow.otf",
+    "name": "Love  Mama  Yellow",
+    "format": "opentype"
+  },
+  {
+    "path": "Love Mom.otf",
+    "name": "Love  Mom",
+    "format": "opentype"
+  },
+  {
+    "path": "Love Usa.otf",
+    "name": "Love  Usa",
+    "format": "opentype"
+  },
+  {
+    "path": "MJ AlGhifari Demo.ttf",
+    "name": "M J  Al Ghifari  Demo",
+    "format": "truetype"
+  },
+  {
+    "path": "MagazineLetterByBrntlbrnl-Regular.ttf",
+    "name": "Magazine Letter By Brntlbrnl  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "Magic.otf",
+    "name": "Magic",
+    "format": "opentype"
+  },
+  {
+    "path": "Magic02.otf",
+    "name": "Magic02",
+    "format": "opentype"
+  },
+  {
+    "path": "Magic03.otf",
+    "name": "Magic03",
+    "format": "opentype"
+  },
+  {
+    "path": "Magic04.otf",
+    "name": "Magic04",
+    "format": "opentype"
+  },
+  {
+    "path": "Magnitude.otf",
+    "name": "Magnitude",
+    "format": "opentype"
+  },
+  {
+    "path": "Magnitude.ttf",
+    "name": "Magnitude",
+    "format": "truetype"
+  },
+  {
+    "path": "Mallians.otf",
+    "name": "Mallians",
+    "format": "opentype"
+  },
+  {
+    "path": "Mallians.ttf",
+    "name": "Mallians",
+    "format": "truetype"
+  },
+  {
+    "path": "Mallinest.ttf",
+    "name": "Mallinest",
+    "format": "truetype"
+  },
+  {
+    "path": "Mango Dream.ttf",
+    "name": "Mango  Dream",
+    "format": "truetype"
+  },
+  {
+    "path": "MarquesfreeItalic-1GB4L.otf",
+    "name": "Marquesfree Italic 1 G B4 L",
+    "format": "opentype"
+  },
+  {
+    "path": "MarquesfreeOutline-BW4PV.otf",
+    "name": "Marquesfree Outline  B W4 P V",
+    "format": "opentype"
+  },
+  {
+    "path": "MarquesfreeOutlineitalic-nRpGM.otf",
+    "name": "Marquesfree Outlineitalic n Rp G M",
+    "format": "opentype"
+  },
+  {
+    "path": "MarquesfreeRegular-RpR2M.otf",
+    "name": "Marquesfree Regular  Rp R2 M",
+    "format": "opentype"
+  },
+  {
+    "path": "MarquesfreeRough-8MvYD.otf",
+    "name": "Marquesfree Rough 8 Mv Y D",
+    "format": "opentype"
+  },
+  {
+    "path": "MarquesfreeRoughitalic-Yz2Lj.otf",
+    "name": "Marquesfree Roughitalic  Yz2 Lj",
+    "format": "opentype"
+  },
+  {
+    "path": "MarquesfreeStamp-MVD8e.otf",
+    "name": "Marquesfree Stamp  M V D8e",
+    "format": "opentype"
+  },
+  {
+    "path": "MarquesfreeStampitalic-rgnGO.otf",
+    "name": "Marquesfree Stampitalic rgn G O",
+    "format": "opentype"
+  },
+  {
+    "path": "Marvel brothers cf.otf",
+    "name": "Marvel brothers cf",
+    "format": "opentype"
+  },
+  {
+    "path": "Master Droid.ttf",
+    "name": "Master  Droid",
+    "format": "truetype"
+  },
+  {
+    "path": "Merge Outline.ttf",
+    "name": "Merge  Outline",
+    "format": "truetype"
+  },
+  {
+    "path": "Merge.ttf",
+    "name": "Merge",
+    "format": "truetype"
+  },
+  {
+    "path": "Metallic Color.otf",
+    "name": "Metallic  Color",
+    "format": "opentype"
+  },
+  {
+    "path": "Michigan Signature.otf",
+    "name": "Michigan  Signature",
+    "format": "opentype"
+  },
+  {
+    "path": "Michigan Signature.ttf",
+    "name": "Michigan  Signature",
+    "format": "truetype"
+  },
+  {
+    "path": "Modern Thrash Slant.otf",
+    "name": "Modern  Thrash  Slant",
+    "format": "opentype"
+  },
+  {
+    "path": "Modern Thrash Slant.ttf",
+    "name": "Modern  Thrash  Slant",
+    "format": "truetype"
+  },
+  {
+    "path": "Modern Thrash.otf",
+    "name": "Modern  Thrash",
+    "format": "opentype"
+  },
+  {
+    "path": "Modern Thrash.ttf",
+    "name": "Modern  Thrash",
+    "format": "truetype"
+  },
+  {
+    "path": "Monogram.otf",
+    "name": "Monogram",
+    "format": "opentype"
+  },
+  {
+    "path": "Mooner-Regular.otf",
+    "name": "Mooner  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "Mooner-Regular.ttf",
+    "name": "Mooner  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "Mooner-RegularOutline.otf",
+    "name": "Mooner  Regular Outline",
+    "format": "opentype"
+  },
+  {
+    "path": "Mooner-RegularOutline.ttf",
+    "name": "Mooner  Regular Outline",
+    "format": "truetype"
+  },
+  {
+    "path": "Mooner-Rounded.otf",
+    "name": "Mooner  Rounded",
+    "format": "opentype"
+  },
+  {
+    "path": "Mooner-Rounded.ttf",
+    "name": "Mooner  Rounded",
+    "format": "truetype"
+  },
+  {
+    "path": "Mooner-RoundedOutline.otf",
+    "name": "Mooner  Rounded Outline",
+    "format": "opentype"
+  },
+  {
+    "path": "Mooner-RoundedOutline.ttf",
+    "name": "Mooner  Rounded Outline",
+    "format": "truetype"
+  },
+  {
+    "path": "Mosaic.otf",
+    "name": "Mosaic",
+    "format": "opentype"
+  },
+  {
+    "path": "MultiDots.otf",
+    "name": "Multi Dots",
+    "format": "opentype"
+  },
+  {
+    "path": "MultiDotsRegular.ttf",
+    "name": "Multi Dots Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "NEONLIGHT-Display.otf",
+    "name": "N E O N L I G H T  Display",
+    "format": "opentype"
+  },
+  {
+    "path": "NEONLIGHT-Display.ttf",
+    "name": "N E O N L I G H T  Display",
+    "format": "truetype"
+  },
+  {
+    "path": "NOS.ttf",
+    "name": "N O S",
+    "format": "truetype"
+  },
+  {
+    "path": "NanumMyeongjo-Regular.ttf",
+    "name": "Nanum Myeongjo  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "Neo Pixel Deco.otf",
+    "name": "Neo  Pixel  Deco",
+    "format": "opentype"
+  },
+  {
+    "path": "Neo Pixel.otf",
+    "name": "Neo  Pixel",
+    "format": "opentype"
+  },
+  {
+    "path": "Neon Colored Font.otf",
+    "name": "Neon  Colored  Font",
+    "format": "opentype"
+  },
+  {
+    "path": "Neon Pink Font.otf",
+    "name": "Neon  Pink  Font",
+    "format": "opentype"
+  },
+  {
+    "path": "Neon Purple Font.otf",
+    "name": "Neon  Purple  Font",
+    "format": "opentype"
+  },
+  {
+    "path": "Neon Rainbow Font.otf",
+    "name": "Neon  Rainbow  Font",
+    "format": "opentype"
+  },
+  {
+    "path": "Neon Red Font.otf",
+    "name": "Neon  Red  Font",
+    "format": "opentype"
+  },
+  {
+    "path": "Nossible-K7qVD.otf",
+    "name": "Nossible  K7q V D",
+    "format": "opentype"
+  },
+  {
+    "path": "Oblivion.otf",
+    "name": "Oblivion",
+    "format": "opentype"
+  },
+  {
+    "path": "One Night1 Color.otf",
+    "name": "One  Night1  Color",
+    "format": "opentype"
+  },
+  {
+    "path": "One Night1 Colorreverse.otf",
+    "name": "One  Night1  Colorreverse",
+    "format": "opentype"
+  },
+  {
+    "path": "One Night1 Colorstripe.otf",
+    "name": "One  Night1  Colorstripe",
+    "format": "opentype"
+  },
+  {
+    "path": "One Night1.otf",
+    "name": "One  Night1",
+    "format": "opentype"
+  },
+  {
+    "path": "Onenight1 Color.ttf",
+    "name": "Onenight1  Color",
+    "format": "truetype"
+  },
+  {
+    "path": "Onenight1 Colorreverse.ttf",
+    "name": "Onenight1  Colorreverse",
+    "format": "truetype"
+  },
+  {
+    "path": "Onenight1 Colorstripe.ttf",
+    "name": "Onenight1  Colorstripe",
+    "format": "truetype"
+  },
+  {
+    "path": "Onenight1.ttf",
+    "name": "Onenight1",
+    "format": "truetype"
+  },
+  {
+    "path": "Over Quality.otf",
+    "name": "Over  Quality",
+    "format": "opentype"
+  },
+  {
+    "path": "Over Quality.ttf",
+    "name": "Over  Quality",
+    "format": "truetype"
+  },
+  {
+    "path": "Overthinking.otf",
+    "name": "Overthinking",
+    "format": "opentype"
+  },
+  {
+    "path": "Paint Splashes Blue.otf",
+    "name": "Paint  Splashes  Blue",
+    "format": "opentype"
+  },
+  {
+    "path": "Paint Splashes Green.otf",
+    "name": "Paint  Splashes  Green",
+    "format": "opentype"
+  },
+  {
+    "path": "Paint Splashes Rainbow.otf",
+    "name": "Paint  Splashes  Rainbow",
+    "format": "opentype"
+  },
+  {
+    "path": "Paint Splashes Regular.otf",
+    "name": "Paint  Splashes  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "PinkbeachitalicpersonaluseIt-p7Vzv.otf",
+    "name": "Pinkbeachitalicpersonaluse It p7 Vzv",
+    "format": "opentype"
+  },
+  {
+    "path": "Polkadot Color.otf",
+    "name": "Polkadot  Color",
+    "format": "opentype"
+  },
+  {
+    "path": "Pop Kid Black Font.otf",
+    "name": "Pop  Kid  Black  Font",
+    "format": "opentype"
+  },
+  {
+    "path": "Pop Kid Color Font.otf",
+    "name": "Pop  Kid  Color  Font",
+    "format": "opentype"
+  },
+  {
+    "path": "Pristine-Script.ttf",
+    "name": "Pristine  Script",
+    "format": "truetype"
+  },
+  {
+    "path": "Puzzle Font 1-SVG.otf",
+    "name": "Puzzle  Font 1  S V G",
+    "format": "opentype"
+  },
+  {
+    "path": "Puzzle Font 2-SVG.otf",
+    "name": "Puzzle  Font 2  S V G",
+    "format": "opentype"
+  },
+  {
+    "path": "Puzzle Font 3.otf",
+    "name": "Puzzle  Font 3",
+    "format": "opentype"
+  },
+  {
+    "path": "Puzzle.otf",
+    "name": "Puzzle",
+    "format": "opentype"
+  },
+  {
+    "path": "Qaddal-Regular-PersonalUse.otf",
+    "name": "Qaddal  Regular  Personal Use",
+    "format": "opentype"
+  },
+  {
+    "path": "Radeil3DDemoRuderight-4n7xD.otf",
+    "name": "Radeil3 D Demo Ruderight 4n7x D",
+    "format": "opentype"
+  },
+  {
+    "path": "Radiantgroove.otf",
+    "name": "Radiantgroove",
+    "format": "opentype"
+  },
+  {
+    "path": "RailwayGank.ttf",
+    "name": "Railway Gank",
+    "format": "truetype"
+  },
+  {
+    "path": "Rainbow Bridge Personal Use.ttf",
+    "name": "Rainbow  Bridge  Personal  Use",
+    "format": "truetype"
+  },
+  {
+    "path": "Rainbow Pow.otf",
+    "name": "Rainbow  Pow",
+    "format": "opentype"
+  },
+  {
+    "path": "Rasedron Regular.otf",
+    "name": "Rasedron  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "Red Right Hand.ttf",
+    "name": "Red  Right  Hand",
+    "format": "truetype"
+  },
+  {
+    "path": "Renoric.otf",
+    "name": "Renoric",
+    "format": "opentype"
+  },
+  {
+    "path": "Resrics.otf",
+    "name": "Resrics",
+    "format": "opentype"
+  },
+  {
+    "path": "Retro Funky O.otf",
+    "name": "Retro  Funky  O",
+    "format": "opentype"
+  },
+  {
+    "path": "Retro Funky Pp.otf",
+    "name": "Retro  Funky  Pp",
+    "format": "opentype"
+  },
+  {
+    "path": "Retro Funky Y.otf",
+    "name": "Retro  Funky  Y",
+    "format": "opentype"
+  },
+  {
+    "path": "Retrofunky G.ttf",
+    "name": "Retrofunky  G",
+    "format": "truetype"
+  },
+  {
+    "path": "Ridge5-Bold.otf",
+    "name": "Ridge5  Bold",
+    "format": "opentype"
+  },
+  {
+    "path": "Riley.otf",
+    "name": "Riley",
+    "format": "opentype"
+  },
+  {
+    "path": "Riviera.otf",
+    "name": "Riviera",
+    "format": "opentype"
+  },
+  {
+    "path": "Ronde-B_square.otf",
+    "name": "Ronde  B square",
+    "format": "opentype"
+  },
+  {
+    "path": "Rope Line.otf",
+    "name": "Rope  Line",
+    "format": "opentype"
+  },
+  {
+    "path": "Rope-Black.otf",
+    "name": "Rope  Black",
+    "format": "opentype"
+  },
+  {
+    "path": "Rosca Slant.otf",
+    "name": "Rosca  Slant",
+    "format": "opentype"
+  },
+  {
+    "path": "Rosca Slant.ttf",
+    "name": "Rosca  Slant",
+    "format": "truetype"
+  },
+  {
+    "path": "Rosca.ttf",
+    "name": "Rosca",
+    "format": "truetype"
+  },
+  {
+    "path": "Runner.otf",
+    "name": "Runner",
+    "format": "opentype"
+  },
+  {
+    "path": "STJEDISE.TTF",
+    "name": "S T J E D I S E. T T F",
+    "format": "truetype"
+  },
+  {
+    "path": "Sale Clean.otf",
+    "name": "Sale  Clean",
+    "format": "opentype"
+  },
+  {
+    "path": "Sale Clean.ttf",
+    "name": "Sale  Clean",
+    "format": "truetype"
+  },
+  {
+    "path": "Sale.otf",
+    "name": "Sale",
+    "format": "opentype"
+  },
+  {
+    "path": "Salty Sugar.otf",
+    "name": "Salty  Sugar",
+    "format": "opentype"
+  },
+  {
+    "path": "SanDiego-Black.otf",
+    "name": "San Diego  Black",
+    "format": "opentype"
+  },
+  {
+    "path": "SanDiego-Bold.otf",
+    "name": "San Diego  Bold",
+    "format": "opentype"
+  },
+  {
+    "path": "SanDiego-ExtraBold.otf",
+    "name": "San Diego  Extra Bold",
+    "format": "opentype"
+  },
+  {
+    "path": "SanDiego-ExtraLight.otf",
+    "name": "San Diego  Extra Light",
+    "format": "opentype"
+  },
+  {
+    "path": "SanDiego-Light.otf",
+    "name": "San Diego  Light",
+    "format": "opentype"
+  },
+  {
+    "path": "SanDiego-Medium.otf",
+    "name": "San Diego  Medium",
+    "format": "opentype"
+  },
+  {
+    "path": "SanDiego-SemiBold.otf",
+    "name": "San Diego  Semi Bold",
+    "format": "opentype"
+  },
+  {
+    "path": "School Kids01.otf",
+    "name": "School  Kids01",
+    "format": "opentype"
+  },
+  {
+    "path": "School Kids02.otf",
+    "name": "School  Kids02",
+    "format": "opentype"
+  },
+  {
+    "path": "School Kids03.otf",
+    "name": "School  Kids03",
+    "format": "opentype"
+  },
+  {
+    "path": "School Kids04.otf",
+    "name": "School  Kids04",
+    "format": "opentype"
+  },
+  {
+    "path": "ShoCard Caps.ttf",
+    "name": "Sho Card  Caps",
+    "format": "truetype"
+  },
+  {
+    "path": "Sicko Regular.otf",
+    "name": "Sicko  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "Slugs Racer.ttf",
+    "name": "Slugs  Racer",
+    "format": "truetype"
+  },
+  {
+    "path": "Snowday.otf",
+    "name": "Snowday",
+    "format": "opentype"
+  },
+  {
+    "path": "South Gardens Personal Use.ttf",
+    "name": "South  Gardens  Personal  Use",
+    "format": "truetype"
+  },
+  {
+    "path": "Space Story 2.otf",
+    "name": "Space  Story 2",
+    "format": "opentype"
+  },
+  {
+    "path": "Spiderboy.otf",
+    "name": "Spiderboy",
+    "format": "opentype"
+  },
+  {
+    "path": "Starjedi.ttf",
+    "name": "Starjedi",
+    "format": "truetype"
+  },
+  {
+    "path": "Starjhol.ttf",
+    "name": "Starjhol",
+    "format": "truetype"
+  },
+  {
+    "path": "Starjout.ttf",
+    "name": "Starjout",
+    "format": "truetype"
+  },
+  {
+    "path": "Starsight.ttf",
+    "name": "Starsight",
+    "format": "truetype"
+  },
+  {
+    "path": "Stjldbl1.ttf",
+    "name": "Stjldbl1",
+    "format": "truetype"
+  },
+  {
+    "path": "Stjldbl2.ttf",
+    "name": "Stjldbl2",
+    "format": "truetype"
+  },
+  {
+    "path": "Stomic-Regular.ttf",
+    "name": "Stomic  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "Streetbomber.ttf",
+    "name": "Streetbomber",
+    "format": "truetype"
+  },
+  {
+    "path": "Strjmono.ttf",
+    "name": "Strjmono",
+    "format": "truetype"
+  },
+  {
+    "path": "Summer Season Redy.otf",
+    "name": "Summer  Season  Redy",
+    "format": "opentype"
+  },
+  {
+    "path": "Summer To Winter Outline.otf",
+    "name": "Summer  To  Winter  Outline",
+    "format": "opentype"
+  },
+  {
+    "path": "Summer To Winter Outline.ttf",
+    "name": "Summer  To  Winter  Outline",
+    "format": "truetype"
+  },
+  {
+    "path": "Summer To Winter Slant.otf",
+    "name": "Summer  To  Winter  Slant",
+    "format": "opentype"
+  },
+  {
+    "path": "Summer To Winter Slant.ttf",
+    "name": "Summer  To  Winter  Slant",
+    "format": "truetype"
+  },
+  {
+    "path": "Summer To Winter.otf",
+    "name": "Summer  To  Winter",
+    "format": "opentype"
+  },
+  {
+    "path": "Summer To Winter.ttf",
+    "name": "Summer  To  Winter",
+    "format": "truetype"
+  },
+  {
+    "path": "Super Black.ttf",
+    "name": "Super  Black",
+    "format": "truetype"
+  },
+  {
+    "path": "Super Hero Font 1.otf",
+    "name": "Super  Hero  Font 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Super Kids Black Font.otf",
+    "name": "Super  Kids  Black  Font",
+    "format": "opentype"
+  },
+  {
+    "path": "Super Outline.otf",
+    "name": "Super  Outline",
+    "format": "opentype"
+  },
+  {
+    "path": "Super White.otf",
+    "name": "Super  White",
+    "format": "opentype"
+  },
+  {
+    "path": "Switzerlandia.otf",
+    "name": "Switzerlandia",
+    "format": "opentype"
+  },
+  {
+    "path": "Tempo.ttf",
+    "name": "Tempo",
+    "format": "truetype"
+  },
+  {
+    "path": "TheMilligram-Regular.ttf",
+    "name": "The Milligram  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "TheOvercook.ttf",
+    "name": "The Overcook",
+    "format": "truetype"
+  },
+  {
+    "path": "Thunder.ttf",
+    "name": "Thunder",
+    "format": "truetype"
+  },
+  {
+    "path": "Thundergood.ttf",
+    "name": "Thundergood",
+    "format": "truetype"
+  },
+  {
+    "path": "Tiffany Laurence.ttf",
+    "name": "Tiffany  Laurence",
+    "format": "truetype"
+  },
+  {
+    "path": "Tilla-Italic.ttf",
+    "name": "Tilla  Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "Tilla-Regular.otf",
+    "name": "Tilla  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "Titia.otf",
+    "name": "Titia",
+    "format": "opentype"
+  },
+  {
+    "path": "Tobacco Road.otf",
+    "name": "Tobacco  Road",
+    "format": "opentype"
+  },
+  {
+    "path": "Tomahawkcamo Svg.otf",
+    "name": "Tomahawkcamo  Svg",
+    "format": "opentype"
+  },
+  {
+    "path": "Tomahawkcamo.otf",
+    "name": "Tomahawkcamo",
+    "format": "opentype"
+  },
+  {
+    "path": "Troemys Deco.otf",
+    "name": "Troemys  Deco",
+    "format": "opentype"
+  },
+  {
+    "path": "Troemys.otf",
+    "name": "Troemys",
+    "format": "opentype"
+  },
+  {
+    "path": "USA Flag Grunge Font 2.otf",
+    "name": "U S A  Flag  Grunge  Font 2",
+    "format": "opentype"
+  },
+  {
+    "path": "Unblessed.otf",
+    "name": "Unblessed",
+    "format": "opentype"
+  },
+  {
+    "path": "Usa Retro.otf",
+    "name": "Usa  Retro",
+    "format": "opentype"
+  },
+  {
+    "path": "Velocity Bold.otf",
+    "name": "Velocity  Bold",
+    "format": "opentype"
+  },
+  {
+    "path": "Velocity Bold.ttf",
+    "name": "Velocity  Bold",
+    "format": "truetype"
+  },
+  {
+    "path": "Velocity Italic Bold.otf",
+    "name": "Velocity  Italic  Bold",
+    "format": "opentype"
+  },
+  {
+    "path": "Velocity Italic Bold.ttf",
+    "name": "Velocity  Italic  Bold",
+    "format": "truetype"
+  },
+  {
+    "path": "Velocity Italic.otf",
+    "name": "Velocity  Italic",
+    "format": "opentype"
+  },
+  {
+    "path": "Velocity Regular.otf",
+    "name": "Velocity  Regular",
+    "format": "opentype"
+  },
+  {
+    "path": "Velocity Regular.ttf",
+    "name": "Velocity  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "Velocity Svg.otf",
+    "name": "Velocity  Svg",
+    "format": "opentype"
+  },
+  {
+    "path": "Vermin Vibes eX.ttf",
+    "name": "Vermin  Vibes e X",
+    "format": "truetype"
+  },
+  {
+    "path": "Versa.otf",
+    "name": "Versa",
+    "format": "opentype"
+  },
+  {
+    "path": "Vintage Clean.otf",
+    "name": "Vintage  Clean",
+    "format": "opentype"
+  },
+  {
+    "path": "Vintage Retro.otf",
+    "name": "Vintage  Retro",
+    "format": "opentype"
+  },
+  {
+    "path": "Vintage Vintage.otf",
+    "name": "Vintage  Vintage",
+    "format": "opentype"
+  },
+  {
+    "path": "VisiaPro-Bold.ttf",
+    "name": "Visia Pro  Bold",
+    "format": "truetype"
+  },
+  {
+    "path": "VisiaPro-BoldItalic.ttf",
+    "name": "Visia Pro  Bold Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "VisiaPro-ExtraBold.ttf",
+    "name": "Visia Pro  Extra Bold",
+    "format": "truetype"
+  },
+  {
+    "path": "VisiaPro-ExtraBoldItalic.ttf",
+    "name": "Visia Pro  Extra Bold Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "VisiaPro-ExtraLight.ttf",
+    "name": "Visia Pro  Extra Light",
+    "format": "truetype"
+  },
+  {
+    "path": "VisiaPro-ExtraLightItalic.ttf",
+    "name": "Visia Pro  Extra Light Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "VisiaPro-Heavy.ttf",
+    "name": "Visia Pro  Heavy",
+    "format": "truetype"
+  },
+  {
+    "path": "VisiaPro-HeavyItalic.ttf",
+    "name": "Visia Pro  Heavy Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "VisiaPro-Italic.ttf",
+    "name": "Visia Pro  Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "VisiaPro-Light.ttf",
+    "name": "Visia Pro  Light",
+    "format": "truetype"
+  },
+  {
+    "path": "VisiaPro-LightItalic.ttf",
+    "name": "Visia Pro  Light Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "VisiaPro-Regular.ttf",
+    "name": "Visia Pro  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "VisiaPro-SemiBold.ttf",
+    "name": "Visia Pro  Semi Bold",
+    "format": "truetype"
+  },
+  {
+    "path": "VisiaPro-SemiBoldItalic.ttf",
+    "name": "Visia Pro  Semi Bold Italic",
+    "format": "truetype"
+  },
+  {
+    "path": "Voronoi.otf",
+    "name": "Voronoi",
+    "format": "opentype"
+  },
+  {
+    "path": "Water.otf",
+    "name": "Water",
+    "format": "opentype"
+  },
+  {
+    "path": "Water.ttf",
+    "name": "Water",
+    "format": "truetype"
+  },
+  {
+    "path": "Watercolor Font 1.otf",
+    "name": "Watercolor  Font 1",
+    "format": "opentype"
+  },
+  {
+    "path": "Watermelon.otf",
+    "name": "Watermelon",
+    "format": "opentype"
+  },
+  {
+    "path": "WildBountyShadow-Regular.ttf",
+    "name": "Wild Bounty Shadow  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "Xeonic.otf",
+    "name": "Xeonic",
+    "format": "opentype"
+  },
+  {
+    "path": "Xeonic.ttf",
+    "name": "Xeonic",
+    "format": "truetype"
+  },
+  {
+    "path": "Yellowtail-Regular.ttf",
+    "name": "Yellowtail  Regular",
+    "format": "truetype"
+  },
+  {
+    "path": "Yummy Candy.otf",
+    "name": "Yummy  Candy",
+    "format": "opentype"
+  },
+  {
+    "path": "Zetan.ttf",
+    "name": "Zetan",
+    "format": "truetype"
+  },
+  {
+    "path": "Zombies Headandtail.otf",
+    "name": "Zombies  Headandtail",
+    "format": "opentype"
+  },
+  {
+    "path": "Zombies Headandtail.ttf",
+    "name": "Zombies  Headandtail",
+    "format": "truetype"
+  },
+  {
+    "path": "Zombies.otf",
+    "name": "Zombies",
+    "format": "opentype"
+  },
+  {
+    "path": "Zombies.ttf",
+    "name": "Zombies",
+    "format": "truetype"
+  },
+  {
+    "path": "adrip1.ttf",
+    "name": "adrip1",
+    "format": "truetype"
+  },
+  {
+    "path": "ascardi-sans.ttf",
+    "name": "ascardi sans",
+    "format": "truetype"
+  },
+  {
+    "path": "averox.otf",
+    "name": "averox",
+    "format": "opentype"
+  },
+  {
+    "path": "beatstreet.ttf",
+    "name": "beatstreet",
+    "format": "truetype"
+  },
+  {
+    "path": "clintonbolditalic.ttf",
+    "name": "clintonbolditalic",
+    "format": "truetype"
+  },
+  {
+    "path": "dronerangerpro_black.otf",
+    "name": "dronerangerpro black",
+    "format": "opentype"
+  },
+  {
+    "path": "dronerangerpro_bold.otf",
+    "name": "dronerangerpro bold",
+    "format": "opentype"
+  },
+  {
+    "path": "dronerangerpro_condensed.otf",
+    "name": "dronerangerpro condensed",
+    "format": "opentype"
+  },
+  {
+    "path": "gravtrac compressed bd.otf",
+    "name": "gravtrac compressed bd",
+    "format": "opentype"
+  },
+  {
+    "path": "velocity-font.ttf",
+    "name": "velocity font",
     "format": "truetype"
   }
 ]

@@ -1,7 +1,12 @@
 
-// scan-fonts.js - Works both as CommonJS and as direct node script
-const fs = require('fs');
-const path = require('path');
+// scan-fonts.js - ES Module version
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get current directory (ES Module equivalent of __dirname)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Configuration
 const FONTS_FOLDER = path.join(process.cwd(), "fonts");
@@ -131,11 +136,9 @@ function main() {
   return fontFiles;
 }
 
-// Run the main function if this file is being executed directly
-if (require.main === module) {
-  main();
-  console.log("Done. Your fonts should now be available in the application.");
-}
+// Run the main function
+main();
+console.log("Done. Your fonts should now be available in the application.");
 
 // Export for use as a module
-module.exports = { scanFontsFolder, main };
+export { scanFontsFolder, main };

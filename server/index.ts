@@ -2,13 +2,13 @@
 import express from 'express';
 import cors from 'cors';
 import { registerRoutes } from './routes';
-import { createViteDevServer } from './vite';
+import { setupVite, serveStatic, log } from './vite';
 import path from 'path';
 import fs from 'fs';
 import { exec } from 'child_process';
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
 const isProduction = process.env.NODE_ENV === 'production';
 
 // Middleware
@@ -29,8 +29,8 @@ const scanFonts = () => {
     }
     
     console.log('Running font scan script...');
-    // Run the scan-fonts.js script to generate fonts.json
-    exec('node scan-fonts.js', (error, stdout, stderr) => {
+    // Run the scan-fonts.js script to generate fonts.json - use import syntax
+    exec('node --experimental-specifier-resolution=node scan-fonts.js', (error, stdout, stderr) => {
       if (error) {
         console.error(`Error scanning fonts: ${error.message}`);
         return;
@@ -42,9 +42,13 @@ const scanFonts = () => {
       
       // Also copy the fonts.json to public folder for client access
       try {
-        const fontsJson = fs.readFileSync(path.join(process.cwd(), 'fonts.json'));
-        fs.writeFileSync(fontsJsonPath, fontsJson);
-        console.log('Copied fonts.json to public folder');
+        if (fs.existsSync(path.join(process.cwd(), 'fonts.json'))) {
+          const fontsJson = fs.readFileSync(path.join(process.cwd(), 'fonts.json'));
+          fs.writeFileSync(fontsJsonPath, fontsJson);
+          console.log('Copied fonts.json to public folder');
+        } else {
+          console.error('fonts.json not found after scan');
+        }
       } catch (copyError) {
         console.error('Error copying fonts.json to public folder:', copyError);
       }
@@ -65,23 +69,19 @@ registerRoutes(app).then(() => {
 // Serve static files from the public directory
 app.use(express.static('public'));
 
+// Create HTTP server
+const server = app.listen(port, '0.0.0.0', () => {
+  log(`serving on port ${port}`);
+});
+
 // For development, set up Vite dev server
 if (!isProduction) {
-  createViteDevServer(app).then(() => {
-    console.log(`[express] serving on port ${port}`);
+  setupVite(app, server).then(() => {
+    log('Vite dev server started');
   });
 } else {
   // For production, serve the built client
-  app.use(express.static(path.resolve(__dirname, '../client/dist')));
-  
-  // Serve index.html for all other routes for SPA client-side routing
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../client/dist/index.html'));
-  });
-  
-  app.listen(port, () => {
-    console.log(`[express] serving on port ${port}`);
-  });
+  serveStatic(app);
 }
 
 export default app;
