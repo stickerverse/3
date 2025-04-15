@@ -110,24 +110,6 @@ export default function DesignWorkspace({
   return (
     <div className="flex-1 flex flex-col h-full">
       <div className="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 p-2 flex justify-between items-center">
-        <Toolbar 
-          addText={handleAddImage} 
-          addShape={handleAddImage} 
-          addImage={handleAddImage}
-          toggleTemplates={() => {}} 
-          toggleLayers={() => {}} 
-          toggleSettings={() => {}} 
-          selectedTool={""} 
-          showToolTips={false} 
-          currentFont={getCurrentFont()}
-          onSelectFont={handleFontSelection}
-          toggleFontShowcase={toggleFontShowcase} 
-        />
-
-        {showFontShowcase && ( 
-          <FontShowcase onSelectFont={handleFontSelection} onClose={toggleFontShowcase} />
-        )}
-
         <div className="flex items-center space-x-2">
           <input 
             type="text" 
@@ -154,6 +136,15 @@ export default function DesignWorkspace({
             </button>
           )}
         </div>
+        
+        {showFontShowcase && ( 
+          <FontShowcase 
+            isOpen={showFontShowcase} 
+            onSelectFont={handleFontSelection} 
+            onClose={toggleFontShowcase}
+            currentFont={getCurrentFont() || ""}
+          />
+        )}
 
         <div className="flex items-center space-x-1">
           <button 

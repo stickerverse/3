@@ -55,17 +55,17 @@ export default function FontToolsPage() {
   };
   
   return (
-    <div className="container mx-auto py-10">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Font Management</h1>
+    <div className="container mx-auto py-6 px-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">Font Management</h1>
         <FontSettingsPanel 
           onFontSetSelected={handleFontSetSelected} 
           currentFontSet={currentFontSet} 
         />
       </div>
       
-      <Card className="mb-8">
-        <CardHeader>
+      <Card className="mb-6">
+        <CardHeader className="pb-3">
           <CardTitle>Font Library Status</CardTitle>
           <CardDescription>
             {isLoading 
@@ -75,7 +75,7 @@ export default function FontToolsPage() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <div className="text-sm font-medium">Current Font Set:</div>
               <div className="bg-primary/10 text-primary rounded-full px-3 py-1 text-sm font-medium">
                 {currentFontSet === "all" ? "All Fonts" : 
@@ -98,7 +98,7 @@ export default function FontToolsPage() {
       </Card>
       
       <Tabs defaultValue="all" className="w-full">
-        <TabsList>
+        <TabsList className="w-full flex-wrap">
           <TabsTrigger value="all">All Fonts</TabsTrigger>
           <TabsTrigger value="serif">Serif</TabsTrigger>
           <TabsTrigger value="sans-serif">Sans Serif</TabsTrigger>
@@ -110,13 +110,13 @@ export default function FontToolsPage() {
         <TabsContent value="all" className="py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {isLoading ? (
-              <div className="col-span-3 py-10 text-center">Loading fonts...</div>
+              <div className="col-span-full py-10 text-center">Loading fonts...</div>
             ) : filteredFonts.length > 0 ? (
               filteredFonts.map((font) => (
                 <FontPreviewCard key={font.family} font={font} />
               ))
             ) : (
-              <div className="col-span-3 py-10 text-center">No fonts found matching your search criteria.</div>
+              <div className="col-span-full py-10 text-center">No fonts found matching your search criteria.</div>
             )}
           </div>
         </TabsContent>
@@ -125,7 +125,7 @@ export default function FontToolsPage() {
           <TabsContent key={category} value={category} className="py-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {isLoading ? (
-                <div className="col-span-3 py-10 text-center">Loading fonts...</div>
+                <div className="col-span-full py-10 text-center">Loading fonts...</div>
               ) : (
                 filteredFonts
                   .filter(font => font.category === category)
