@@ -531,6 +531,8 @@ class GoogleFontsService {
    */
   async loadSystemFontsFromJson(): Promise<void> {
     try {
+      console.log('Loading system fonts from fonts.json...');
+      
       // First check if fonts.json exists
       const response = await fetch('/fonts.json');
       if (!response.ok) {
@@ -558,31 +560,29 @@ class GoogleFontsService {
         console.log('No fonts-metadata.json found, using simple naming');
       }
       
+      // Clear existing system fonts
+      this.categories['system'] = [];
+      
       // Process each font path
       for (const fontPath of fontPaths) {
         try {
           // Generate full URL to the font
           const fontUrl = `/fonts/${fontPath}`;
           
-          // Find metadata if available
-          let fontName = '';
+          // Extract name from filename for display
+          const fileName = fontPath.split('/').pop() || '';
+          let fontName = fileName.split('.')[0]
+            .replace(/([_-])/g, ' ') // Replace underscores and hyphens with spaces
+            .replace(/([A-Z])/g, ' $1') // Add spaces before capital letters
+            .trim();
+            
+          // Find metadata if available (for future use)
           const metadata = fontMetadata.find(meta => meta.path === fontPath);
-          
           if (metadata && metadata.name) {
             fontName = metadata.name;
-          } else {
-            // Extract name from filename
-            const fileName = fontPath.split('/').pop() || '';
-            fontName = fileName.split('.')[0]
-              .replace(/[_-]/g, ' ') // Replace underscores and hyphens with spaces
-              .replace(/([A-Z])/g, ' $1') // Add spaces before capital letters
-              .trim();
           }
           
-          // Add prefix to distinguish system fonts
-          fontName = `System: ${fontName}`;
-          
-          // Register the font
+          // Register the font with @font-face
           const style = document.createElement('style');
           style.textContent = `
             @font-face {
@@ -595,7 +595,7 @@ class GoogleFontsService {
           `;
           document.head.appendChild(style);
           
-          // Add to system fonts category
+          // Initialize system fonts category if needed
           if (!this.categories['system']) {
             this.categories['system'] = [];
           }
@@ -610,17 +610,22 @@ class GoogleFontsService {
           
           // Mark as loaded
           this.loadedFonts.add(fontName);
-          
-          console.log(`Loaded system font: ${fontName}`);
         } catch (error) {
           console.error(`Error loading system font ${fontPath}:`, error);
         }
       }
       
+      // Sort system fonts alphabetically for better browsing
+      if (this.categories['system'].length > 0) {
+        this.categories['system'].sort((a, b) => a.localeCompare(b));
+      }
+      
       console.log(`Successfully loaded ${this.categories['system']?.length || 0} system fonts`);
       
     } catch (error) {
-      console.warn('Error loading system fonts:', error);
+      console.error('Error loading system fonts:', error);
+      // Ensure we have an empty array even if loading fails
+      this.categories['system'] = [];
     }
   }
 }

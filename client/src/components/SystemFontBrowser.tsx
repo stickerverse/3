@@ -115,7 +115,7 @@ export default function SystemFontBrowser({ onClose, onFontSelected }: SystemFon
                     </span>
                   </div>
                   <div className="text-xs text-center p-1 border-t border-neutral-100 dark:border-neutral-700 truncate font-medium bg-neutral-50 dark:bg-neutral-900">
-                    {fontName.replace('System: ', '')}
+                    {fontName}
                   </div>
                 </div>
               ))
