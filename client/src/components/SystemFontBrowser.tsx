@@ -33,6 +33,18 @@ export default function SystemFontBrowser({ onClose, onFontSelected, currentFont
           setLoadedFonts(systemFonts);
           setLoadComplete(true);
         } else {
+          // Trigger a font scan on the server if no fonts are found
+          try {
+            const response = await fetch('/api/fonts/scan', { method: 'POST' });
+            if (response.ok) {
+              console.log('Font scan triggered successfully');
+              // Wait a moment for the scan to complete
+              await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+          } catch (error) {
+            console.error('Error triggering font scan:', error);
+          }
+
           // Try to reload system fonts (force refresh from file)
           await googleFontsService.loadSystemFontsFromJson();
           const refreshedFonts = await googleFontsService.getFontsByCategory('system');

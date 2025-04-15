@@ -1,70 +1,85 @@
-import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+
+import express from 'express';
+import cors from 'cors';
+import { apiRouter } from './routes';
+import { createViteDevServer } from './vite';
+import path from 'path';
+import fs from 'fs';
+import { exec } from 'child_process';
 
 const app = express();
+const port = process.env.PORT || 5000;
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Middleware
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
-app.use((req, res, next) => {
-  const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
+// Scan fonts on server startup and ensure fonts.json exists
+const scanFonts = () => {
+  try {
+    console.log('Scanning fonts directory...');
+    const fontsDir = path.join(process.cwd(), 'fonts');
+    const fontsJsonPath = path.join(process.cwd(), 'public', 'fonts.json');
+    const fontsExists = fs.existsSync(fontsDir);
+    
+    if (!fontsExists) {
+      console.log('Creating fonts directory...');
+      fs.mkdirSync(fontsDir, { recursive: true });
     }
-  });
-
-  next();
-});
-
-(async () => {
-  const server = await registerRoutes(app);
-
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-    throw err;
-  });
-
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+    
+    console.log('Running font scan script...');
+    // Run the scan-fonts.js script to generate fonts.json
+    exec('node scan-fonts.js', (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error scanning fonts: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`Font scan stderr: ${stderr}`);
+      }
+      console.log(`Font scan stdout: ${stdout}`);
+      
+      // Also copy the fonts.json to public folder for client access
+      try {
+        const fontsJson = fs.readFileSync(path.join(process.cwd(), 'fonts.json'));
+        fs.writeFileSync(fontsJsonPath, fontsJson);
+        console.log('Copied fonts.json to public folder');
+      } catch (copyError) {
+        console.error('Error copying fonts.json to public folder:', copyError);
+      }
+    });
+  } catch (error) {
+    console.error('Error in scanFonts:', error);
   }
+};
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
+// Run font scan on startup
+scanFonts();
+
+// API Routes
+app.use('/api', apiRouter);
+
+// Serve static files from the public directory
+app.use(express.static('public'));
+
+// For development, set up Vite dev server
+if (!isProduction) {
+  createViteDevServer(app).then(() => {
+    console.log(`[express] serving on port ${port}`);
   });
-})();
+} else {
+  // For production, serve the built client
+  app.use(express.static(path.resolve(__dirname, '../client/dist')));
+  
+  // Serve index.html for all other routes for SPA client-side routing
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../client/dist/index.html'));
+  });
+  
+  app.listen(port, () => {
+    console.log(`[express] serving on port ${port}`);
+  });
+}
+
+export default app;

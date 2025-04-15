@@ -544,17 +544,48 @@ class GoogleFontsService {
     try {
       console.log('Loading system fonts from fonts.json...');
 
-      console.log('Attempting to load fonts.json');
-      // First check if fonts.json exists
-      const response = await fetch('/fonts.json', {
-        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
-        cache: 'no-store'
-      });
+      // First ensure the fonts directory exists and has been scanned
+      await this.ensureFontsScanned();
 
-      if (!response.ok) {
-        console.error(`Failed to load fonts.json: ${response.status} ${response.statusText}`);
+      console.log('Attempting to load fonts.json');
+      // Try to fetch fonts.json with retry mechanism
+      let response;
+      let retries = 3;
+      
+      while (retries > 0) {
+        try {
+          response = await fetch('/fonts.json', {
+            headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+            cache: 'no-store'
+          });
+          
+          if (response.ok) {
+            break; // Success, exit the retry loop
+          }
+          
+          console.warn(`Attempt to fetch fonts.json failed, retrying... (${retries} attempts left)`);
+          retries--;
+          
+          // Wait before retrying
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (fetchError) {
+          console.error('Error fetching fonts.json:', fetchError);
+          retries--;
+          
+          if (retries === 0) {
+            throw new Error('Failed to load fonts.json after multiple attempts');
+          }
+          
+          // Wait before retrying
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+      if (!response || !response.ok) {
+        console.error(`Failed to load fonts.json: ${response?.status} ${response?.statusText}`);
         throw new Error('No fonts.json file found');
       }
+      
       console.log('Successfully fetched fonts.json');
 
       // Parse the fonts.json file
@@ -644,6 +675,36 @@ class GoogleFontsService {
       console.error('Error loading system fonts:', error);
       // Ensure we have an empty array even if loading fails
       this.categories['system'] = [];
+    }
+  }
+  
+  // Helper method to make sure fonts have been scanned
+  private async ensureFontsScanned(): Promise<void> {
+    try {
+      // First try to fetch fonts.json to see if it exists
+      const checkResponse = await fetch('/fonts.json', { 
+        method: 'HEAD',
+        cache: 'no-store'
+      });
+      
+      if (!checkResponse.ok) {
+        console.log('fonts.json not found, requesting font scan...');
+        
+        // Request the server to scan fonts
+        const scanResponse = await fetch('/api/fonts/scan', {
+          method: 'POST'
+        });
+        
+        if (!scanResponse.ok) {
+          console.warn('Font scanning request failed, fonts might not be available');
+        } else {
+          console.log('Font scanning triggered successfully');
+          // Wait a moment for the scan to complete
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+      }
+    } catch (error) {
+      console.warn('Error checking for fonts.json:', error);
     }
   }
 }

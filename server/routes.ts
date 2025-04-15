@@ -6,25 +6,26 @@ import fetch from "node-fetch";
 import * as fs from "fs";
 import path from "path";
 import express from "express";
+import { exec } from 'child_process';
 
 
 export async function registerRoutes(app: express.Express): Promise<Server> {
   // Serve standalone font previewer
   app.get("/standalone-font-previewer", (req, res) => {
     const htmlPath = path.resolve(import.meta.dirname, "..", "index.html");
-    
+
     if (!fs.existsSync(htmlPath)) {
       console.error("Error: index.html not found at", htmlPath);
       return res.status(404).send("Font previewer not found");
     }
-    
+
     try {
       let html = fs.readFileSync(htmlPath, "utf-8");
-      
+
       // Set appropriate headers
       res.setHeader('Content-Type', 'text/html');
       res.setHeader('Cache-Control', 'no-cache');
-      
+
       // Serve the HTML
       res.send(html);
     } catch (error) {
@@ -35,7 +36,7 @@ export async function registerRoutes(app: express.Express): Promise<Server> {
 
   // Serve fonts
   app.use("/fonts", express.static(path.resolve(import.meta.dirname, "..", "fonts")));
-  
+
   // Serve fonts.json file
   app.get("/fonts.json", (req, res) => {
     const fontsJsonPath = path.resolve(import.meta.dirname, "..", "public", "fonts.json");
@@ -627,6 +628,51 @@ export async function registerRoutes(app: express.Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching Google Fonts:', error);
       res.status(500).json({ message: "Failed to fetch Google Fonts" });
+    }
+  });
+
+  // Add endpoint to trigger font scanning
+  app.post('/fonts/scan', async (req, res) => {
+    try {
+      console.log('Manually triggered font scan');
+
+      // Run the scan-fonts.js script
+      exec('node scan-fonts.js', (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Error scanning fonts: ${error.message}`);
+          return res.status(500).json({ error: error.message });
+        }
+
+        console.log(`Font scan output: ${stdout}`);
+
+        if (stderr) {
+          console.warn(`Font scan warnings: ${stderr}`);
+        }
+
+        // Ensure the public directory exists
+        const publicDir = path.join(process.cwd(), 'public');
+        if (!fs.existsSync(publicDir)) {
+          fs.mkdirSync(publicDir, { recursive: true });
+        }
+
+        // Copy fonts.json to public directory for client access
+        try {
+          const fontsJsonPath = path.join(process.cwd(), 'fonts.json');
+          const publicFontsJsonPath = path.join(publicDir, 'fonts.json');
+
+          if (fs.existsSync(fontsJsonPath)) {
+            fs.copyFileSync(fontsJsonPath, publicFontsJsonPath);
+            console.log('Copied fonts.json to public directory');
+          }
+        } catch (copyError) {
+          console.error('Error copying fonts.json:', copyError);
+        }
+
+        return res.json({ success: true, message: 'Fonts scanned successfully' });
+      });
+    } catch (error) {
+      console.error('Error in font scan endpoint:', error);
+      return res.status(500).json({ error: 'Failed to scan fonts' });
     }
   });
 

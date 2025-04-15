@@ -1,15 +1,12 @@
-// scan-fonts.js - ES Module version
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 
-// Get current directory (ES Module equivalent of __dirname)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// scan-fonts.js - Works both as CommonJS and as direct node script
+const fs = require('fs');
+const path = require('path');
 
 // Configuration
-const FONTS_FOLDER = path.join(__dirname, "fonts");
-const OUTPUT_FILE = path.join(__dirname, "fonts.json");
+const FONTS_FOLDER = path.join(process.cwd(), "fonts");
+const OUTPUT_FILE = path.join(process.cwd(), "fonts.json");
+const PUBLIC_OUTPUT_FILE = path.join(process.cwd(), "public", "fonts.json");
 const FONT_EXTENSIONS = [".ttf", ".otf", ".woff", ".woff2"];
 
 // Function to scan the fonts folder
@@ -19,6 +16,7 @@ function scanFontsFolder() {
   // Check if the fonts folder exists
   if (!fs.existsSync(FONTS_FOLDER)) {
     console.error(`Fonts folder not found: ${FONTS_FOLDER}`);
+    fs.mkdirSync(FONTS_FOLDER, { recursive: true });
     return [];
   }
 
@@ -57,25 +55,24 @@ function scanFontsFolder() {
   }
 }
 
-// Main function
-function main() {
-  // Scan the fonts folder
-  const fontFiles = scanFontsFolder();
-
-  if (fontFiles.length === 0) {
-    console.warn(
-      "No font files found. Make sure your fonts are in the correct folder.",
-    );
-    return;
-  }
-
-  // Write the font list to a JSON file
-  try {
-    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(fontFiles, null, 2));
-    console.log(`Wrote ${fontFiles.length} font files to ${OUTPUT_FILE}`);
-  } catch (error) {
-    console.error(`Error writing font list to file: ${error.message}`);
-  }
+// Function to create fonts-metadata.json with display names
+function createFontMetadata(fontFiles) {
+  const metadata = fontFiles.map(fontPath => {
+    const fileName = path.basename(fontPath);
+    const ext = path.extname(fileName).toLowerCase();
+    let displayName = fileName.replace(ext, '')
+      .replace(/([A-Z])/g, ' $1') // Add spaces before capital letters
+      .replace(/([_-])/g, ' ') // Replace underscores and hyphens with spaces
+      .trim();
+    
+    return {
+      path: fontPath,
+      name: displayName,
+      format: getFormatFromExtension(ext.substring(1)) // Remove the dot
+    };
+  });
+  
+  return metadata;
 }
 
 // Helper function to get font format based on file extension
@@ -94,12 +91,51 @@ function getFormatFromExtension(ext) {
   }
 }
 
-// Run the main function
-main();
+// Main function
+function main() {
+  // Scan the fonts folder
+  const fontFiles = scanFontsFolder();
 
-console.log("Done. To use this output in your Replit project:");
-console.log("1. Make sure your fonts.json file is accessible at /fonts.json");
-console.log("2. Include the HTML/CSS/JS code from the Font Previewer artifact");
-console.log(
-  "3. Your fonts should now appear in a grid layout similar to Fontcloud",
-);
+  if (fontFiles.length === 0) {
+    console.warn(
+      "No font files found. Make sure your fonts are in the correct folder."
+    );
+  }
+
+  // Create public directory if it doesn't exist
+  const publicDir = path.dirname(PUBLIC_OUTPUT_FILE);
+  if (!fs.existsSync(publicDir)) {
+    fs.mkdirSync(publicDir, { recursive: true });
+  }
+
+  // Write the font list to a JSON file
+  try {
+    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(fontFiles, null, 2));
+    console.log(`Wrote ${fontFiles.length} font files to ${OUTPUT_FILE}`);
+    
+    // Also copy to public folder
+    fs.writeFileSync(PUBLIC_OUTPUT_FILE, JSON.stringify(fontFiles, null, 2));
+    console.log(`Also copied to ${PUBLIC_OUTPUT_FILE}`);
+    
+    // Generate and save metadata
+    const metadata = createFontMetadata(fontFiles);
+    fs.writeFileSync(
+      path.join(process.cwd(), "public", "fonts-metadata.json"),
+      JSON.stringify(metadata, null, 2)
+    );
+    console.log(`Created fonts-metadata.json with ${metadata.length} entries`);
+  } catch (error) {
+    console.error(`Error writing font list to file: ${error.message}`);
+  }
+  
+  return fontFiles;
+}
+
+// Run the main function if this file is being executed directly
+if (require.main === module) {
+  main();
+  console.log("Done. Your fonts should now be available in the application.");
+}
+
+// Export for use as a module
+module.exports = { scanFontsFolder, main };

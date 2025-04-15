@@ -126,7 +126,7 @@ export async function fetchGoogleFonts(sort = 'popularity'): Promise<{
 // Keep track of loaded fonts to avoid reloading
 const loadedFontsCache = new Set<string>();
 
-// Load a batch of fonts
+// Load a batch of fonts with retry
 export function loadFontBatch(fontFamilies: string[]): Promise<void> {
   // Filter out already loaded fonts
   const fontsToLoad = fontFamilies.filter(font => !loadedFontsCache.has(font));
@@ -136,7 +136,22 @@ export function loadFontBatch(fontFamilies: string[]): Promise<void> {
     return Promise.resolve();
   }
   
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
+    // Add font preload links to document head first
+    fontsToLoad.forEach(fontFamily => {
+      try {
+        // Sanitize the font name for the URL
+        const encodedFont = fontFamily.replace(/ /g, '+');
+        const link = document.createElement('link');
+        link.href = `https://fonts.googleapis.com/css2?family=${encodedFont}:wght@400;700&display=swap`;
+        link.rel = 'stylesheet';
+        document.head.appendChild(link);
+      } catch (err) {
+        console.warn(`Error preloading font ${fontFamily}:`, err);
+      }
+    });
+    
+    // Then use WebFont loader
     WebFont.load({
       google: {
         families: fontsToLoad,
@@ -156,7 +171,7 @@ export function loadFontBatch(fontFamilies: string[]): Promise<void> {
         fontsToLoad.forEach(font => loadedFontsCache.add(font));
         resolve(); // Resolve instead of reject to avoid blocking UI
       },
-      timeout: 3000 // Reduced timeout for better user experience
+      timeout: 5000 // Increased timeout for better reliability
     });
   });
 }

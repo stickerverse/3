@@ -6,8 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" href="/fonts.json" as="fetch" crossorigin="anonymous" />
     <meta name="description" content="Vinyl Font Designer Application" />
-    <!-- Add font display swap to improve perceived performance -->
+    <!-- Default fonts to ensure something is displayed while custom fonts load -->
     <style>
       @font-face {
         font-family: 'system-ui';
@@ -15,7 +16,24 @@
         font-weight: 400;
         font-display: swap;
       }
+      
+      /* Pre-load some common Google fonts to improve initial loading */
+      @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&display=swap');
     </style>
+    <!-- Script to attempt early font scanning -->
+    <script>
+      // Try to fetch fonts.json, if it fails trigger a scan
+      fetch('/fonts.json')
+        .then(response => {
+          if (!response.ok) {
+            console.log('Triggering font scan on page load');
+            return fetch('/api/fonts/scan', { method: 'POST' });
+          }
+        })
+        .catch(error => {
+          console.warn('Error checking fonts.json:', error);
+        });
+    </script>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
