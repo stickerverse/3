@@ -1,0 +1,1293 @@
+import React, { useState, useEffect, useRef } from "react";
+import { SketchPicker } from "react-color";
+import WebFont from "webfontloader";
+import { fabric } from "fabric";
+import "./App.css";
+
+// Load Google Fonts - expanded collection
+WebFont.load({
+  google: {
+    families: [
+      // Display fonts
+      "Anton",
+      "Bebas Neue",
+      "Lobster",
+      "Pacifico",
+      "Orbitron",
+      "Rubik Mono One",
+      "Satisfy",
+      "Playfair Display",
+      "Permanent Marker",
+      "Abril Fatface",
+      "Bangers",
+      "Fredoka One",
+      "Bungee",
+      "Righteous",
+      "Monoton",
+      "Special Elite",
+      "Gruppo",
+      "Racing Sans One",
+      "Rock Salt",
+      "Black Ops One",
+      
+      // Sans-serif fonts
+      "Montserrat",
+      "Oswald",
+      "Roboto",
+      "Lato",
+      "Open Sans",
+      "Source Sans Pro",
+      "Poppins",
+      "Raleway",
+      "Nunito",
+      "Work Sans",
+      
+      // Serif fonts
+      "Merriweather",
+      "Roboto Slab",
+      "Crimson Text",
+      "Libre Baskerville",
+      "Cormorant Garamond"
+    ]
+  }
+});
+
+export default function App() {
+  // State management
+  const [canvas, setCanvas] = useState(null);
+  const [color, setColor] = useState("#e74c3c");
+  const [text, setText] = useState("Your Text Here");
+  const [font, setFont] = useState("Anton");
+  const [fontSize, setFontSize] = useState(40);
+  const [selectedObj, setSelectedObj] = useState(null);
+  const [opacity, setOpacity] = useState(100);
+  const [zoom, setZoom] = useState(100);
+  const [view, setView] = useState("Front");
+  const [theme, setTheme] = useState("Light");
+  const [uiMode, setUiMode] = useState("Advanced UI");
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [strokeColor, setStrokeColor] = useState("#000000");
+  const [strokeWidth, setStrokeWidth] = useState(0);
+  const [textEffect, setTextEffect] = useState("none");
+  const [showFontPanel, setShowFontPanel] = useState(false);
+  const [appliedEffects, setAppliedEffects] = useState([]);
+  const [undoStack, setUndoStack] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
+  const [editHistory, setEditHistory] = useState([]);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [showToolTips, setShowToolTips] = useState(true);
+  const [savedDesigns, setSavedDesigns] = useState([]);
+  const [currentDesignName, setCurrentDesignName] = useState("Untitled Design");
+  const [showLayersPanel, setShowLayersPanel] = useState(false);
+  const [layers, setLayers] = useState([]);
+  const [clipboard, setClipboard] = useState(null);
+  
+  // Expanded color palette with trendy colors
+  const colorPalette = [
+    // Reds & Pinks
+    "#e74c3c", "#e84393", "#ff6b6b", "#ff9ff3", "#fd79a8", 
+    // Purples & Blues
+    "#9b59b6", "#6c5ce7", "#8c7ae6", "#3498db", "#0abde3", 
+    // Teals & Greens
+    "#4e9ff5", "#55c8f9", "#0CD7E4", "#81ECEC", "#00D572", 
+    // Yellows & Oranges
+    "#ADFF2F", "#FFFF00", "#F1C40F", "#FDA22A", "#FF8833",
+    // Neutrals
+    "#F97432", "#000000", "#7F8C8D", "#FFFFFF", "#2d3436"
+  ];
+  
+  // Text effects options
+  const textEffects = {
+    none: { name: "None", icon: "✓" },
+    shadow: { name: "Shadow", icon: "🌑" },
+    outline: { name: "Outline", icon: "◯" },
+    glow: { name: "Glow", icon: "✨" },
+    gradient: { name: "Gradient", icon: "🌈" },
+    distressed: { name: "Distressed", icon: "💢" },
+    retro: { name: "Retro", icon: "📺" },
+    metallic: { name: "Metallic", icon: "⚙️" }
+  };
+
+  // Font categories for improved font selection
+  const fontCategories = {
+    display: ["Anton", "Bebas Neue", "Abril Fatface", "Bangers", "Black Ops One"],
+    handwritten: ["Pacifico", "Satisfy", "Permanent Marker", "Rock Salt"],
+    serif: ["Playfair Display", "Merriweather", "Roboto Slab", "Crimson Text", "Libre Baskerville"],
+    sansSerif: ["Montserrat", "Oswald", "Roboto", "Lato", "Open Sans", "Poppins"],
+    monospace: ["Roboto Mono", "Source Code Pro", "Space Mono"],
+    decorative: ["Orbitron", "Rubik Mono One", "Monoton", "Special Elite", "Bungee"]
+  };
+
+  // Pre-made templates for quick starting points
+  const designTemplates = [
+    { name: "Car Decal", font: "Anton", fontSize: 60, color: "#FFFFFF", effect: "outline", strokeWidth: 2 },
+    { name: "Business Name", font: "Montserrat", fontSize: 45, color: "#2d3436", effect: "none", strokeWidth: 0 },
+    { name: "Laptop Sticker", font: "Permanent Marker", fontSize: 36, color: "#6c5ce7", effect: "none", strokeWidth: 0 },
+    { name: "Window Sign", font: "Bebas Neue", fontSize: 72, color: "#e74c3c", effect: "shadow", strokeWidth: 0 },
+    { name: "Sports Jersey", font: "Black Ops One", fontSize: 54, color: "#f1c40f", effect: "outline", strokeWidth: 3 }
+  ];
+
+  const canvasRef = useRef(null);
+
+  // Initialize canvas with advanced options
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    
+    const c = new fabric.Canvas("vinylCanvas", {
+      height: 400,
+      width: 600,
+      backgroundColor: "#fff",
+      preserveObjectStacking: true,
+      stopContextMenu: true,
+      fireRightClick: true,
+      selection: true
+    });
+
+    // Set up snap grid for better alignment
+    if (c.setGridOptions) {
+      c.setGridOptions({
+        size: 20,
+        enabled: true,
+        lineWidth: 1,
+        lineColor: '#ebebeb',
+        snapTo: true
+      });
+    }
+
+    // Register all selection events
+    c.on("selection:created", handleSelection);
+    c.on("selection:updated", handleSelection);
+    c.on("selection:cleared", () => setSelectedObj(null));
+    
+    // Register object modification events for undo/redo
+    c.on("object:modified", saveToHistory);
+    c.on("object:added", saveToHistory);
+    c.on("object:removed", saveToHistory);
+    
+    // Enable keyboard shortcuts
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'z') {
+          e.preventDefault();
+          undo();
+        } else if (e.key === 'y') {
+          e.preventDefault();
+          redo();
+        } else if (e.key === 'c') {
+          e.preventDefault();
+          copySelectedObject();
+        } else if (e.key === 'v') {
+          e.preventDefault();
+          pasteObject();
+        }
+      } else if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (document.activeElement.tagName !== 'INPUT' && 
+            document.activeElement.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          deleteSelectedObject();
+        }
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyDown);
+    
+    // Initialize with a welcome text
+    const welcomeText = new fabric.Text('Create Your Vinyl Design', {
+      left: 300,
+      top: 200,
+      fontFamily: 'Bebas Neue',
+      fontSize: 36,
+      fill: '#3498db',
+      originX: 'center',
+      originY: 'center',
+      textAlign: 'center'
+    });
+    
+    c.add(welcomeText);
+    c.centerObject(welcomeText);
+    c.renderAll();
+    
+    // Animate welcome text to fade in
+    welcomeText.set({ opacity: 0 });
+    (function fadeIn() {
+      welcomeText.set('opacity', welcomeText.opacity + 0.05);
+      c.renderAll();
+      if (welcomeText.opacity < 1) {
+        requestAnimationFrame(fadeIn);
+      }
+    })();
+    
+    // Set the initial canvas
+    setCanvas(c);
+    
+    // Update layers when canvas is initialized
+    updateLayers(c);
+    
+    // Clean up function when component unmounts
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      c.dispose();
+    };
+  }, []);
+
+  // Save state to history for undo/redo
+  const saveToHistory = () => {
+    if (!canvas) return;
+    
+    // Save current canvas state
+    const jsonState = JSON.stringify(canvas.toJSON(['id']));
+    setEditHistory(prev => [...prev, jsonState]);
+    
+    // Clear redo stack when a new action is performed
+    setRedoStack([]);
+    
+    // Update layers
+    updateLayers(canvas);
+  };
+  
+  // Update layers panel with current objects
+  const updateLayers = (canvasInstance) => {
+    if (!canvasInstance) return;
+    
+    const objects = canvasInstance.getObjects();
+    const layersData = objects.map((obj, index) => {
+      return {
+        id: obj.id || `layer-${index}`,
+        name: obj.name || (obj.type === 'text' ? `Text: ${obj.text.substring(0, 10)}...` : `${obj.type}-${index}`),
+        type: obj.type,
+        visible: obj.visible !== false,
+        locked: obj.selectable === false,
+        obj
+      };
+    }).reverse(); // Reverse to match visual stacking order
+    
+    setLayers(layersData);
+  };
+
+  // Handle object selection with extended properties
+  const handleSelection = (e) => {
+    const obj = e.selected[0];
+    if (obj && obj.type === "text") {
+      setSelectedObj(obj);
+      setText(obj.text);
+      setFont(obj.fontFamily);
+      setFontSize(obj.fontSize || 40);
+      setColor(obj.fill);
+      setOpacity(obj.opacity * 100);
+      setStrokeColor(obj.stroke || "#000000");
+      setStrokeWidth(obj.strokeWidth || 0);
+      
+      // Detect applied effects
+      const effects = [];
+      if (obj.shadow) effects.push("shadow");
+      if (obj.strokeWidth > 0) effects.push("outline");
+      if (obj.fill && typeof obj.fill === 'object') effects.push("gradient");
+      setAppliedEffects(effects);
+      
+      // Set text effect based on detected effects
+      if (effects.length > 0) {
+        setTextEffect(effects[0]);
+      } else {
+        setTextEffect("none");
+      }
+    } else if (obj) {
+      setSelectedObj(obj);
+      setColor(obj.fill);
+      setOpacity(obj.opacity * 100);
+      setStrokeColor(obj.stroke || "#000000");
+      setStrokeWidth(obj.strokeWidth || 0);
+    } else {
+      setSelectedObj(null);
+    }
+  };
+
+  // Add text to canvas with animation
+  const addText = () => {
+    if (!canvas) return;
+
+    // Create unique ID for the object
+    const id = `text-${Date.now()}`;
+
+    const textObj = new fabric.Text(text, {
+      id,
+      name: `Text: ${text.substring(0, 10)}...`,
+      fill: color,
+      fontFamily: font,
+      left: canvas.width / 2,
+      top: canvas.height / 2,
+      fontSize,
+      opacity: 0, // Start with opacity 0 for animation
+      originX: 'center',
+      originY: 'center',
+      stroke: strokeWidth > 0 ? strokeColor : undefined,
+      strokeWidth: strokeWidth
+    });
+
+    // Apply text effects if selected
+    applyTextEffect(textObj, textEffect);
+
+    canvas.add(textObj);
+    canvas.setActiveObject(textObj);
+    
+    // Animated entrance
+    (function fadeIn() {
+      textObj.set('opacity', textObj.opacity + 0.1);
+      canvas.renderAll();
+      if (textObj.opacity < opacity / 100) {
+        requestAnimationFrame(fadeIn);
+      } else {
+        textObj.set('opacity', opacity / 100);
+        canvas.renderAll();
+        saveToHistory();
+      }
+    })();
+    
+    setSelectedObj(textObj);
+  };
+  
+  // Apply text effect to object
+  const applyTextEffect = (obj, effectName) => {
+    if (!obj || obj.type !== 'text') return;
+    
+    // Reset previous effects
+    obj.set({
+      shadow: null
+    });
+    
+    // Apply selected effect
+    switch(effectName) {
+      case 'shadow':
+        obj.set({
+          shadow: new fabric.Shadow({
+            color: 'rgba(0,0,0,0.3)',
+            blur: 10,
+            offsetX: 5,
+            offsetY: 5
+          })
+        });
+        break;
+        
+      case 'glow':
+        obj.set({
+          shadow: new fabric.Shadow({
+            color: 'rgba(100,200,255,0.7)',
+            blur: 15,
+            offsetX: 0,
+            offsetY: 0
+          })
+        });
+        break;
+        
+      case 'gradient':
+        // This is a simplified version since fabric.js gradient is more complex
+        const gradient = new fabric.Gradient({
+          type: 'linear',
+          coords: {
+            x1: 0,
+            y1: 0,
+            x2: obj.width,
+            y2: obj.height
+          },
+          colorStops: [
+            { offset: 0, color: color },
+            { offset: 1, color: tintColor(color, 0.7) }
+          ]
+        });
+        obj.set({ fill: gradient });
+        break;
+        
+      case 'retro':
+        obj.set({
+          stroke: '#000',
+          strokeWidth: 1,
+          shadow: new fabric.Shadow({
+            color: 'rgba(255,200,100,0.5)',
+            blur: 15,
+            offsetX: 3,
+            offsetY: 3
+          })
+        });
+        break;
+        
+      case 'metallic':
+        // Simplified metallic effect
+        obj.set({
+          fill: '#A5A5A5',
+          stroke: '#333',
+          strokeWidth: 1,
+          shadow: new fabric.Shadow({
+            color: 'rgba(255,255,255,0.5)',
+            blur: 3,
+            offsetX: -1,
+            offsetY: -1
+          })
+        });
+        break;
+        
+      default:
+        // No effect or reset
+        break;
+    }
+  };
+  
+  // Helper function to tint a color
+  const tintColor = (hex, factor) => {
+    if (!hex) return "#FFFFFF";
+    
+    // Convert hex to RGB
+    let r = parseInt(hex.substring(1, 3), 16);
+    let g = parseInt(hex.substring(3, 5), 16);
+    let b = parseInt(hex.substring(5, 7), 16);
+    
+    // Tint
+    r = Math.min(255, r + (255 - r) * factor);
+    g = Math.min(255, g + (255 - g) * factor);
+    b = Math.min(255, b + (255 - b) * factor);
+    
+    // Convert back to hex
+    return `#${Math.round(r).toString(16).padStart(2, '0')}${Math.round(g).toString(16).padStart(2, '0')}${Math.round(b).toString(16).padStart(2, '0')}`;
+  };
+
+  // Update selected object with all properties
+  const updateSelectedObject = () => {
+    if (!selectedObj) return;
+    
+    // Start transformation animation
+    let progress = 0;
+    const animate = () => {
+      progress += 0.1;
+      
+      if (progress <= 1) {
+        // Get intermediate values
+        const currentScale = selectedObj.scaleX + (1 - selectedObj.scaleX) * progress;
+        
+        // Apply intermediate transform
+        selectedObj.set({
+          scaleX: currentScale,
+          scaleY: currentScale
+        });
+        
+        canvas.renderAll();
+        requestAnimationFrame(animate);
+      } else {
+        // Final update with all properties
+        if (selectedObj.type === "text") {
+          selectedObj.set({
+            text,
+            fontFamily: font,
+            fontSize,
+            fill: color,
+            opacity: opacity / 100,
+            stroke: strokeWidth > 0 ? strokeColor : undefined,
+            strokeWidth,
+            scaleX: 1,
+            scaleY: 1
+          });
+          
+          // Apply text effect
+          applyTextEffect(selectedObj, textEffect);
+        } else {
+          selectedObj.set({
+            fill: color,
+            opacity: opacity / 100,
+            stroke: strokeWidth > 0 ? strokeColor : undefined,
+            strokeWidth,
+            scaleX: 1,
+            scaleY: 1
+          });
+        }
+        
+        canvas.renderAll();
+        saveToHistory();
+      }
+    };
+    
+    // Start animation
+    animate();
+  };
+
+  // Copy/paste functionality
+  const copySelectedObject = () => {
+    if (!canvas || !selectedObj) return;
+    
+    selectedObj.clone(cloned => {
+      setClipboard(cloned);
+    });
+    
+    // Visual feedback for copy
+    const origOpacity = selectedObj.opacity;
+    selectedObj.set({ opacity: origOpacity * 0.5 });
+    canvas.renderAll();
+    
+    setTimeout(() => {
+      selectedObj.set({ opacity: origOpacity });
+      canvas.renderAll();
+    }, 150);
+  };
+  
+  const pasteObject = () => {
+    if (!canvas || !clipboard) return;
+    
+    clipboard.clone(clonedObj => {
+      // Position slightly offset from original
+      clonedObj.set({
+        left: clonedObj.left + 20,
+        top: clonedObj.top + 20,
+        id: `${clonedObj.type}-${Date.now()}`,
+        name: clonedObj.name ? `Copy of ${clonedObj.name}` : `Copy-${Date.now()}`
+      });
+      
+      // Initialize with 0 opacity for fade-in effect
+      clonedObj.set({ opacity: 0 });
+      
+      canvas.add(clonedObj);
+      canvas.setActiveObject(clonedObj);
+      
+      // Animate the pasted object
+      (function fadeIn() {
+        clonedObj.set('opacity', clonedObj.opacity + 0.1);
+        canvas.renderAll();
+        if (clonedObj.opacity < opacity / 100) {
+          requestAnimationFrame(fadeIn);
+        } else {
+          clonedObj.set('opacity', opacity / 100);
+          canvas.renderAll();
+          saveToHistory();
+        }
+      })();
+      
+      setSelectedObj(clonedObj);
+    });
+  };
+  
+  // Undo/redo implementation
+  const undo = () => {
+    if (editHistory.length <= 1) return;
+    
+    // Move current state to redo stack
+    const currentState = editHistory.pop();
+    setRedoStack(prev => [...prev, currentState]);
+    
+    // Get the previous state
+    const previousState = editHistory[editHistory.length - 1];
+    
+    // Apply previous state to canvas
+    canvas.loadFromJSON(previousState, () => {
+      canvas.renderAll();
+      updateLayers(canvas);
+      setSelectedObj(null);
+    });
+    
+    setEditHistory([...editHistory]);
+  };
+  
+  const redo = () => {
+    if (redoStack.length === 0) return;
+    
+    // Get next state from redo stack
+    const nextState = redoStack.pop();
+    
+    // Add to history
+    setEditHistory(prev => [...prev, nextState]);
+    
+    // Apply state to canvas
+    canvas.loadFromJSON(nextState, () => {
+      canvas.renderAll();
+      updateLayers(canvas);
+      setSelectedObj(null);
+    });
+    
+    setRedoStack([...redoStack]);
+  };
+  
+  // Set color from palette with animation
+  const selectColorFromPalette = (newColor) => {
+    setColor(newColor);
+    if (selectedObj) {
+      // Create color transition animation
+      const origColor = selectedObj.fill;
+      
+      // Simple animation for color transition
+      let progress = 0;
+      const colorTransition = () => {
+        progress += 0.1;
+        
+        if (progress < 1) {
+          // Simple interpolation (not actually color blending in this simple example)
+          selectedObj.set({ fill: progress > 0.5 ? newColor : origColor });
+          canvas.renderAll();
+          requestAnimationFrame(colorTransition);
+        } else {
+          selectedObj.set({ fill: newColor });
+          canvas.renderAll();
+          saveToHistory();
+        }
+      };
+      
+      requestAnimationFrame(colorTransition);
+    }
+  };
+
+  // Handle opacity change with visual feedback
+  const handleOpacityChange = (e) => {
+    const newOpacity = Number(e.target.value);
+    setOpacity(newOpacity);
+    
+    if (selectedObj) {
+      selectedObj.set({ opacity: newOpacity / 100 });
+      canvas.renderAll();
+      // We don't save to history here to avoid too many states
+      // saveToHistory will be called when the slider is released
+    }
+  };
+
+  // Zoom control with animation
+  const handleZoomChange = (newZoom) => {
+    const origZoom = zoom;
+    setZoom(newZoom);
+    
+    // Animate zoom change
+    let progress = 0;
+    const zoomAnimation = () => {
+      progress += 0.1;
+      
+      if (progress < 1) {
+        const currentZoom = origZoom + (newZoom - origZoom) * progress;
+        canvas.setZoom(currentZoom / 100);
+        canvas.renderAll();
+        requestAnimationFrame(zoomAnimation);
+      } else {
+        canvas.setZoom(newZoom / 100);
+        canvas.renderAll();
+      }
+    };
+    
+    requestAnimationFrame(zoomAnimation);
+  };
+
+  // Delete selected object with animation
+  const deleteSelectedObject = () => {
+    if (!selectedObj || !canvas) return;
+    
+    // Animate object deletion with a shrink effect
+    let scale = 1;
+    const deleteAnimation = () => {
+      scale -= 0.1;
+      
+      if (scale > 0) {
+        selectedObj.set({
+          scaleX: scale,
+          scaleY: scale,
+          opacity: scale
+        });
+        canvas.renderAll();
+        requestAnimationFrame(deleteAnimation);
+      } else {
+        canvas.remove(selectedObj);
+        canvas.renderAll();
+        setSelectedObj(null);
+        saveToHistory();
+      }
+    };
+    
+    requestAnimationFrame(deleteAnimation);
+  };
+
+  // Add shape (rectangle) with animation
+  const addRectangle = () => {
+    if (!canvas) return;
+    
+    const id = `rect-${Date.now()}`;
+    const rect = new fabric.Rect({
+      id,
+      name: `Rectangle`,
+      width: 100,
+      height: 100,
+      left: canvas.width / 2,
+      top: canvas.height / 2,
+      fill: color,
+      opacity: 0,
+      originX: 'center',
+      originY: 'center',
+      stroke: strokeWidth > 0 ? strokeColor : undefined,
+      strokeWidth
+    });
+    
+    canvas.add(rect);
+    canvas.setActiveObject(rect);
+    
+    // Animated entrance with scale and fade
+    rect.set({ scaleX: 0.1, scaleY: 0.1 });
+    
+    (function growIn() {
+      rect.set({
+        opacity: rect.opacity + 0.1,
+        scaleX: rect.scaleX + (1 - rect.scaleX) * 0.3,
+        scaleY: rect.scaleY + (1 - rect.scaleY) * 0.3
+      });
+      
+      canvas.renderAll();
+      
+      if (rect.opacity < opacity / 100 || rect.scaleX < 0.95) {
+        requestAnimationFrame(growIn);
+      } else {
+        rect.set({
+          opacity: opacity / 100,
+          scaleX: 1,
+          scaleY: 1
+        });
+        canvas.renderAll();
+        saveToHistory();
+      }
+    })();
+    
+    setSelectedObj(rect);
+  };
+
+  // Add shape (circle) with animation
+  const addCircle = () => {
+    if (!canvas) return;
+    
+    const id = `circle-${Date.now()}`;
+    const circle = new fabric.Circle({
+      id,
+      name: `Circle`,
+      radius: 50,
+      left: canvas.width / 2,
+      top: canvas.height / 2,
+      fill: color,
+      opacity: 0,
+      originX: 'center',
+      originY: 'center',
+      stroke: strokeWidth > 0 ? strokeColor : undefined,
+      strokeWidth
+    });
+    
+    canvas.add(circle);
+    canvas.setActiveObject(circle);
+    
+    // Animated entrance with scale and fade
+    circle.set({ scaleX: 0.1, scaleY: 0.1 });
+    
+    (function growIn() {
+      circle.set({
+        opacity: circle.opacity + 0.1,
+        scaleX: circle.scaleX + (1 - circle.scaleX) * 0.3,
+        scaleY: circle.scaleY + (1 - circle.scaleY) * 0.3
+      });
+      
+      canvas.renderAll();
+      
+      if (circle.opacity < opacity / 100 || circle.scaleX < 0.95) {
+        requestAnimationFrame(growIn);
+      } else {
+        circle.set({
+          opacity: opacity / 100,
+          scaleX: 1,
+          scaleY: 1
+        });
+        canvas.renderAll();
+        saveToHistory();
+      }
+    })();
+    
+    setSelectedObj(circle);
+  };
+
+  // Add shape (triangle) with animation
+  const addTriangle = () => {
+    if (!canvas) return;
+    
+    const id = `triangle-${Date.now()}`;
+    const triangle = new fabric.Triangle({
+      id,
+      name: `Triangle`,
+      width: 100,
+      height: 100,
+      left: canvas.width / 2,
+      top: canvas.height / 2,
+      fill: color,
+      opacity: 0,
+      originX: 'center',
+      originY: 'center',
+      stroke: strokeWidth > 0 ? strokeColor : undefined,
+      strokeWidth
+    });
+    
+    canvas.add(triangle);
+    canvas.setActiveObject(triangle);
+    
+    // Animated entrance with rotation and fade
+    triangle.set({ scaleX: 0.1, scaleY: 0.1, angle: -45 });
+    
+    (function growIn() {
+      triangle.set({
+        opacity: triangle.opacity + 0.1,
+        scaleX: triangle.scaleX + (1 - triangle.scaleX) * 0.3,
+        scaleY: triangle.scaleY + (1 - triangle.scaleY) * 0.3,
+        angle: triangle.angle + 45 * 0.3
+      });
+      
+      canvas.renderAll();
+      
+      if (triangle.opacity < opacity / 100 || triangle.scaleX < 0.95) {
+        requestAnimationFrame(growIn);
+      } else {
+        triangle.set({
+          opacity: opacity / 100,
+          scaleX: 1,
+          scaleY: 1,
+          angle: 0
+        });
+        canvas.renderAll();
+        saveToHistory();
+      }
+    })();
+    
+    setSelectedObj(triangle);
+  };
+
+  // Add a sticker or icon
+  const addSticker = (stickerType) => {
+    if (!canvas) return;
+    
+    // Dictionary of SVG paths for various stickers
+    const stickerPaths = {
+      heart: 'M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.9-207.9z',
+      star: 'M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z',
+      music: 'M470.38 1.51L150.41 96A32 32 0 0 0 128 126.51v261.41A139 139 0 0 0 96 384c-53 0-96 28.66-96 64s43 64 96 64 96-28.66 96-64V214.32l256-75v184.61a138.4 138.4 0 0 0-32-3.93c-53 0-96 28.66-96 64s43 64 96 64 96-28.65 96-64V32a32 32 0 0 0-41.62-30.49z',
+      car: 'M499.99 176h-59.87l-16.64-41.6C406.38 91.63 365.57 64 319.5 64h-127c-46.06 0-86.88 27.63-103.99 70.4L71.87 176H12.01C4.2 176-1.53 183.34.37 190.91l6 24C7.7 220.25 12.5 224 18.01 224h20.07C24.65 235.73 16 252.78 16 272v48c0 16.12 6.16 30.67 16 41.93V416c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32v-32h256v32c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32v-54.07c9.84-11.25 16-25.8 16-41.93v-48c0-19.22-8.65-36.27-22.07-48H494c5.51 0 10.31-3.75 11.64-9.09l6-24c1.89-7.57-3.84-14.91-11.65-14.91zm-352.06-17.83c7.29-18.22 24.94-30.17 44.57-30.17h127c19.63 0 37.28 11.95 44.57 30.17L384 208H128l19.93-49.83zM96 319.8c-19.2 0-32-12.76-32-31.9S76.8 256 96 256s48 28.71 48 47.85-28.8 15.95-48 15.95zm320 0c-19.2 0-48 3.19-48-15.95S396.8 256 416 256s32 12.76 32 31.9-12.8 31.9-32 31.9z',
+      paw: 'M256 224c-79.41 0-192 122.76-192 200.25 0 34.9 26.81 55.75 71.74 55.75 48.84 0 81.09-25.08 120.26-25.08 39.51 0 71.85 25.08 120.26 25.08 44.93 0 71.74-20.85 71.74-55.75C448 346.76 335.41 224 256 224zm-147.28-12.61c-10.4-34.65-42.44-57.09-71.56-50.13-29.12 6.96-44.29 40.69-33.89 75.34 10.4 34.65 42.44 57.09 71.56 50.13 29.12-6.96 44.29-40.69 33.89-75.34zm84.72-20.78c30.94-8.14 46.42-49.94 34.58-93.36s-46.52-72.01-77.46-63.87-46.42 49.94-34.58 93.36c11.84 43.42 46.53 72.02 77.46 63.87zm281.39-29.34c-29.12-6.96-61.15 15.48-71.56 50.13-10.4 34.65 4.77 68.38 33.89 75.34 29.12 6.96 61.15-15.48 71.56-50.13 10.4-34.65-4.77-68.38-33.89-75.34zm-156.27 29.34c30.94 8.14 65.62-20.45 77.46-63.87 11.84-43.42-3.64-85.21-34.58-93.36s-65.62 20.45-77.46 63.87c-11.84 43.42 3.64 85.22 34.58 93.36z',
+      rainbow: 'M248 8C111.03 8 0 119.03 0 256s111.03 248 248 248 248-111.03 248-248S384.97 8 248 8zm0 448c-110.28 0-200-89.72-200-200S137.72 56 248 56s200 89.72 200 200-89.72 200-200 200zm-32-316v116h-67c0-61.85 50.15-116 115-116 0 0-3.88 0-32 0zm0 152v-24h-67c0-70.69 57.31-132 128-132h88v32h-88c-48.6 0-89.78 33.37-101 78.32 0 0-3.05-.32-27-.32H216z'
+    };
+    
+    const id = `sticker-${Date.now()}`;
+    
+    // Create sticker from SVG path
+    const sticker = new fabric.Path(stickerPaths[stickerType], {
+      id,
+      name: `Sticker: ${stickerType}`,
+      left: canvas.width / 2,
+      top: canvas.height / 2,
+      fill: color,
+      opacity: 0,
+      scaleX: 0.2,
+      scaleY: 0.2,
+      originX: 'center',
+      originY: 'center',
+      stroke: strokeWidth > 0 ? strokeColor : undefined,
+      strokeWidth
+    });
+    
+    canvas.add(sticker);
+    canvas.setActiveObject(sticker);
+    
+    // Animated entrance with bounce
+    const bounceAnimation = () => {
+      let t = 0;
+      const animate = () => {
+        t += 0.05;
+        
+        if (t <= 1) {
+          // Bounce easing function
+          const bounce = function(t) {
+            const a = 4 / 11;
+            const b = 8 / 11;
+            const c = 9 / 10;
+            
+            const ca = 4356 / 361;
+            const cb = 35442 / 1805;
+            const cc = 16061 / 1805;
+            
+            const t2 = t * t;
+            
+            return t < a
+              ? 7.5625 * t2
+              : t < b
+                ? 9.075 * t2 - 9.9 * t + 3.4
+                : t < c
+                  ? ca * t2 - cb * t + cc
+                  : 10.8 * t * t - 20.52 * t + 10.72;
+          };
+          
+          const scale = 0.2 + bounce(t) * 0.8 * (1);
+          const currentOpacity = Math.min(t * 2, 1) * (opacity / 100);
+          
+          sticker.set({
+            scaleX: scale,
+            scaleY: scale,
+            opacity: currentOpacity
+          });
+          
+          canvas.renderAll();
+          requestAnimationFrame(animate);
+        } else {
+          sticker.set({
+            scaleX: 1,
+            scaleY: 1,
+            opacity: opacity / 100
+          });
+          canvas.renderAll();
+          saveToHistory();
+        }
+      };
+      
+      requestAnimationFrame(animate);
+    };
+    
+    bounceAnimation();
+    setSelectedObj(sticker);
+  };
+  
+  // Add image from file
+  const addImageFromFile = (e) => {
+    if (!canvas || !e.target.files[0]) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const imgObj = new Image();
+      imgObj.src = event.target.result;
+      
+      imgObj.onload = function() {
+        const image = new fabric.Image(imgObj, {
+          id: `image-${Date.now()}`,
+          name: `Image: ${e.target.files[0].name}`,
+          left: canvas.width / 2,
+          top: canvas.height / 2,
+          originX: 'center',
+          originY: 'center',
+          opacity: 0
+        });
+        
+        // Scale image to reasonable size if it's too large
+        if (image.width > canvas.width / 2) {
+          const scale = (canvas.width / 2) / image.width;
+          image.scale(scale);
+        }
+        
+        canvas.add(image);
+        canvas.setActiveObject(image);
+        
+        // Animated entrance
+        (function fadeIn() {
+          image.set('opacity', image.opacity + 0.1);
+          canvas.renderAll();
+          if (image.opacity < opacity / 100) {
+            requestAnimationFrame(fadeIn);
+          } else {
+            image.set('opacity', opacity / 100);
+            canvas.renderAll();
+            saveToHistory();
+          }
+        })();
+        
+        setSelectedObj(image);
+      };
+    };
+    
+    reader.readAsDataURL(e.target.files[0]);
+  };
+  
+  // Apply a template 
+  const applyTemplate = (template) => {
+    if (!canvas) return;
+    
+    // Clear canvas first with animation
+    const objects = [...canvas.getObjects()];
+    let fadeOutCounter = objects.length;
+    
+    // If no objects on canvas, just create the template
+    if (objects.length === 0) {
+      createTemplateObjects(template);
+      return;
+    }
+    
+    // Fade out all existing objects
+    objects.forEach(obj => {
+      (function fadeOut() {
+        obj.set('opacity', obj.opacity - 0.1);
+        canvas.renderAll();
+        
+        if (obj.opacity <= 0) {
+          canvas.remove(obj);
+          fadeOutCounter--;
+          
+          // When all objects are removed, create the new template
+          if (fadeOutCounter === 0) {
+            createTemplateObjects(template);
+          }
+        } else {
+          requestAnimationFrame(fadeOut);
+        }
+      })();
+    });
+  };
+  
+  // Helper function to create template objects
+  const createTemplateObjects = (template) => {
+    // Set properties from template
+    setText(text || "Sample Text");
+    setFont(template.font);
+    setFontSize(template.fontSize);
+    setColor(template.color);
+    setTextEffect(template.effect);
+    setStrokeWidth(template.strokeWidth || 0);
+    
+    // Create text object with template settings
+    const textObj = new fabric.Text(text || "Sample Text", {
+      id: `text-${Date.now()}`,
+      name: `Template Text`,
+      fill: template.color,
+      fontFamily: template.font,
+      left: canvas.width / 2,
+      top: canvas.height / 2,
+      fontSize: template.fontSize,
+      opacity: 0,
+      originX: 'center',
+      originY: 'center',
+      stroke: template.strokeWidth > 0 ? strokeColor : undefined,
+      strokeWidth: template.strokeWidth
+    });
+    
+    // Apply template effect
+    applyTextEffect(textObj, template.effect);
+    
+    canvas.add(textObj);
+    canvas.setActiveObject(textObj);
+    
+    // Animated entrance
+    (function fadeIn() {
+      textObj.set('opacity', textObj.opacity + 0.1);
+      canvas.renderAll();
+      if (textObj.opacity < opacity / 100) {
+        requestAnimationFrame(fadeIn);
+      } else {
+        textObj.set('opacity', opacity / 100);
+        canvas.renderAll();
+        saveToHistory();
+      }
+    })();
+    
+    setSelectedObj(textObj);
+  };
+  
+  // Export canvas as image
+  const exportImage = () => {
+    if (!canvas) return;
+    
+    // Add visual feedback animation for export
+    canvas.getObjects().forEach(obj => {
+      const originalOpacity = obj.opacity;
+      const originalScaleX = obj.scaleX;
+      const originalScaleY = obj.scaleY;
+      
+      // Flash effect
+      obj.set({
+        opacity: 1,
+        scaleX: originalScaleX * 1.05,
+        scaleY: originalScaleY * 1.05
+      });
+      
+      canvas.renderAll();
+      
+      // Reset after flash
+      setTimeout(() => {
+        obj.set({
+          opacity: originalOpacity,
+          scaleX: originalScaleX,
+          scaleY: originalScaleY
+        });
+        
+        canvas.renderAll();
+        
+        // Now export the image
+        window.open(canvas.toDataURL({ format: "png" }), "_blank");
+      }, 150);
+    });
+  };
+  
+  // Save current design to saved designs
+  const saveCurrentDesign = () => {
+    if (!canvas) return;
+    
+    const designThumb = canvas.toDataURL({ 
+      format: "png",
+      multiplier: 0.3 // Smaller thumbnail
+    });
+    
+    const designData = {
+      id: Date.now(),
+      name: currentDesignName,
+      thumbnail: designThumb,
+      canvasJson: JSON.stringify(canvas.toJSON(['id'])),
+      createdAt: new Date().toISOString()
+    };
+    
+    setSavedDesigns(prev => [...prev, designData]);
+  };
+  
+  // Load saved design
+  const loadSavedDesign = (designData) => {
+    if (!canvas) return;
+    
+    // Clear canvas first
+    canvas.clear();
+    
+    // Load the saved design
+    canvas.loadFromJSON(JSON.parse(designData.canvasJson), () => {
+      canvas.renderAll();
+      setCurrentDesignName(designData.name);
+      updateLayers(canvas);
+      setSelectedObj(null);
+      saveToHistory();
+    });
+  };
+  
+  // Toggle layer visibility
+  const toggleLayerVisibility = (layerId) => {
+    if (!canvas) return;
+    
+    const objects = canvas.getObjects();
+    const targetObj = objects.find(obj => obj.id === layerId);
+    
+    if (targetObj) {
+      targetObj.set('visible', !targetObj.visible);
+      canvas.renderAll();
+      updateLayers(canvas);
+    }
+  };
+  
+  // Lock/unlock layer
+  const toggleLayerLock = (layerId) => {
+    if (!canvas) return;
+    
+    const objects = canvas.getObjects();
+    const targetObj = objects.find(obj => obj.id === layerId);
+    
+    if (targetObj) {
+      targetObj.set('selectable', !targetObj.selectable);
+      canvas.renderAll();
+      updateLayers(canvas);
+    }
+  };
+  
+  // Reorder layers (move up)
+  const moveLayerUp = (layerId) => {
+    if (!canvas) return;
+    
+    const objects = canvas.getObjects();
+    const index = objects.findIndex(obj => obj.id === layerId);
+    
+    if (index > 0) {
+      canvas.bringForward(objects[index]);
+      canvas.renderAll();
+      updateLayers(canvas);
+      saveToHistory();
+    }
+  };
+  
+  // Reorder layers (move down)
+  const moveLayerDown = (layerId) => {
+    if (!canvas) return;
+    
+    const objects = canvas.getObjects();
+    const index = objects.findIndex(obj => obj.id === layerId);
+    
+    if (index < objects.length - 1) {
+      canvas.sendBackwards(objects[index]);
+      canvas.renderAll();
+      updateLayers(canvas);
+      saveToHistory();
+    }
+  };
+  
+  // Switch between front/back view
+  const switchView = (newView) => {
+    setView(newView);
+    // In a real app, you might load different canvas content here
+  };
+
+  // Toggle theme
+  const toggleTheme = (newTheme) => {
+    setTheme(newTheme);
+  };
+
+  // Toggle UI mode
+  const toggleUIMode = (newMode) => {
+    setUiMode(newMode);
+  };
+
+  // Main component rendering with modern UI
+  return (
+    <div className={`flex h-screen ${theme === 'Dark' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'} overflow-hidden`}>
+      {/* Modern Toolbar with glass morphism */}
+      <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 flex items-center rounded-full px-2 py-1 ${theme === 'Dark' ? 'bg-gray-800/80 shadow-dark' : 'bg-white/80 shadow-lg'} backdrop-blur-md border border-gray-200/20`}>
+        <div className="flex items-center divide-x divide-gray-300">
+          <div className="flex items-center px-3">
+            <button 
+              className="mr-2 w-3 h-3 rounded-full bg-red-500"
+              onClick={() => window.location.reload()}
+              title="Reload Application"
+            />
+            <button 
+              className="mr-2 w-3 h-3 rounded-full bg-yellow-500"
+              onClick={() => canvas && canvas.clear() && saveToHistory()}
+              title="Clear Canvas"
+            />
+            <button 
+              className="w-3 h-3 rounded-full bg-green-500"
+              onClick={saveCurrentDesign}
+              title="Save Design"
+            />
+          </div>
+          
+          <div className="px-3 flex items-center">
+            <button 
+              className={`px-3 py-1 text-sm rounded-full ${view === 'Front' ? theme === 'Dark' ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}
+              onClick={() => switchView('Front')}
+            >
+              Front
+            </button>
+            <button 
+              className={`px-3 py-1 text-sm rounded-full ml-1 ${view === 'Back' ? theme === 'Dark' ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}
+              onClick={() => switchView('Back')}
+            >
+              Back
+            </button>
+          </div>
+          
+          <div className="px-3 flex items-center">
+            <button 
+              className="p-1 rounded-md hover:bg-gray-100/50"
+              onClick={() => handleZoomChange(Math.max(10, zoom - 10))}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4" />
+              </svg>
+            </button>
+
+            <div className="font-medium mx-2 text-sm">{zoom}%</div>
+
+            <button 
+              className="p-1 rounded-md hover:bg-gray-100/50"
+              onClick={() => handleZoomChange(Math.min(200, zoom + 10))}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="px-3">
+            <button 
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm px-4 py-1 rounded-full hover:shadow-md transition"
+              onClick={exportImage}
+            >
+              Export
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
