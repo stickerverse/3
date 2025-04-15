@@ -84,6 +84,50 @@ export default function SystemFontBrowser({ onClose, onFontSelected, currentFont
   const handleLoadMore = () => {
     setCurrentPage(currentPage + 1);
   };
+  
+  // Handle scroll to load more fonts
+  useEffect(() => {
+    if (!containerRef.current || missingFontsFolder || isLoading) return;
+    
+    // Create a debounce function for scroll events
+    let scrollTimeout: NodeJS.Timeout | null = null;
+    
+    const handleScroll = () => {
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+      
+      scrollTimeout = setTimeout(() => {
+        const container = containerRef.current;
+        if (!container) return;
+        
+        const { scrollTop, scrollHeight, clientHeight } = container;
+        
+        // If scrolled to bottom - 100px, load more fonts
+        if (scrollHeight - scrollTop <= clientHeight + 100) {
+          console.log("System fonts scroll triggered loading more fonts");
+          
+          // Check if we have more fonts to load
+          if (endIndex < filteredFonts.length) {
+            setCurrentPage(prevPage => prevPage + 1);
+          }
+        }
+      }, 150); // Small debounce for performance
+    };
+    
+    const container = containerRef.current;
+    container.addEventListener('scroll', handleScroll);
+    
+    // Initial check - in case the container isn't scrollable yet
+    setTimeout(handleScroll, 500);
+    
+    return () => {
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, [endIndex, filteredFonts.length, isLoading, missingFontsFolder]);
 
   return (
     <div className="w-full">
@@ -121,7 +165,10 @@ export default function SystemFontBrowser({ onClose, onFontSelected, currentFont
             />
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[300px] overflow-y-auto p-1">
+          <div 
+            ref={containerRef}
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[380px] overflow-y-auto p-1 rounded-lg"
+          >
             {fontsToDisplay.length === 0 ? (
               <div className="col-span-full text-center p-4 text-muted-foreground">
                 No fonts match your search
@@ -147,13 +194,14 @@ export default function SystemFontBrowser({ onClose, onFontSelected, currentFont
                 </div>
               ))
             )}
+            
+            {/* Show loading indicator at the bottom while more fonts are available */}
+            {filteredFonts.length > fontsToDisplay.length && (
+              <div className="col-span-full flex justify-center py-2">
+                <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full"></div>
+              </div>
+            )}
           </div>
-
-          {filteredFonts.length > fontsPerPage && (
-            <button onClick={handleLoadMore} className="mt-2 block mx-auto px-4 py-2 bg-primary text-white rounded">
-              Load More ({fontsToDisplay.length} of {filteredFonts.length})
-            </button>
-          )}
 
           {loadComplete && (
             <div className="text-xs text-muted-foreground text-center mt-2">

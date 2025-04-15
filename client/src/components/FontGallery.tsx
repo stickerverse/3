@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import googleFontsService from "../lib/googleFontsService";
-import githubFontService from "../lib/githubFontService";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, Github, HardDrive } from "lucide-react";
+import { Search, Filter, HardDrive } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SystemFontBrowser from "./SystemFontBrowser";
 
@@ -145,32 +144,7 @@ export default function FontGallery({
     setIsLoading(true);
 
     const loadCategoryFonts = async () => {
-      // Handle special categories first
-      if (activeCategory === "github") {
-        try {
-          // Load fonts from GitHub if they haven't been loaded yet
-          if (!categories['github'] || categories['github'].length === 0) {
-            // Load fonts from GitHub repo
-            const githubFonts = await githubFontService.loadFontsFromGitHub("stickerverse/Fonts1");
-
-            // Update categories with GitHub fonts
-            const updatedCategories = { ...categories, github: githubFonts };
-            setCategories(updatedCategories);
-
-            // Display GitHub fonts
-            setDisplayFonts(githubFonts);
-          } else {
-            // Display GitHub fonts from cache
-            setDisplayFonts(categories['github']);
-          }
-        } catch (error) {
-          console.error("Error loading GitHub fonts:", error);
-          setDisplayFonts([]);
-        } finally {
-          setIsLoading(false);
-        }
-        return; // Exit early
-      }
+      // GitHub fonts category was removed
 
       // Handle system fonts category
       if (activeCategory === "system") {
@@ -391,10 +365,7 @@ export default function FontGallery({
           <TabsTrigger value="all" onClick={() => handleCategoryChange("all")}>
             All Fonts
           </TabsTrigger>
-          <TabsTrigger value="github" onClick={() => handleCategoryChange("github")}>
-            <Github className="h-4 w-4 mr-1" />
-            GitHub Fonts
-          </TabsTrigger>
+          {/* GitHub Fonts tab removed */}
           <TabsTrigger value="sans-serif" onClick={() => handleCategoryChange("sans-serif")}>
             Sans Serif
           </TabsTrigger>
@@ -466,8 +437,7 @@ export default function FontGallery({
                     style={{ 
                       fontFamily: (googleFontsService.isFontLoaded(font) || categories['github']?.includes(font))
                         ? `"${font}", sans-serif` 
-                        : 'system-ui, sans-serif',
-                      fontDisplay: 'swap'
+                        : 'system-ui, sans-serif'
                     }}
                     className={`
                       inline-block transition-all duration-300
