@@ -33,6 +33,66 @@ export async function registerRoutes(app: express.Express): Promise<Server> {
       res.status(500).send("Error loading font previewer");
     }
   });
+  
+  // Add an endpoint to scan fonts directory and generate metadata
+  app.post("/api/scan-fonts", (req, res) => {
+    console.log("Received request to scan fonts directory");
+    
+    // Path to the script
+    const scriptPath = path.resolve(import.meta.dirname, "..", "scan-fonts.js");
+    
+    if (!fs.existsSync(scriptPath)) {
+      console.error("Error: scan-fonts.js not found at", scriptPath);
+      return res.status(404).json({ error: "Font scanner script not found" });
+    }
+    
+    try {
+      // Execute the script
+      exec(`node ${scriptPath}`, (error, stdout, stderr) => {
+        if (error) {
+          console.error("Error executing font scan script:", error);
+          return res.status(500).json({ error: "Failed to scan fonts", details: error.message });
+        }
+        
+        if (stderr) {
+          console.error("Font scan script stderr:", stderr);
+        }
+        
+        console.log("Font scan stdout:", stdout);
+        
+        // Copy the generated fonts.json to the public directory
+        const fontJsonPath = path.resolve(import.meta.dirname, "..", "fonts.json");
+        const publicFontJsonPath = path.resolve(import.meta.dirname, "..", "public", "fonts.json");
+        
+        if (fs.existsSync(fontJsonPath)) {
+          fs.copyFileSync(fontJsonPath, publicFontJsonPath);
+          console.log("Copied fonts.json to public folder");
+        }
+        
+        // Check if fonts-metadata.json exists and also copy it
+        const fontMetadataPath = path.resolve(import.meta.dirname, "..", "fonts-metadata.json");
+        const publicFontMetadataPath = path.resolve(import.meta.dirname, "..", "public", "fonts-metadata.json");
+        
+        if (fs.existsSync(fontMetadataPath)) {
+          fs.copyFileSync(fontMetadataPath, publicFontMetadataPath);
+          console.log("fonts-metadata.json already exists in public folder");
+        } else {
+          console.log("fonts-metadata.json not found after scan");
+        }
+        
+        // Return success response
+        res.json({ 
+          success: true, 
+          message: "Font scan completed successfully",
+          fontCount: fs.existsSync(publicFontJsonPath) ? 
+            JSON.parse(fs.readFileSync(publicFontJsonPath, 'utf-8')).length : 0
+        });
+      });
+    } catch (error) {
+      console.error("Error initiating font scan:", error);
+      res.status(500).json({ error: "Failed to initiate font scan" });
+    }
+  });
 
   // Serve fonts
   app.use("/fonts", express.static(path.resolve(import.meta.dirname, "..", "fonts")));

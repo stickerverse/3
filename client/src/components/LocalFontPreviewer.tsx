@@ -25,16 +25,20 @@ export default function LocalFontPreviewer({
       setIsLoading(true);
       try {
         // Explicitly run the font scan to ensure fonts are loaded
-        const scanResponse = await fetch('/api/scan-fonts', { method: 'POST' });
-        if (!scanResponse.ok) {
-          console.warn('Font scan request failed, will try to use existing data');
+        try {
+          const scanResponse = await fetch('/api/scan-fonts', { method: 'POST' });
+          if (!scanResponse.ok) {
+            console.warn('Font scan request failed, will try to use existing data');
+          }
+        } catch (scanError) {
+          console.warn('Font scan endpoint not available, will try to use existing data');
         }
         
         // Load system fonts - this also loads the fonts.json file
         await googleFontsService.loadSystemFontsFromJson();
         
-        // Get the fonts
-        const systemFonts = googleFontsService.getFontsByCategory('system');
+        // Get the fonts - make sure we're using a synchronous method here, not a Promise
+        const systemFonts = googleFontsService.categories['system'] || [];
         console.log('Loading system fonts from fonts.json...');
         
         if (systemFonts && systemFonts.length > 0) {
