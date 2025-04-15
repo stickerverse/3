@@ -44,7 +44,7 @@ export default function VinylPropertiesDialog({
     initialDimensions || { width: 100, height: 100 }
   );
   const [useCustomDimensions, setUseCustomDimensions] = useState<boolean>(!!initialDimensions && !initialSizeId);
-  
+
   const { toast } = useToast();
 
   // Reset form when dialog opens with new initialValues
@@ -95,7 +95,7 @@ export default function VinylPropertiesDialog({
       materialId: selectedMaterialId,
       dimensions: useCustomDimensions ? customDimensions : null
     });
-    
+
     onClose();
   };
 
@@ -105,7 +105,7 @@ export default function VinylPropertiesDialog({
         <DialogHeader>
           <DialogTitle>Vinyl Properties</DialogTitle>
           <DialogDescription>
-            Configure the size and material for your vinyl design
+            Configure the size and material for your vinyl design.
           </DialogDescription>
         </DialogHeader>
 
@@ -114,7 +114,7 @@ export default function VinylPropertiesDialog({
             <TabsTrigger value="size">Size</TabsTrigger>
             <TabsTrigger value="material">Material</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="size" className="mt-4">
             <div className="mb-6">
               <VinylSizeSelector 
@@ -162,7 +162,7 @@ export default function VinylPropertiesDialog({
               )}
             </div>
           </TabsContent>
-          
+
           <TabsContent value="material" className="mt-4">
             <VinylMaterialSelector 
               selectedMaterialId={selectedMaterialId}
