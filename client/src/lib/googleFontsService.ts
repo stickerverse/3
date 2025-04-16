@@ -475,6 +475,43 @@ class GoogleFontsService {
   isLocalFont(fontFamily: string): boolean {
     return this.categories['local']?.includes(fontFamily) || false;
   }
+  
+  /**
+   * Get the category of a font
+   * @param fontFamily The font family name
+   * @returns The category name or null if not found
+   */
+  getFontCategory(fontFamily: string): string | null {
+    // Check in all font categories
+    for (const [category, fonts] of Object.entries(this.categories)) {
+      if (fonts.includes(fontFamily)) {
+        return category;
+      }
+    }
+    
+    // Check the font cache for Google fonts
+    if (this.fontCache?.fonts) {
+      const fontData = this.fontCache.fonts.find((font: any) => 
+        font.family === fontFamily
+      );
+      if (fontData?.category) {
+        return fontData.category;
+      }
+    }
+    
+    return null;
+  }
+  
+  /**
+   * Get all available font categories
+   * @returns Array of category names
+   */
+  getFontCategories(): string[] {
+    return Object.keys(this.categories).filter(c => 
+      // Only return categories that have fonts
+      this.categories[c] && this.categories[c].length > 0
+    );
+  }
 
   /**
    * Get the URL for a local font
