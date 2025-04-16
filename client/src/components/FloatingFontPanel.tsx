@@ -1,11 +1,15 @@
-import React, { useState, useRef, useEffect } from "react";
-import { X, Minimize2, Maximize2, PanelLeft, AlignJustify } from "lucide-react";
+import React, { useState } from "react";
+import { 
+  TypeIcon, PaintBucket, Layers, Settings, Image, TextIcon, Wand2,
+  ChevronLeft, ChevronRight, Search, Home
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 import LocalFontPreviewer from '@/components/LocalFontPreviewer';
 import FontComparison from '@/components/FontComparison';
 import FontGallery from '@/components/FontGallery';
-import SystemFontBrowser from '@/components/SystemFontBrowser';
 
 interface FloatingFontPanelProps {
   onFontSelected: (fontFamily: string) => void;
@@ -16,147 +20,165 @@ export default function FloatingFontPanel({
   onFontSelected,
   currentFont
 }: FloatingFontPanelProps) {
+  // States for navigation and panel control
   const [isExpanded, setIsExpanded] = useState(true);
-  const [isDocked, setIsDocked] = useState(true);
-  const [position, setPosition] = useState({ x: 20, y: 60 });
-  const [dragging, setDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [activeTab, setActiveTab] = useState("local");
-  const panelRef = useRef<HTMLDivElement>(null);
+  const [activeMainTab, setActiveMainTab] = useState<string>("fonts");
+  const [activeFontTab, setActiveFontTab] = useState<string>("local");
+  const [searchQuery, setSearchQuery] = useState("");
   
-  // Toggle between docked and floating modes
-  const toggleDock = () => {
-    setIsDocked(!isDocked);
-    // When undocking, position the panel in a sensible location
-    if (isDocked) {
-      setPosition({ x: 20, y: 60 });
-    }
-  };
-  
-  // Minimize/Expand the panel
-  const toggleExpand = () => {
+  // Toggle expanded/collapsed state
+  const toggleSidebar = () => {
     setIsExpanded(!isExpanded);
   };
   
-  // Handle the start of dragging
-  const handleDragStart = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isDocked) return;
-    
-    setDragging(true);
-    if (panelRef.current) {
-      const rect = panelRef.current.getBoundingClientRect();
-      setDragOffset({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      });
-    }
-  };
-  
-  // Handle dragging motion
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (dragging && !isDocked) {
-        setPosition({
-          x: e.clientX - dragOffset.x,
-          y: e.clientY - dragOffset.y
-        });
-      }
-    };
-    
-    const handleMouseUp = () => {
-      setDragging(false);
-    };
-    
-    if (dragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-    
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [dragging, dragOffset, isDocked]);
+  // Main navigation tabs
+  const mainTabs = [
+    { id: "home", label: "Home", icon: <Home className="w-5 h-5" /> },
+    { id: "fonts", label: "Fonts", icon: <TypeIcon className="w-5 h-5" /> },
+    { id: "colors", label: "Colors", icon: <PaintBucket className="w-5 h-5" /> },
+    { id: "layers", label: "Layers", icon: <Layers className="w-5 h-5" /> },
+    { id: "images", label: "Images", icon: <Image className="w-5 h-5" /> },
+    { id: "text", label: "Text", icon: <TextIcon className="w-5 h-5" /> },
+    { id: "effects", label: "Effects", icon: <Wand2 className="w-5 h-5" /> },
+    { id: "settings", label: "Settings", icon: <Settings className="w-5 h-5" /> },
+  ];
 
   return (
-    <div 
-      ref={panelRef}
-      className={`
-        ${isDocked 
-          ? "fixed right-0 top-[60px] bottom-0 w-[280px] border-l border-gray-200 dark:border-gray-800" 
-          : "fixed shadow-lg rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden"}
-        ${dragging ? "pointer-events-none" : ""}
-        bg-gray-50 dark:bg-gray-900 z-40 transition-all
-      `}
-      style={!isDocked ? {
-        width: isExpanded ? "280px" : "auto",
-        height: isExpanded ? "450px" : "auto",
-        top: `${position.y}px`,
-        left: `${position.x}px`,
-      } : {}}
-    >
-      {/* Panel Header */}
-      <div 
-        className="bg-white dark:bg-gray-800 p-2 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 cursor-move"
-        onMouseDown={handleDragStart}
-      >
-        <div className="text-sm font-medium flex items-center">
-          <span className="ml-1">Font Selector</span>
-        </div>
-        <div className="flex gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6"
-            onClick={toggleDock}
-          >
-            {isDocked ? <PanelLeft className="h-3.5 w-3.5" /> : <AlignJustify className="h-3.5 w-3.5" />}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6"
-            onClick={toggleExpand}
-          >
-            {isExpanded ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
-          </Button>
+    <div className="fixed right-0 top-[60px] bottom-0 flex h-[calc(100vh-60px)] z-40">
+      {/* Main Navigation Tabs */}
+      <div className="bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 py-2">
+        <div className="flex flex-col items-center space-y-1">
+          {mainTabs.map(tab => (
+            <Button
+              key={tab.id}
+              variant={activeMainTab === tab.id ? "secondary" : "ghost"}
+              size="icon"
+              className={cn(
+                "w-10 h-10 rounded-lg",
+                activeMainTab === tab.id && "bg-gray-100 dark:bg-gray-700"
+              )}
+              onClick={() => setActiveMainTab(tab.id)}
+              title={tab.label}
+            >
+              {tab.icon}
+            </Button>
+          ))}
         </div>
       </div>
       
-      {/* Panel Content */}
+      {/* Collapsible Toggle Button */}
+      <div className="relative">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          className="absolute -left-4 top-1/2 transform -translate-y-1/2 w-4 h-16 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-l-md z-50"
+        >
+          {isExpanded ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
+        </Button>
+      </div>
+      
+      {/* Content Panel based on active main tab */}
       {isExpanded && (
-        <div className="p-2 h-[calc(100%-40px)] overflow-auto">
-          <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-3 mb-2">
-              <TabsTrigger value="local">Local</TabsTrigger>
-              <TabsTrigger value="google">Google</TabsTrigger>
-              <TabsTrigger value="compare">Compare</TabsTrigger>
-            </TabsList>
+        <div className={`bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 w-[350px] transition-all duration-300 overflow-hidden flex flex-col`}>
+          {/* Panel Header - changes based on active tab */}
+          <div className="border-b border-gray-200 dark:border-gray-700 p-3">
+            <h2 className="text-lg font-medium">{mainTabs.find(t => t.id === activeMainTab)?.label}</h2>
+            {activeMainTab === "fonts" && (
+              <div className="relative mt-2">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search fonts..."
+                  className="pl-8"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            )}
+          </div>
+          
+          {/* Panel Content - changes based on active tab */}
+          <div className="flex-1 overflow-auto">
+            {activeMainTab === "fonts" && (
+              <Tabs 
+                defaultValue={activeFontTab} 
+                onValueChange={setActiveFontTab} 
+                className="w-full h-full"
+              >
+                <div className="px-4 pt-3">
+                  <TabsList className="grid grid-cols-3 w-full">
+                    <TabsTrigger value="local">Local</TabsTrigger>
+                    <TabsTrigger value="google">Google</TabsTrigger>
+                    <TabsTrigger value="compare">Compare</TabsTrigger>
+                  </TabsList>
+                </div>
+                
+                <div className="p-4 h-[calc(100%-60px)]">
+                  <TabsContent value="local" className="h-full mt-0 overflow-auto">
+                    <LocalFontPreviewer 
+                      onFontSelected={onFontSelected}
+                      currentFont={currentFont}
+                      previewText="Aa Bb Cc 123"
+                    />
+                  </TabsContent>
+                  
+                  <TabsContent value="google" className="h-full mt-0 overflow-auto">
+                    <FontGallery 
+                      currentFont={currentFont || "Roboto"}
+                      onFontSelected={onFontSelected}
+                      sampleText="Aa Bb Cc 123"
+                      visible={activeFontTab === "google"}
+                    />
+                  </TabsContent>
+                  
+                  <TabsContent value="compare" className="h-full mt-0 overflow-auto">
+                    <FontComparison 
+                      currentFont={currentFont} 
+                      onFontSelected={onFontSelected}
+                    />
+                  </TabsContent>
+                </div>
+              </Tabs>
+            )}
             
-            <TabsContent value="local" className="h-[calc(100%-40px)] overflow-auto">
-              <LocalFontPreviewer 
-                onFontSelected={onFontSelected}
-                currentFont={currentFont}
-                previewText="Aa Bb Cc 123"
-              />
-            </TabsContent>
+            {activeMainTab === "home" && (
+              <div className="p-4">
+                <h3 className="font-medium mb-2">Welcome!</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Select the Fonts tab to choose from local or Google fonts for your design.
+                </p>
+              </div>
+            )}
             
-            <TabsContent value="google" className="h-[calc(100%-40px)] overflow-auto">
-              <FontGallery 
-                currentFont={currentFont || "Roboto"}
-                onFontSelected={onFontSelected}
-                sampleText="Aa Bb Cc 123"
-                visible={activeTab === "google"}
-              />
-            </TabsContent>
+            {activeMainTab === "colors" && (
+              <div className="p-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Color tools will appear here. Select a text object first.
+                </p>
+              </div>
+            )}
             
-            <TabsContent value="compare" className="h-[calc(100%-40px)] overflow-auto">
-              <FontComparison 
-                currentFont={currentFont} 
-                onFontSelected={onFontSelected}
-              />
-            </TabsContent>
-          </Tabs>
+            {(activeMainTab !== "fonts" && activeMainTab !== "home" && activeMainTab !== "colors") && (
+              <div className="p-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {mainTabs.find(t => t.id === activeMainTab)?.label} tools will appear here.
+                </p>
+              </div>
+            )}
+          </div>
+          
+          {/* Display current selection information */}
+          {activeMainTab === "fonts" && (
+            <div className="border-t border-gray-200 dark:border-gray-700 p-3">
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                {currentFont ? (
+                  <>Current font: <span className="font-medium">{currentFont}</span></>
+                ) : (
+                  "Select text to apply a font"
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
