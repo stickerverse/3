@@ -205,9 +205,11 @@ export default function FontComparison({
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent 
-          className={isFullScreen ? "max-w-[95vw] w-[95vw] h-[90vh] max-h-[90vh]" : "max-w-4xl"} 
-          aria-describedby="Font comparison tool dialog"
+          className={isFullScreen ? "max-w-[95vw] w-[95vw] h-[90vh] max-h-[90vh]" : "max-w-4xl"}
         >
+          <div id="font-comparison-description" className="sr-only">
+            Font comparison tool for comparing different fonts side by side
+          </div>
           <DialogHeader>
             <div className="flex justify-between items-center">
               <DialogTitle>Font Comparison Tool</DialogTitle>

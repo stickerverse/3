@@ -1,17 +1,7 @@
 [
   {
-    "path": "3d Jigsaw Puzzle Font 1 1.otf",
-    "name": "3d  Jigsaw  Puzzle  Font 1 1",
-    "format": "opentype"
-  },
-  {
     "path": "3d Jigsaw Puzzle Font 2 1.otf",
     "name": "3d  Jigsaw  Puzzle  Font 2 1",
-    "format": "opentype"
-  },
-  {
-    "path": "3d Jigsaw Puzzle Font 3 2.otf",
-    "name": "3d  Jigsaw  Puzzle  Font 3 2",
     "format": "opentype"
   },
   {
@@ -45,11 +35,6 @@
     "format": "truetype"
   },
   {
-    "path": "AlienTwits-zXY4.ttf",
-    "name": "Alien Twits z X Y4",
-    "format": "truetype"
-  },
-  {
     "path": "Aliensy.otf",
     "name": "Aliensy",
     "format": "opentype"
@@ -58,146 +43,6 @@
     "path": "Aliensy.ttf",
     "name": "Aliensy",
     "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-Black.ttf",
-    "name": "Aloeveradisplaycondensed  Black",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-BlackItalic.ttf",
-    "name": "Aloeveradisplaycondensed  Black Italic",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-Bold.ttf",
-    "name": "Aloeveradisplaycondensed  Bold",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-BoldItalic.ttf",
-    "name": "Aloeveradisplaycondensed  Bold Italic",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-ELightItalic.ttf",
-    "name": "Aloeveradisplaycondensed  E Light Italic",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-ExBoldItalic.ttf",
-    "name": "Aloeveradisplaycondensed  Ex Bold Italic",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-ExtraBold.ttf",
-    "name": "Aloeveradisplaycondensed  Extra Bold",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-ExtraLight.ttf",
-    "name": "Aloeveradisplaycondensed  Extra Light",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-Light.ttf",
-    "name": "Aloeveradisplaycondensed  Light",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-Lightitalic.ttf",
-    "name": "Aloeveradisplaycondensed  Lightitalic",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-Medium.ttf",
-    "name": "Aloeveradisplaycondensed  Medium",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-MediumItalic.ttf",
-    "name": "Aloeveradisplaycondensed  Medium Italic",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-Regular.ttf",
-    "name": "Aloeveradisplaycondensed  Regular",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-RegularItalic.ttf",
-    "name": "Aloeveradisplaycondensed  Regular Italic",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-SBoldItalic.ttf",
-    "name": "Aloeveradisplaycondensed  S Bold Italic",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-SemiBold.ttf",
-    "name": "Aloeveradisplaycondensed  Semi Bold",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-Thin.ttf",
-    "name": "Aloeveradisplaycondensed  Thin",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplaycondensed-ThinItalic.ttf",
-    "name": "Aloeveradisplaycondensed  Thin Italic",
-    "format": "truetype"
-  },
-  {
-    "path": "Aloeveradisplayoutline-BlackItalic.otf",
-    "name": "Aloeveradisplayoutline  Black Italic",
-    "format": "opentype"
-  },
-  {
-    "path": "Aloeveradisplayoutline-BoldItalic.otf",
-    "name": "Aloeveradisplayoutline  Bold Italic",
-    "format": "opentype"
-  },
-  {
-    "path": "Aloeveradisplayoutline-ELightItalic.otf",
-    "name": "Aloeveradisplayoutline  E Light Italic",
-    "format": "opentype"
-  },
-  {
-    "path": "Aloeveradisplayoutline-ExtraBoldItalic.otf",
-    "name": "Aloeveradisplayoutline  Extra Bold Italic",
-    "format": "opentype"
-  },
-  {
-    "path": "Aloeveradisplayoutline-LightItalic.otf",
-    "name": "Aloeveradisplayoutline  Light Italic",
-    "format": "opentype"
-  },
-  {
-    "path": "Aloeveradisplayoutline-MediumItalic.otf",
-    "name": "Aloeveradisplayoutline  Medium Italic",
-    "format": "opentype"
-  },
-  {
-    "path": "Aloeveradisplayoutline-RegularItalic.otf",
-    "name": "Aloeveradisplayoutline  Regular Italic",
-    "format": "opentype"
-  },
-  {
-    "path": "Aloeveradisplayoutline-SemiBoldItalic.otf",
-    "name": "Aloeveradisplayoutline  Semi Bold Italic",
-    "format": "opentype"
-  },
-  {
-    "path": "Aloeveradisplayoutline-ThinItalic.otf",
-    "name": "Aloeveradisplayoutline  Thin Italic",
-    "format": "opentype"
-  },
-  {
-    "path": "Alphabet Blocks.otf",
-    "name": "Alphabet  Blocks",
-    "format": "opentype"
   },
   {
     "path": "American Flag.otf",
