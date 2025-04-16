@@ -11,6 +11,7 @@ import Toolbar from "@/components/Toolbar";
 import FontShowcase from "@/components/FontShowcase"; 
 import FontCarouselPicker from "@/components/FontCarouselPicker";
 import FloatingFontPanel from "@/components/FloatingFontPanel";
+import FontPreviewGrid from "@/components/FontPreviewGrid";
 
 import StandaloneFontPreviewer from '@/components/StandaloneFontPreviewer'; 
 import googleFontsService from "@/lib/googleFontsService";
@@ -236,11 +237,20 @@ export default function DesignWorkspace({
         </div>
       </div>
 
-      {/* We've removed static font sections and replaced with floating panel */}
+      {/* Tabbed sidebar panel */}
       <FloatingFontPanel 
         onFontSelected={handleFontSelection}
         currentFont={getCurrentFont() || ""}
       />
+      
+      {/* Font preview grid below the canvas */}
+      <div className="p-4">
+        <FontPreviewGrid
+          onFontSelected={handleFontSelection}
+          currentFont={getCurrentFont() || ""}
+          previewText={selectedObj && selectedObj.type === 'text' ? (selectedObj as fabric.Text).text.substring(0, 2) : "Aa"}
+        />
+      </div>
 
       <div className="bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 px-4 py-1 flex justify-between items-center text-xs text-neutral-500 dark:text-neutral-400">
         <div>Size: {canvasSize.width}px × {canvasSize.height}px</div>
