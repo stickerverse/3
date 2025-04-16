@@ -766,6 +766,49 @@ class GoogleFontsService {
   getSystemFonts(): string[] {
     return this.categories['system'] || [];
   }
+  
+  /**
+   * Get detailed information about a font, including available variants
+   * @param fontFamily The font family name
+   * @returns Font information including variants, or null if not found
+   */
+  async getFontInfo(fontFamily: string): Promise<{family: string, variants: string[]} | null> {
+    try {
+      // Ensure we have font data loaded
+      await this.fetchGoogleFonts();
+      
+      // First check the font cache
+      if (this.fontCache && this.fontCache.fonts) {
+        const fontData = this.fontCache.fonts.find((font: any) => font.family === fontFamily);
+        if (fontData) {
+          return {
+            family: fontData.family,
+            variants: fontData.variants || ['regular', '700']
+          };
+        }
+      }
+      
+      // If not found in cache, try to request it specifically
+      try {
+        const response = await fetch(`/api/fonts/info?family=${encodeURIComponent(fontFamily)}`);
+        if (response.ok) {
+          const data = await response.json();
+          return data;
+        }
+      } catch (error) {
+        console.error(`Error fetching info for font ${fontFamily}:`, error);
+      }
+      
+      // Fallback to basic info
+      return {
+        family: fontFamily,
+        variants: ['regular', '700'] // Assume regular and bold weights
+      };
+    } catch (error) {
+      console.error(`Error getting font info for ${fontFamily}:`, error);
+      return null;
+    }
+  }
 }
 
 export default new GoogleFontsService();

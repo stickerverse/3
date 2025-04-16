@@ -90,7 +90,7 @@ export default function DesignWorkspace({
     return '';
   }, [canvas]);
 
-  const handleFontSelection = async (fontFamily: string) => {
+  const handleFontSelection = async (fontFamily: string, options?: { weight?: number, isItalic?: boolean, isUnderlined?: boolean }) => {
     const activeObject = canvas?.getActiveObject();
     if (!activeObject || activeObject.type !== 'textbox' && activeObject.type !== 'text') {
       // If no text object is selected, show a notification to the user
@@ -108,18 +108,36 @@ export default function DesignWorkspace({
       }
       
       // Apply the font to the text object with enhanced settings for color fonts
-      (activeObject as fabric.Text).set({
+      const fontOptions: any = {
         fontFamily: fontFamily,
         fill: 'rgba(0,0,0,1)', // Use fully opaque fill to ensure color fonts show properly
         paintFirst: 'fill'
-      });
+      };
+      
+      // Apply weight if specified
+      if (options?.weight) {
+        fontOptions.fontWeight = options.weight;
+      }
+      
+      // Apply italic if specified
+      if (options?.isItalic !== undefined) {
+        fontOptions.fontStyle = options.isItalic ? 'italic' : 'normal';
+      }
+      
+      // Apply underline if specified
+      if (options?.isUnderlined !== undefined) {
+        fontOptions.underline = options.isUnderlined;
+      }
+      
+      // Apply all settings to the text object
+      (activeObject as fabric.Text).set(fontOptions);
       
       // For color fonts, ensure we're using SVG text rendering
       if (activeObject.type === 'text' || activeObject.type === 'textbox') {
         (activeObject as any).setSvgRendering(true);
       }
       
-      console.log(`Applied font: ${fontFamily} to selected text`);
+      console.log(`Applied font: ${fontFamily} to selected text with options:`, options || 'default');
       
       // Re-render the canvas to show the changes
       canvas?.renderAll();

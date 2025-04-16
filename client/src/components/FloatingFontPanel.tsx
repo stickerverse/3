@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Search, Heart, X, Star, Clock, Check, Info } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, Heart, X, Star, Clock, Check, Info, Sliders } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -8,10 +8,11 @@ import { Separator } from "@/components/ui/separator";
 import LocalFontPreviewer from '@/components/LocalFontPreviewer';
 import FontComparison from '@/components/FontComparison';
 import FontGallery from '@/components/FontGallery';
+import FontWeightStylePreview from '@/components/FontWeightStylePreview';
 import googleFontsService from "@/lib/googleFontsService";
 
 interface FloatingFontPanelProps {
-  onFontSelected: (fontFamily: string) => void;
+  onFontSelected: (fontFamily: string, options?: { weight?: number, isItalic?: boolean, isUnderlined?: boolean }) => void;
   currentFont?: string;
 }
 
@@ -120,7 +121,7 @@ export default function FloatingFontPanel({
   };
   
   // Add font to recent fonts when selected
-  const handleFontSelected = (font: string) => {
+  const handleFontSelected = (font: string, options?: { weight?: number, isItalic?: boolean, isUnderlined?: boolean }) => {
     // Add to recent fonts if not already there
     setRecentFonts(prev => {
       const filtered = prev.filter(f => f !== font); // Remove if exists
@@ -128,7 +129,7 @@ export default function FloatingFontPanel({
     });
     
     // Call the original handler
-    onFontSelected(font);
+    onFontSelected(font, options);
   };
   
   // Clear search
@@ -183,11 +184,12 @@ export default function FloatingFontPanel({
               className="w-full h-full"
             >
               <div className="px-4 pt-3">
-                <TabsList className="grid grid-cols-4 w-full">
+                <TabsList className="grid grid-cols-5 w-full">
                   <TabsTrigger value="quick">Quick</TabsTrigger>
                   <TabsTrigger value="browse">Browse</TabsTrigger>
                   <TabsTrigger value="compare">Compare</TabsTrigger>
                   <TabsTrigger value="custom">Custom</TabsTrigger>
+                  <TabsTrigger value="styles"><Sliders className="h-4 w-4" /></TabsTrigger>
                 </TabsList>
               </div>
               
@@ -488,6 +490,41 @@ export default function FloatingFontPanel({
                     currentFont={currentFont}
                     previewText="Aa Bb Cc 123"
                   />
+                </TabsContent>
+                
+                <TabsContent value="styles" className="h-full mt-0 overflow-auto">
+                  {currentFont ? (
+                    <FontWeightStylePreview 
+                      fontFamily={currentFont}
+                      sampleText="The quick brown fox jumps over the lazy dog"
+                      onWeightChange={(weight) => {
+                        // Apply weight change to selected text in canvas
+                        if (onFontSelected && currentFont) {
+                          onFontSelected(currentFont, { weight });
+                        }
+                      }}
+                      onStyleChange={(isItalic) => {
+                        // Apply style change to selected text in canvas
+                        if (onFontSelected && currentFont) {
+                          onFontSelected(currentFont, { isItalic });
+                        }
+                      }}
+                      onUnderlineChange={(isUnderlined) => {
+                        // Apply underline change to selected text in canvas
+                        if (onFontSelected && currentFont) {
+                          onFontSelected(currentFont, { isUnderlined });
+                        }
+                      }}
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                      <Sliders className="h-12 w-12 text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium mb-2">No Font Selected</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Select a text object on the canvas first to adjust its font weight and style.
+                      </p>
+                    </div>
+                  )}
                 </TabsContent>
               </div>
             </Tabs>
